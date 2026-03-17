@@ -1,0 +1,118 @@
+/* ═══════════════════════════════════════════════════
+   Global Styles — FinanceApp Angular
+   ═══════════════════════════════════════════════════ */
+
+/* ── CSS Variables (Light) ── */
+:root {
+  /* Colors */
+  --primary:      #6366f1;
+  --primary-dark: #4f46e5;
+  --success:      #22c55e;
+  --danger:       #ef4444;
+  --warning:      #f59e0b;
+
+  /* Backgrounds */
+  --bg-primary:   #ffffff;
+  --bg-secondary: #f8fafc;
+
+  /* Text */
+  --text-primary:   #0f172a;
+  --text-secondary: #334155;
+  --text-muted:     #64748b;
+
+  /* Border */
+  --border: #e2e8f0;
+
+  /* Skeleton */
+  --skeleton-bg: #e2e8f0;
+
+  /* Scrollbar */
+  --scrollbar-thumb: #cbd5e1;
+}
+
+/* ── CSS Variables (Dark) ── */
+.dark {
+  --primary:      #818cf8;
+  --primary-dark: #6366f1;
+  --success:      #4ade80;
+  --danger:       #f87171;
+  --warning:      #fbbf24;
+
+  --bg-primary:   #1e1e2e;
+  --bg-secondary: #141420;
+
+  --text-primary:   #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted:     #64748b;
+
+  --border: #2d2d3f;
+
+  --skeleton-bg: #2d2d3f;
+
+  --scrollbar-thumb: #3f3f5a;
+}
+
+/* ── Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 0.8; }
+}
+
+/* ── Scrollbars ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 9999px;
+}
+
+/* ── Focus ring ── */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Utility ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}

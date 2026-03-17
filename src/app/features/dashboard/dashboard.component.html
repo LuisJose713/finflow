@@ -1,0 +1,29 @@
+<div class="app-shell">
+  <app-navbar></app-navbar>
+
+  <main class="main-content">
+    <header class="page-header">
+      <div class="header-left">
+        <h1>Dashboard</h1>
+        <p class="greeting">Hola  </p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-export" (click)="exportPdf()">⬇ Exportar PDF</button>
+        <app-add-transaction
+          (created)="onTransactionCreated()"
+        ></app-add-transaction>
+      </div>
+    </header>
+
+    <section class="section">
+      <app-transaction-stats></app-transaction-stats>
+    </section>
+
+    <section class="section grid-two">
+      <app-overview></app-overview>
+      <app-recent-transactions #recentTx></app-recent-transactions>
+    </section>
+  </main>
+
+  <app-toast-container></app-toast-container>
+</div>

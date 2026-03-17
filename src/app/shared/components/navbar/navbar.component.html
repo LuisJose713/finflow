@@ -1,0 +1,27 @@
+<aside class="sidebar" [class.collapsed]="collapsed()">
+  <div class="sidebar-header">
+    <span class="logo">💰</span>
+    <span class="brand" *ngIf="!collapsed()">FinFlow</span>
+    <button class="collapse-btn" (click)="toggleCollapse()">
+      {{ collapsed() ? '→' : '←' }}
+    </button>
+  </div>
+
+  <nav class="nav">
+    <a
+      *ngFor="let item of navItems"
+      [routerLink]="item.path"
+      routerLinkActive="active"
+      class="nav-item"
+      [title]="item.label"
+    >
+      <span class="nav-icon">{{ item.icon }}</span>
+      <span class="nav-label" *ngIf="!collapsed()">{{ item.label }}</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <app-theme-switcher></app-theme-switcher>
+    <app-logout-button *ngIf="!collapsed()"></app-logout-button>
+  </div>
+</aside>

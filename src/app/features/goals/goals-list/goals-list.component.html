@@ -1,0 +1,67 @@
+<div class="app-shell">
+  <app-navbar></app-navbar>
+
+  <main class="main-content">
+    <header class="page-header">
+      <div>
+        <h1>Metas financieras</h1>
+        <p class="subtitle">Rastrea tu progreso hacia tus objetivos</p>
+      </div>
+      <button class="btn-new" (click)="goalForm.open()">+ Nueva meta</button>
+    </header>
+
+
+    <div *ngIf="loading()">
+      <div class="goals-grid">
+        <div class="goal-card skeleton" *ngFor="let i of [1,2,3]"></div>
+      </div>
+    </div>
+
+   
+    <div *ngIf="!loading() && goals().length === 0" class="empty-state">
+      <span class="empty-icon">🎯</span>
+      <h2>Sin metas aún</h2>
+      <p>Crea tu primera meta financiera para comenzar a ahorrar</p>
+      <button class="btn-new" (click)="goalForm.open()">Crear primera meta</button>
+    </div>
+
+
+    <div *ngIf="!loading() && goals().length > 0" class="goals-grid">
+      <div class="goal-card" *ngFor="let goal of goals(); trackBy: trackByGoal" [class]="goal.status">
+        <div class="goal-header">
+          <h3>{{ goal.title }}</h3>
+          <span class="status-badge" [class]="goal.status">{{ statusLabel(goal.status) }}</span>
+        </div>
+
+        <p class="goal-desc" *ngIf="goal.description">{{ goal.description }}</p>
+
+        <div class="progress-section">
+          <div class="amounts">
+            <span class="current">{{ goal.currentAmount | appCurrency }}</span>
+            <span class="separator">/</span>
+            <span class="target">{{ goal.targetAmount | appCurrency }}</span>
+          </div>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              [style.width.%]="progressPct(goal)"
+              [class.completed]="progressPct(goal) >= 100"
+            ></div>
+          </div>
+          <span class="pct">{{ progressPct(goal) | number: '1.0-0' }}%</span>
+        </div>
+
+        <div class="goal-footer">
+          <span class="deadline">📅 {{ goal.deadline | slice:0:10 }}</span>
+          <div class="goal-actions">
+            <button class="btn-icon" (click)="goalForm.open(goal)" title="Editar">✏️</button>
+            <button class="btn-icon danger" (click)="delete(goal)" title="Eliminar">🗑️</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <app-goal-form #goalForm (saved)="load()"></app-goal-form>
+  <app-toast-container></app-toast-container>
+</div>
