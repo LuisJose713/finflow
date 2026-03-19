@@ -5,7 +5,7 @@
     <header class="page-header">
       <div class="header-left">
         <h1>Dashboard</h1>
-        <p class="greeting">Hola  </p>
+        <p class="greeting"> Hola, {{ firstName() || 'Usuario' }} 👋  </p>
       </div>
       <div class="header-actions">
         <button class="btn-export" (click)="exportPdf()">⬇ Exportar PDF</button>

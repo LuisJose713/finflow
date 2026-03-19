@@ -27,21 +27,25 @@ export type TransactionType = 'income' | 'expense';
 
 export interface Transaction {
   id: string;
-  title: string;
+  userId: number;
   amount: number;
   type: TransactionType;
-  category: string;
+  categoryId: number;
+  description: string;
   date: string;
-  description?: string;
+  currency: string;
+  status: string;
+  createdAt: string;
 }
 
 export interface CreateTransactionRequest {
-  title: string;
   amount: number;
   type: TransactionType;
-  category: string;
+  categoryId: number;
+  description: string;
   date: string;
-  description?: string;
+  currency?: string;
+  status?: string;
 }
 
 export interface TransactionStats {
@@ -51,6 +55,12 @@ export interface TransactionStats {
   savingsRate: number;
 }
 
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
 // ─── Goal ──────────────────────────────────────────────────────────────────
 export type GoalStatus = 'active' | 'completed' | 'cancelled';
 
@@ -93,4 +103,12 @@ export interface PaginatedResponse<T> {
   total: number;
   page: number;
   limit: number;
+}
+
+//---- Category -----------------
+
+export interface Category {
+  id: number;
+  name: string;
+  type: string;
 }

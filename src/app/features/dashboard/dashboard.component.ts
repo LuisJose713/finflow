@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild, signal } from '@angular/core';
+import { Component, inject, ViewChild, signal, computed } from '@angular/core';
 import { AuthService } from '../../core/services/auth.service';
 import { ExportPdfService } from '../../core/services/export-pdf.service';
 import { ToastService } from '../../core/services/toast.service';
@@ -34,9 +34,9 @@ export class DashboardComponent {
   user = signal(this.authService.currentUser());
 
   // Getter reactivo para el nombre
-  get firstName() {
-    return this.user()?.name?.split(' ')[0] ?? 'Usuario';
-  }
+  firstName = computed(() => {
+  return this.authService.currentUser()?.name?.split(' ')[0] ?? '';
+});
 
   // Si quieres actualizar el usuario después de login
   refreshUser() {

@@ -1,0 +1,51 @@
+<div class="transactions-card">
+  <div class="card-header">
+    <h2>Transacciones recientes</h2>
+    <span class="badge">Últimas 5</span>
+  </div>
+
+  <ng-container *ngIf="loading()">
+    <div class="list">
+      <div
+        *ngFor="let i of [1, 2, 3, 4, 5]"
+        class="transaction-item skeleton"
+      ></div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!loading() && transactions().length === 0">
+    <div class="empty-state">
+      <p>No hay transacciones aún</p>
+      <small>Agrega tu primera transacción para comenzar</small>
+    </div>
+  </ng-container>
+
+  <ul *ngIf="!loading() && transactions().length > 0" class="list">
+    <li
+      *ngFor="let tx of transactions(); trackBy: trackById"
+      class="transaction-item"
+    >
+      <div class="tx-icon" [class]="tx.type">
+        {{ tx.type === "income" ? "↑" : "↓" }}
+      </div>
+      <div class="tx-info">
+        <span class="tx-title">{{ tx.description }}</span>
+        <span class="tx-meta">
+          {{ tx.categoryId }} · {{ tx.date | date: "dd MMM yyyy" }}
+        </span>
+      </div>
+      <div class="tx-actions">
+        <span
+          class="tx-amount"
+          [class.income]="tx.type === 'income'"
+          [class.expense]="tx.type === 'expense'"
+        >
+          {{ tx.type === "income" ? "+" : "-" }}{{ tx.amount | appCurrency }}
+        </span>
+        <button class="btn-delete" (click)="confirmDelete(tx)" title="Eliminar">
+          ✕
+        </button>
+      </div>
+    </li>
+  </ul>
+</div>
