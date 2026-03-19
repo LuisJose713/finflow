@@ -1,64 +1,133 @@
-.overview-card {
-  background: var(--bg-primary);
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  border: 1px solid var(--border);
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
-}
+// .overview-card {
+//   background: var(--bg-primary);
+//   border-radius: 0.75rem;
+//   padding: 1.5rem;
+//   border: 1px solid var(--border);
+//   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+// }
 
-.card-header {
+// .card-header {
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+//   margin-bottom: 1.5rem;
+
+//   h2 {
+//     font-size: 1rem;
+//     font-weight: 600;
+//     color: var(--text-primary);
+//   }
+// }
+
+// .legend {
+//   display: flex;
+//   gap: 1rem;
+// }
+
+// .legend-item {
+//   font-size: 0.75rem;
+//   font-weight: 500;
+//   padding: 0.25rem 0.625rem;
+//   border-radius: 9999px;
+
+//   &.income {
+//     background: rgba(34, 197, 94, 0.12);
+//     color: var(--success);
+//   }
+
+//   &.expense {
+//     background: rgba(239, 68, 68, 0.12);
+//     color: var(--danger);
+//   }
+// }
+
+// .chart-wrapper {
+//   height: 220px;
+//   position: relative;
+
+//   canvas {
+//     width: 100%;
+//     height: 100%;
+//   }
+// }
+
+// .chart-skeleton {
+//   height: 220px;
+//   border-radius: 0.5rem;
+//   background: var(--skeleton-bg);
+//   animation: pulse 1.5s ease-in-out infinite;
+// }
+
+// @keyframes pulse {
+//   0%, 100% { opacity: 1; }
+//   50% { opacity: 0.4; }
+// }
+
+.filter-btns {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
+  gap: 0.5rem;
 
-  h2 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary);
+  button {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: all 0.2s;
+
+    &:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    &.active:nth-child(1) {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border-color: var(--border);
+    }
+
+    &.active:nth-child(2) {
+      background: rgba(34, 197, 94, 0.12);
+      color: var(--success);
+      border-color: var(--success);
+    }
+
+    &.active:nth-child(3) {
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--danger);
+      border-color: var(--danger);
+    }
   }
 }
 
-.legend {
+.totals {
   display: flex;
   gap: 1rem;
-}
+  margin-bottom: 1.5rem;
 
-.legend-item {
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 0.25rem 0.625rem;
-  border-radius: 9999px;
+  .total {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
 
-  &.income {
-    background: rgba(34, 197, 94, 0.12);
-    color: var(--success);
+    .label {
+      display: block;
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.25rem;
+    }
+
+    .value {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    &.income .value { color: var(--success); }
+    &.expense .value { color: var(--danger); }
   }
-
-  &.expense {
-    background: rgba(239, 68, 68, 0.12);
-    color: var(--danger);
-  }
-}
-
-.chart-wrapper {
-  height: 220px;
-  position: relative;
-
-  canvas {
-    width: 100%;
-    height: 100%;
-  }
-}
-
-.chart-skeleton {
-  height: 220px;
-  border-radius: 0.5rem;
-  background: var(--skeleton-bg);
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
 }

@@ -1,0 +1,58 @@
+<!-- <div class="overview-card">
+      <div class="card-header">
+        <h2>Resumen mensual</h2>
+        <div class="legend">
+          <span class="legend-item income">Ingresos</span>
+          <span class="legend-item expense">Gastos</span>
+        </div>
+      </div>
+
+      @if (loading()) {
+        <div class="chart-skeleton"></div>
+      } @else {
+        <div class="chart-wrapper">
+          <canvas #chartCanvas></canvas>
+        </div>
+    } -->
+
+<div class="overview-card">
+  <div class="card-header">
+    <h2>Resumen mensual</h2>
+    <div class="filter-btns">
+      <button [class.active]="filter() === 'all'" (click)="setFilter('all')">
+        Todo
+      </button>
+      <button
+        [class.active]="filter() === 'income'"
+        (click)="setFilter('income')"
+      >
+        Ingresos
+      </button>
+      <button
+        [class.active]="filter() === 'expense'"
+        (click)="setFilter('expense')"
+      >
+        Egresos
+      </button>
+    </div>
+  </div>
+
+  <div class="totals">
+    <div class="total income">
+      <span class="label">Total ingresos</span>
+      <span class="value">+${{ totalIncome.toLocaleString("es-CO") }}</span>
+    </div>
+    <div class="total expense">
+      <span class="label">Total egresos</span>
+      <span class="value">-${{ totalExpenses.toLocaleString("es-CO") }}</span>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="chart-skeleton"></div>
+  } @else {
+    <div class="chart-wrapper">
+      <canvas #chartCanvas></canvas>
+    </div>
+  }
+</div>
