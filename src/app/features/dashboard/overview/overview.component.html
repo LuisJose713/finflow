@@ -1,58 +1,54 @@
-<!-- <div class="overview-card">
-      <div class="card-header">
-        <h2>Resumen mensual</h2>
-        <div class="legend">
-          <span class="legend-item income">Ingresos</span>
-          <span class="legend-item expense">Gastos</span>
-        </div>
-      </div>
-
-      @if (loading()) {
-        <div class="chart-skeleton"></div>
-      } @else {
-        <div class="chart-wrapper">
-          <canvas #chartCanvas></canvas>
-        </div>
-    } -->
-
 <div class="overview-card">
   <div class="card-header">
     <h2>Resumen mensual</h2>
-    <div class="filter-btns">
-      <button [class.active]="filter() === 'all'" (click)="setFilter('all')">
-        Todo
-      </button>
-      <button
-        [class.active]="filter() === 'income'"
-        (click)="setFilter('income')"
-      >
-        Ingresos
-      </button>
-      <button
-        [class.active]="filter() === 'expense'"
-        (click)="setFilter('expense')"
-      >
-        Egresos
-      </button>
-    </div>
+    <span class="month-badge">Mar 2026</span>
   </div>
 
-  <div class="totals">
-    <div class="total income">
-      <span class="label">Total ingresos</span>
-      <span class="value">+${{ totalIncome.toLocaleString("es-CO") }}</span>
+  <div class="tabs">
+    <button class="tab" [class.active]="filter() === 'all'" (click)="setFilter('all')">
+      Todo
+    </button>
+    <button class="tab" [class.active]="filter() === 'income'" (click)="setFilter('income')">
+      Ingresos
+    </button>
+    <button class="tab" [class.active]="filter() === 'expense'" (click)="setFilter('expense')">
+      Egresos
+    </button>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card income">
+      <span class="stat-label">Total ingresos</span>
+      <span class="stat-value income">+${{ totalIncome.toLocaleString('es-CO') }}</span>
     </div>
-    <div class="total expense">
-      <span class="label">Total egresos</span>
-      <span class="value">-${{ totalExpenses.toLocaleString("es-CO") }}</span>
+    <div class="stat-card expense">
+      <span class="stat-label">Total egresos</span>
+      <span class="stat-value expense">−${{ totalExpenses.toLocaleString('es-CO') }}</span>
     </div>
   </div>
 
   @if (loading()) {
     <div class="chart-skeleton"></div>
   } @else {
-    <div class="chart-wrapper">
-      <canvas #chartCanvas></canvas>
+    <div class="chart-wrap">
+      <canvas #chartCanvas width="320" height="320"></canvas>
+      <div class="chart-center">
+        <span class="net-label">Neto</span>
+        <span class="net-value" [class.positive]="netValue >= 0" [class.negative]="netValue < 0">
+          {{ netValue >= 0 ? '+' : '−' }}${{ Math.abs(netValue).toLocaleString('es-CO') }}
+        </span>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item">
+        <span class="legend-dot income"></span>
+        Ingresos
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot expense"></span>
+        Egresos
+      </div>
     </div>
   }
 </div>

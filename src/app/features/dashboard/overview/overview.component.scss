@@ -1,133 +1,246 @@
-// .overview-card {
-//   background: var(--bg-primary);
-//   border-radius: 0.75rem;
-//   padding: 1.5rem;
-//   border: 1px solid var(--border);
-//   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
-// }
+// Add to your global styles.scss or index.html:
+// @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap');
 
-// .card-header {
-//   display: flex;
-//   align-items: center;
-//   justify-content: space-between;
-//   margin-bottom: 1.5rem;
+.overview-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Syne', sans-serif;
 
-//   h2 {
-//     font-size: 1rem;
-//     font-weight: 600;
-//     color: var(--text-primary);
-//   }
-// }
-
-// .legend {
-//   display: flex;
-//   gap: 1rem;
-// }
-
-// .legend-item {
-//   font-size: 0.75rem;
-//   font-weight: 500;
-//   padding: 0.25rem 0.625rem;
-//   border-radius: 9999px;
-
-//   &.income {
-//     background: rgba(34, 197, 94, 0.12);
-//     color: var(--success);
-//   }
-
-//   &.expense {
-//     background: rgba(239, 68, 68, 0.12);
-//     color: var(--danger);
-//   }
-// }
-
-// .chart-wrapper {
-//   height: 220px;
-//   position: relative;
-
-//   canvas {
-//     width: 100%;
-//     height: 100%;
-//   }
-// }
-
-// .chart-skeleton {
-//   height: 220px;
-//   border-radius: 0.5rem;
-//   background: var(--skeleton-bg);
-//   animation: pulse 1.5s ease-in-out infinite;
-// }
-
-// @keyframes pulse {
-//   0%, 100% { opacity: 1; }
-//   50% { opacity: 0.4; }
-// }
-
-.filter-btns {
-  display: flex;
-  gap: 0.5rem;
-
-  button {
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-secondary);
-    cursor: pointer;
-    font-size: 0.75rem;
-    font-weight: 500;
-    transition: all 0.2s;
-
-    &:hover {
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-    }
-
-    &.active:nth-child(1) {
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      border-color: var(--border);
-    }
-
-    &.active:nth-child(2) {
-      background: rgba(34, 197, 94, 0.12);
-      color: var(--success);
-      border-color: var(--success);
-    }
-
-    &.active:nth-child(3) {
-      background: rgba(239, 68, 68, 0.12);
-      color: var(--danger);
-      border-color: var(--danger);
-    }
+  &::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle, rgba(108, 138, 255, 0.07) 0%, transparent 70%);
+    pointer-events: none;
   }
 }
 
-.totals {
+// ── Header ──────────────────────────────────────────────
+.card-header {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
 
-  .total {
-    flex: 1;
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-
-    .label {
-      display: block;
-      font-size: 0.7rem;
-      color: var(--text-secondary);
-      margin-bottom: 0.25rem;
-    }
-
-    .value {
-      font-size: 1rem;
-      font-weight: 700;
-    }
-
-    &.income .value { color: var(--success); }
-    &.expense .value { color: var(--danger); }
+  h2 {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: var(--text-primary);
+    margin: 0;
   }
+}
+
+.month-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary, rgba(255,255,255,0.04));
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+// ── Tabs ────────────────────────────────────────────────
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-tertiary, rgba(255,255,255,0.04));
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 22px;
+}
+
+.tab {
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.01em;
+
+  &:hover:not(.active) {
+    color: var(--text-primary);
+  }
+
+  &.active {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+  }
+}
+
+// ── Stats cards ─────────────────────────────────────────
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--bg-tertiary, rgba(255,255,255,0.04));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp 0.5s ease both;
+
+  &:nth-child(1) { animation-delay: 0.1s; }
+  &:nth-child(2) { animation-delay: 0.2s; }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+  }
+
+  &.income::after { background: var(--success); }
+  &.expense::after { background: var(--danger); }
+}
+
+.stat-label {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+
+  &.income { color: var(--success); }
+  &.expense { color: var(--danger); }
+}
+
+// ── Chart ───────────────────────────────────────────────
+.chart-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto 24px;
+  animation: fadeUp 0.5s ease 0.3s both;
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+
+.chart-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.net-label {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.net-value {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -1px;
+
+  &.positive { color: var(--success); }
+  &.negative { color: var(--danger); }
+}
+
+// ── Legend ──────────────────────────────────────────────
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &.income { background: var(--success); }
+  &.expense { background: var(--danger); }
+}
+
+// ── Skeleton ────────────────────────────────────────────
+.chart-skeleton {
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 1;
+  margin: 0 auto 24px;
+  border-radius: 50%;
+  background: linear-gradient(
+    90deg,
+    var(--border) 25%,
+    rgba(255, 255, 255, 0.06) 50%,
+    var(--border) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+// ── Animations ──────────────────────────────────────────
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }

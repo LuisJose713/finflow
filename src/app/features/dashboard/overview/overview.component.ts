@@ -1,81 +1,3 @@
-// import {
-//   Component,
-//   inject,
-//   OnInit,
-//   signal,
-//   ElementRef,
-//   viewChild,
-//   AfterViewInit,
-// } from '@angular/core';
-// import { TransactionService } from '../../../core/services/transaction.service';
-// import { Transaction } from '../../../core/models';
-
-// interface MonthlyData {
-//   month: string;
-//   income: number;
-//   expenses: number;
-// }
-
-// @Component({
-//   selector: 'app-overview',
-//   standalone: true,
-//   templateUrl: './overview.component.html',
-//   styleUrl: './overview.component.scss',
-// })
-// export class OverviewComponent implements OnInit, AfterViewInit {
-//   private transactionService = inject(TransactionService);
-
-//   chartCanvas = viewChild<ElementRef<HTMLCanvasElement>>('chartCanvas');
-
-//   loading = signal(true);
-//   monthlyData = signal<MonthlyData[]>([]);
-
-//   ngOnInit() {
-//     this.transactionService.getAll(1, 100).subscribe({
-//       next: ({ data }) => {
-//         this.monthlyData.set(this.groupByMonth(data));
-//         this.loading.set(false);
-//       },
-//       error: () => this.loading.set(false),
-//     });
-//   }
-
-//   ngAfterViewInit() {
-//     // Chart renders after data loads
-//   }
-
-//   private groupByMonth(transactions: Transaction[]): MonthlyData[] {
-//     const map = new Map<string, MonthlyData>();
-
-//     transactions.forEach((t) => {
-//       const date = new Date(t.date);
-//       const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-//       const label = date.toLocaleString('es', { month: 'short', year: '2-digit' });
-
-//       if (!map.has(key)) {
-//         map.set(key, { month: label, income: 0, expenses: 0 });
-//       }
-
-//       const entry = map.get(key)!;
-//       if (t.type === 'income') entry.income += t.amount;
-//       else entry.expenses += t.amount;
-//     });
-
-//     return Array.from(map.entries())
-//       .sort(([a], [b]) => a.localeCompare(b))
-//       .slice(-6)
-//       .map(([, v]) => v);
-//   }
-
-//   getBarHeight(value: number): number {
-//     const max = Math.max(
-//       ...this.monthlyData().flatMap((d) => [d.income, d.expenses])
-//     );
-//     return max > 0 ? (value / max) * 100 : 0;
-//   }
-// }
-
-
 import {
   Component,
   inject,
@@ -83,14 +5,10 @@ import {
   signal,
   ElementRef,
   viewChild,
-  AfterViewInit,
-  effect,
+  OnDestroy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TransactionService } from '../../../core/services/transaction.service';
-import { Chart, ArcElement, Tooltip, Legend, DoughnutController } from 'chart.js';
-
-Chart.register(ArcElement, Tooltip, Legend, DoughnutController);
 
 interface MonthlyData {
   month: string;
@@ -105,7 +23,7 @@ interface MonthlyData {
   templateUrl: './overview.component.html',
   styleUrl: './overview.component.scss',
 })
-export class OverviewComponent implements OnInit, AfterViewInit {
+export class OverviewComponent implements OnInit, OnDestroy {
   private transactionService = inject(TransactionService);
 
   chartCanvas = viewChild<ElementRef<HTMLCanvasElement>>('chartCanvas');
@@ -113,7 +31,17 @@ export class OverviewComponent implements OnInit, AfterViewInit {
   loading = signal(true);
   monthlyData = signal<MonthlyData[]>([]);
   filter = signal<'all' | 'income' | 'expense'>('all');
-  private chart: Chart | null = null;
+
+  // Expose Math to template
+  readonly Math = Math;
+
+  private animationId: number | null = null;
+
+  // Chart colors — keep in sync with your CSS vars if desired
+  private readonly C_INC      = '#22c55e';
+  private readonly C_INC_TRACK = 'rgba(34, 197, 94, 0.15)';
+  private readonly C_EXP      = '#ef4444';
+  private readonly C_EXP_TRACK = 'rgba(239, 68, 68, 0.15)';
 
   ngOnInit() {
     this.transactionService.getMonthlyStats().subscribe({
@@ -125,17 +53,111 @@ export class OverviewComponent implements OnInit, AfterViewInit {
         }));
         this.monthlyData.set(mapped);
         this.loading.set(false);
+        // Wait a tick for @if to render the canvas
         setTimeout(() => this.renderChart(), 0);
       },
       error: () => this.loading.set(false),
     });
   }
 
-  ngAfterViewInit() {}
+  ngOnDestroy() {
+    this.cancelAnimation();
+  }
 
   setFilter(f: 'all' | 'income' | 'expense') {
     this.filter.set(f);
     this.renderChart();
+  }
+
+  renderChart() {
+    const canvasRef = this.chartCanvas();
+    if (!canvasRef) return;
+
+    this.cancelAnimation();
+
+    const canvas = canvasRef.nativeElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const W = canvas.width;
+    const H = canvas.height;
+    const cx = W / 2;
+    const cy = H / 2;
+
+    const outerR = W * 0.44;
+    const outerW = W * 0.12;
+    const innerR = W * 0.30;
+    const innerW = W * 0.12;
+
+    const TAU   = Math.PI * 2;
+    const START = -Math.PI / 2; // top
+
+    const income  = this.totalIncome;
+    const expense = this.totalExpenses;
+    const expFrac = income > 0 ? Math.min(expense / income, 1) : 0;
+
+    const showIncome  = this.filter() !== 'expense';
+    const showExpense = this.filter() !== 'income';
+
+    const DURATION = 900;
+    const startTime = performance.now();
+
+    const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    const drawRing = (
+      r: number,
+      lineW: number,
+      fraction: number,
+      color: string,
+      trackColor: string,
+    ) => {
+      // Track
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, TAU);
+      ctx.strokeStyle = trackColor;
+      ctx.lineWidth = lineW;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      if (fraction <= 0) return;
+
+      // Filled arc
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, START, START + TAU * fraction);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineW;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    };
+
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const t       = Math.min(elapsed / DURATION, 1);
+      const p       = easeOut(t);
+
+      ctx.clearRect(0, 0, W, H);
+
+      if (showIncome) {
+        drawRing(outerR, outerW, p, this.C_INC, this.C_INC_TRACK);
+      }
+
+      if (showExpense) {
+        drawRing(innerR, innerW, expFrac * p, this.C_EXP, this.C_EXP_TRACK);
+      }
+
+      if (t < 1) {
+        this.animationId = requestAnimationFrame(tick);
+      }
+    };
+
+    this.animationId = requestAnimationFrame(tick);
+  }
+
+  private cancelAnimation() {
+    if (this.animationId !== null) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
   }
 
   private formatMonth(key: string): string {
@@ -144,57 +166,15 @@ export class OverviewComponent implements OnInit, AfterViewInit {
     return date.toLocaleString('es', { month: 'short', year: '2-digit' });
   }
 
-  renderChart() {
-    const canvas = this.chartCanvas();
-    if (!canvas) return;
-    if (this.chart) this.chart.destroy();
-
-    const stats = this.monthlyData();
-    const labels = stats.map(s => s.month);
-    const datasets = [];
-
-    if (this.filter() !== 'expense') {
-      datasets.push({
-        label: 'Ingresos',
-        data: stats.map(s => s.income),
-        backgroundColor: stats.map(() => 'rgba(34, 197, 94, 0.7)'),
-        borderColor: stats.map(() => 'rgba(34, 197, 94, 1)'),
-        borderWidth: 2,
-      });
-    }
-
-    if (this.filter() !== 'income') {
-      datasets.push({
-        label: 'Egresos',
-        data: stats.map(s => s.expenses),
-        backgroundColor: stats.map(() => 'rgba(239, 68, 68, 0.7)'),
-        borderColor: stats.map(() => 'rgba(239, 68, 68, 1)'),
-        borderWidth: 2,
-      });
-    }
-
-    this.chart = new Chart(canvas.nativeElement, {
-      type: 'doughnut',
-      data: { labels, datasets },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { position: 'bottom', labels: { color: '#94a3b8' } },
-          tooltip: {
-            callbacks: {
-              label: (ctx) => ` $${ctx.parsed.toLocaleString('es-CO')}`
-            }
-          }
-        }
-      }
-    });
-  }
-
-  get totalIncome() {
+  get totalIncome(): number {
     return this.monthlyData().reduce((acc, s) => acc + s.income, 0);
   }
 
-  get totalExpenses() {
+  get totalExpenses(): number {
     return this.monthlyData().reduce((acc, s) => acc + s.expenses, 0);
+  }
+
+  get netValue(): number {
+    return this.totalIncome - this.totalExpenses;
   }
 }

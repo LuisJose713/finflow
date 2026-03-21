@@ -1,0 +1,85 @@
+<div *ngIf="isOpen()" class="modal-overlay" (click)="close()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="header-info">
+        <h2>{{ goal()?.title }}</h2>
+        <span class="status-badge" [class]="'badge-' + goal()?.status">
+          {{ goal()?.status === 'completed' ? 'Completada' :
+             goal()?.status === 'cancelled' ? 'Cancelada' : 'Activa' }}
+        </span>
+      </div>
+      <button class="modal-close" (click)="close()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Resumen de la meta -->
+      <div class="goal-summary">
+        <div class="summary-amounts">
+          <div class="amount-block">
+            <span class="amount-label">Ahorrado</span>
+            <span class="amount-value positive">{{ goal()?.currentAmount | appCurrency }}</span>
+          </div>
+          <div class="amount-block right">
+            <span class="amount-label">Objetivo</span>
+            <span class="amount-value">{{ goal()?.targetAmount | appCurrency }}</span>
+          </div>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-track">
+            <div
+              class="progress-fill"
+              [style.width.%]="progressPct"
+              [class.completed]="progressPct >= 100"
+            ></div>
+          </div>
+          <span class="progress-pct">{{ progressPct | number:'1.0-0' }}%</span>
+        </div>
+
+        <div *ngIf="progressPct >= 100" class="completed-banner">
+          🎉 ¡Meta alcanzada!
+        </div>
+      </div>
+
+      <!-- Historial -->
+      <div class="history-header">
+        <span class="history-title">Historial de abonos</span>
+        <span class="history-count">{{ contributions().length }} abonos</span>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="loading()" class="history-list">
+        <div class="contribution-skeleton" *ngFor="let i of [1,2,3]"></div>
+      </div>
+
+      <!-- Empty -->
+      <div *ngIf="!loading() && contributions().length === 0" class="empty-history">
+        <span>Sin abonos registrados aún</span>
+      </div>
+
+      <!-- Lista -->
+      <div *ngIf="!loading() && contributions().length > 0" class="history-list">
+        <div class="contribution-item" *ngFor="let c of contributions()">
+          <div class="contribution-icon">💰</div>
+          <div class="contribution-info">
+            <span class="contribution-amount">+ {{ c.amount | appCurrency }}</span>
+            <span class="contribution-note" *ngIf="c.note">{{ c.note }}</span>
+          </div>
+          <span class="contribution-date">{{ c.createdAt | date:'d MMM yyyy':'':'es' }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-ghost" (click)="close()">Cerrar</button>
+    </div>
+
+  </div>
+</div>

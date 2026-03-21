@@ -1,0 +1,73 @@
+<div *ngIf="isOpen()" class="modal-overlay" (click)="close()">
+  <div class="modal modal-sm" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="abono-title">
+        <div class="goal-dot" [style.background]="'var(--primary)'"></div>
+        <h2>
+          Abonar a <span>{{ goal()?.title }}</span>
+        </h2>
+      </div>
+      <button class="modal-close" (click)="close()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M18 6L6 18M6 6l12 12"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="modal-body">
+        <!-- Mini progress -->
+        <div class="progress-wrap">
+          <div class="progress-track">
+            <div class="progress-fill" [style.width.%]="progressPct"></div>
+          </div>
+          <span class="progress-pct">{{ progressPct | number: "1.0-0" }}%</span>
+        </div>
+
+        <p class="remaining-text">
+          Faltan
+          <strong>${{ remaining | number: "1.0-0" }}</strong>
+          para completar la meta
+        </p>
+
+        <!-- Monto -->
+        <div class="field">
+          <label class="field-label">Monto a abonar</label>
+          <div class="input-wrap">
+            <span class="input-prefix">$</span>
+            <input
+              class="field-input prefixed"
+              type="text"
+              inputmode="numeric"
+              placeholder="0"
+              [value]="amountDisplay()"
+              (input)="onInput($event)"
+              (blur)="f['amount'].markAsTouched()"
+              [class.invalid]="f['amount'].invalid && f['amount'].touched"
+            />
+          </div>
+          <span
+            class="field-error"
+            *ngIf="f['amount'].invalid && f['amount'].touched"
+          >
+            Ingresa un monto válido
+          </span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-ghost" (click)="close()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="loading()">
+          {{ loading() ? "Guardando…" : "Confirmar abono" }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

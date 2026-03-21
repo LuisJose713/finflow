@@ -10,21 +10,18 @@
       <button class="btn-new" (click)="goalForm.open()">+ Nueva meta</button>
     </header>
 
-
     <div *ngIf="loading()">
       <div class="goals-grid">
         <div class="goal-card skeleton" *ngFor="let i of [1,2,3]"></div>
       </div>
     </div>
 
-   
     <div *ngIf="!loading() && goals().length === 0" class="empty-state">
       <span class="empty-icon">🎯</span>
       <h2>Sin metas aún</h2>
       <p>Crea tu primera meta financiera para comenzar a ahorrar</p>
       <button class="btn-new" (click)="goalForm.open()">Crear primera meta</button>
     </div>
-
 
     <div *ngIf="!loading() && goals().length > 0" class="goals-grid">
       <div class="goal-card" *ngFor="let goal of goals(); trackBy: trackByGoal" [class]="goal.status">
@@ -54,14 +51,24 @@
         <div class="goal-footer">
           <span class="deadline">📅 {{ goal.deadline | slice:0:10 }}</span>
           <div class="goal-actions">
+            <!-- 👇 botón abono -->
+            <button
+              class="btn-icon"
+              *ngIf="goal.status === 'active' && progressPct(goal) < 100"
+              (click)="goalAbono.open(goal)"
+              title="Abonar">➕
+            </button>
             <button class="btn-icon" (click)="goalForm.open(goal)" title="Editar">✏️</button>
             <button class="btn-icon danger" (click)="delete(goal)" title="Eliminar">🗑️</button>
+            <button class="btn-icon" (click)="goalHistory.open(goal)" title="Ver historial">📋</button>
           </div>
         </div>
       </div>
     </div>
   </main>
 
-  <app-goal-form #goalForm (saved)="load()"></app-goal-form>
+  <app-goal-form  #goalForm  (saved)="load()"></app-goal-form>
+  <app-goal-abono #goalAbono (saved)="load()"></app-goal-abono> 
+  <app-goal-history #goalHistory></app-goal-history>
   <app-toast-container></app-toast-container>
 </div>

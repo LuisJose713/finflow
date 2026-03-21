@@ -63,7 +63,7 @@ export interface PaginatedResponse<T> {
 }
 // ─── Goal ──────────────────────────────────────────────────────────────────
 export type GoalStatus = 'active' | 'completed' | 'cancelled';
-
+ 
 export interface Goal {
   id: string;
   title: string;
@@ -72,8 +72,10 @@ export interface Goal {
   deadline: string;
   status: GoalStatus;
   description?: string;
+  createdAt?: string;
 }
-
+ 
+/** Crear meta — currentAmount es opcional (default 0 en backend) */
 export interface CreateGoalRequest {
   title: string;
   targetAmount: number;
@@ -81,7 +83,21 @@ export interface CreateGoalRequest {
   deadline: string;
   description?: string;
 }
-
+ 
+/** Editar meta — todos los campos opcionales excepto title si lo mandas */
+export interface UpdateGoalRequest {
+  title?: string;
+  targetAmount?: number;
+  currentAmount?: number;
+  deadline?: string;
+  description?: string;
+  status?: GoalStatus;
+}
+ 
+/** Abonar a una meta */
+export interface AddContributionRequest {
+  amount: number;
+}
 // ─── Advisor ───────────────────────────────────────────────────────────────
 export interface AdvisorMessage {
   role: 'user' | 'assistant';
@@ -112,3 +128,31 @@ export interface Category {
   name: string;
   type: string;
 }
+
+
+// ─── GoalContribution ──────────────────────────────────────────────────────
+export interface GoalContribution {
+  id: string;
+  goalId: string;
+  userId: string;
+  amount: number;
+  note?: string;
+  createdAt: string;
+}
+ 
+// UpdateGoalRequest — todos opcionales
+export interface UpdateGoalRequest {
+  title?: string;
+  targetAmount?: number;
+  currentAmount?: number;
+  deadline?: string;
+  description?: string;
+  status?: GoalStatus;
+}
+ 
+// AddContributionRequest — con note opcional
+export interface AddContributionRequest {
+  amount: number;
+  note?: string;
+}
+ 

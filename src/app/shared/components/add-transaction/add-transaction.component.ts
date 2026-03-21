@@ -14,27 +14,30 @@ import { CommonModule } from "@angular/common";
   styleUrls: ["./add-transaction.component.scss"],
 })
 export class AddTransactionComponent implements OnInit {
-  private fb = inject(FormBuilder);
+  private fb                 = inject(FormBuilder);
   private transactionService = inject(TransactionService);
-  private categoryService = inject(CategoryService);
-  private toast = inject(ToastService);
+  private categoryService    = inject(CategoryService);
+  private toast              = inject(ToastService);
 
-  isOpen = signal(false);
+  isOpen  = signal(false);
   loading = signal(false);
 
-  allCategories = signal<Category[]>([]);
+  allCategories      = signal<Category[]>([]);
   filteredCategories = signal<Category[]>([]);
+
+  // Signal de display para el monto
+  amountDisplay = signal('');
 
   created = output<void>();
 
   form = this.fb.group({
-    amount: [null as number | null, [Validators.required, Validators.min(0.01)]],
-    type: ["expense" as TransactionType, Validators.required],
-    categoryId: [null as number | null, Validators.required],
+    amount:      [null as number | null, [Validators.required, Validators.min(0.01)]],
+    type:        ["expense" as TransactionType, Validators.required],
+    categoryId:  [null as number | null, Validators.required],
     description: ["", [Validators.required, Validators.minLength(2)]],
-    date: [new Date().toISOString().split("T")[0], Validators.required],
-    currency: ["COP"],
-    status: ["completed"],
+    date:        [new Date().toISOString().split("T")[0], Validators.required],
+    currency:    ["COP"],
+    status:      ["completed"],
   });
 
   get f() { return this.form.controls; }
@@ -43,14 +46,13 @@ export class AddTransactionComponent implements OnInit {
     this.categoryService.getAll().subscribe({
       next: (cats) => {
         this.allCategories.set(cats);
-        this.filterCategories("expense"); // por defecto
+        this.filterCategories("expense");
       }
     });
 
-    // Filtrar categorías cuando cambia el tipo
     this.form.get("type")!.valueChanges.subscribe(type => {
       this.filterCategories(type!);
-      this.form.patchValue({ categoryId: null }); // reset categoria
+      this.form.patchValue({ categoryId: null });
     });
   }
 
@@ -61,16 +63,36 @@ export class AddTransactionComponent implements OnInit {
     );
   }
 
-  open() { this.isOpen.set(true); }
+  onAmountInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const raw   = input.value.replace(/\D/g, '');
+    if (!raw) {
+      this.form.get('amount')?.setValue(null, { emitEvent: false });
+      this.amountDisplay.set('');
+      input.value = '';
+      return;
+    }
+    const numeric   = parseInt(raw, 10);
+    const formatted = numeric.toLocaleString('es-CO', { maximumFractionDigits: 0 });
+    input.value = formatted;
+    this.amountDisplay.set(formatted);
+    this.form.get('amount')?.setValue(numeric, { emitEvent: false });
+  }
+
+  open() {
+    this.amountDisplay.set('');
+    this.isOpen.set(true);
+  }
 
   close() {
     this.isOpen.set(false);
+    this.amountDisplay.set('');
     this.form.reset({
-      type: "expense",
+      type:       "expense",
       categoryId: null,
-      date: new Date().toISOString().split("T")[0],
-      currency: "COP",
-      status: "completed",
+      date:       new Date().toISOString().split("T")[0],
+      currency:   "COP",
+      status:     "completed",
     });
   }
 

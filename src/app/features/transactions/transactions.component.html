@@ -1,0 +1,142 @@
+<div class="app-shell">
+  <app-navbar></app-navbar>
+
+  <main class="main-content">
+
+    <!-- Header -->
+    <header class="page-header">
+      <div class="header-text">
+        <h1>Transacciones</h1>
+        <p class="subtitle">{{ transactions().length }} registros encontrados</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-export csv" (click)="exportCsv()" title="Exportar CSV">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          CSV
+        </button>
+        <button class="btn-export pdf" (click)="exportPdf()" title="Exportar PDF">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          PDF
+        </button>
+      </div>
+    </header>
+
+    <!-- Filtros -->
+    <div class="filters-card">
+      <!-- Búsqueda -->
+      <div class="search-wrap">
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+          <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input
+          class="search-input"
+          type="text"
+          placeholder="Buscar por descripción..."
+          [ngModel]="filterSearch()"
+          (ngModelChange)="filterSearch.set($event); load()"
+        />
+      </div>
+
+      <div class="filters-row">
+        <!-- Tipo -->
+        <select class="filter-select"
+          [ngModel]="filterType()"
+          (ngModelChange)="filterType.set($event); load()">
+          <option value="">Todos los tipos</option>
+          <option value="income">Ingresos</option>
+          <option value="expense">Egresos</option>
+        </select>
+
+        <!-- Mes -->
+        <select class="filter-select"
+          [ngModel]="filterMonth()"
+          (ngModelChange)="filterMonth.set($event ? +$event : null); load()">
+          <option [ngValue]="null">Todos los meses</option>
+          <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+        </select>
+
+        <!-- Año -->
+        <select class="filter-select"
+          [ngModel]="filterYear()"
+          (ngModelChange)="filterYear.set($event ? +$event : null); load()">
+          <option [ngValue]="null">Todos los años</option>
+          <option *ngFor="let y of years()" [value]="y">{{ y }}</option>
+        </select>
+
+        <!-- Categoría -->
+        <select class="filter-select"
+          [ngModel]="filterCategoryId()"
+          (ngModelChange)="filterCategoryId.set($event ? +$event : null); load()">
+          <option [ngValue]="null">Todas las categorías</option>
+          <option *ngFor="let c of categories()" [value]="c.id">{{ c.name }}</option>
+        </select>
+
+        <!-- Limpiar -->
+        <button class="btn-clear" *ngIf="hasFilters" (click)="clearFilters()">
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+
+    <!-- Skeleton -->
+    <div *ngIf="loading()" class="list">
+      <div class="tx-item skeleton" *ngFor="let i of [1,2,3,4,5]"></div>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!loading() && transactions().length === 0" class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h3>Sin resultados</h3>
+      <p>No hay transacciones que coincidan con los filtros</p>
+      <button class="btn-clear-lg" *ngIf="hasFilters" (click)="clearFilters()">
+        Limpiar filtros
+      </button>
+    </div>
+
+    <!-- Lista -->
+    <ul *ngIf="!loading() && transactions().length > 0" class="list">
+      <li *ngFor="let tx of transactions(); trackBy: trackById" class="tx-item">
+
+        <div class="tx-icon" [class]="tx.type">
+          <svg *ngIf="tx.type === 'income'" width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <svg *ngIf="tx.type === 'expense'" width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M12 5v14M19 12l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <div class="tx-info">
+          <span class="tx-title">{{ tx.description }}</span>
+          <span class="tx-meta">
+            {{ categoryName(tx.categoryId) }} · {{ tx.date | date:'dd MMM yyyy' }}
+          </span>
+        </div>
+
+        <div class="tx-right">
+          <span class="tx-amount" [class.income]="tx.type === 'income'" [class.expense]="tx.type === 'expense'">
+            {{ tx.type === 'income' ? '+' : '-' }}{{ tx.amount | appCurrency }}
+          </span>
+          <button class="btn-delete" (click)="delete(tx)" title="Eliminar">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+      </li>
+    </ul>
+
+  </main>
+
+  <app-toast-container></app-toast-container>
+</div>

@@ -27,7 +27,7 @@ export class RecentTransactionsComponent implements OnInit {
 
   load() {
     this.loading.set(true);
-    this.transactionService.getRecent(5).subscribe({
+    this.transactionService.getRecent().subscribe({
       next: (data) => {
         this.transactions.set(data);
         this.loading.set(false);

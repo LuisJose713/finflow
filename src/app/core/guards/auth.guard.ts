@@ -1,14 +1,32 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
 
 export const authGuard: CanActivateFn = () => {
-   const router = inject(Router);
-  const token = localStorage.getItem('token');
-  if (token) {
-    return true;
-  }
-  router.navigate(['/']);
+  const router = inject(Router);
+  const token  = localStorage.getItem('token');
 
-  return false;
+  if (!token) {
+    router.navigate(['/login']);
+    return false;
+  }
+
+  // Verificar expiración del JWT sin librería externa
+  try {
+    const payload    = JSON.parse(atob(token.split('.')[1]));
+    const expiredAt  = payload.exp * 1000; // exp viene en segundos
+    const isExpired  = Date.now() >= expiredAt;
+
+    if (isExpired) {
+      localStorage.clear();
+      router.navigate(['/login']);
+      return false;
+    }
+
+    return true;
+  } catch {
+    // Token malformado
+    localStorage.clear();
+    router.navigate(['/login']);
+    return false;
+  }
 };

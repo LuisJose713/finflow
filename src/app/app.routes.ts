@@ -5,7 +5,7 @@ import { guestGuard } from "./core/guards/guest.guard";
 export const routes: Routes = [
   {
     path: "",
-    redirectTo: "/dashboard",
+    redirectTo: "/login",
     pathMatch: "full",
   },
   {
@@ -30,7 +30,7 @@ export const routes: Routes = [
       import("./features/dashboard/dashboard.component").then(
         (m) => m.DashboardComponent,
       ),
-     canActivate: [authGuard],
+    canActivate: [authGuard],
   },
   {
     path: "goals",
@@ -38,7 +38,7 @@ export const routes: Routes = [
       import("./features/goals/goals-list/goals-list.component").then(
         (m) => m.GoalsListComponent,
       ),
-     canActivate: [authGuard],
+    canActivate: [authGuard],
   },
   {
     path: "advisor",
@@ -46,10 +46,20 @@ export const routes: Routes = [
       import("./features/advisor/advisor.component").then(
         (m) => m.AdvisorComponent,
       ),
-     canActivate: [authGuard],
+    canActivate: [authGuard],
+  },
+   {
+    path:"transactions",
+    loadComponent: () =>
+      import("./features/transactions/transactions.component").then(
+        (m) => m.TransactionsComponent,
+      ),
+    canActivate: [authGuard],
+
   },
   {
     path: "**",
-    redirectTo: "/dashboard",
+    redirectTo: "/login",
   },
+ 
 ];

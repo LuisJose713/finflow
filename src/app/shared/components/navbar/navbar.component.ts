@@ -31,6 +31,7 @@ export class NavbarComponent {
     { path: '/dashboard', label: 'Dashboard', icon: '📊' },
     { path: '/goals',     label: 'Metas',     icon: '🎯' },
     { path: '/advisor',   label: 'Asesor IA', icon: '🤖' },
+    { path: '/transactions', label: 'Transacciones', icon: '💳' } 
   ];
 
   toggleCollapse() {

@@ -6,6 +6,7 @@
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
       <div class="form-group">
         <label>Título de la meta</label>
         <input
@@ -17,23 +18,28 @@
       </div>
 
       <div class="form-grid">
+
         <div class="form-group">
           <label>Monto objetivo</label>
           <input
-            type="number"
-            formControlName="targetAmount"
-            placeholder="0.00"
-            min="1"
+            type="text"
+            inputmode="numeric"
+            placeholder="0"
+            [value]="targetDisplay()"
+            (input)="onInput($event, 'targetAmount')"
+            (blur)="f['targetAmount'].markAsTouched()"
+            [class.error]="f['targetAmount'].invalid && f['targetAmount'].touched"
           />
         </div>
 
-        <div class="form-group">
-          <label>Monto actual</label>
+        <div class="form-group" *ngIf="!editGoal()">
+          <label>Ya tengo ahorrado</label>
           <input
-            type="number"
-            formControlName="currentAmount"
-            placeholder="0.00"
-            min="0"
+            type="text"
+            inputmode="numeric"
+            placeholder="0"
+            [value]="currentDisplay()"
+            (input)="onInput($event, 'currentAmount')"
           />
         </div>
 
@@ -41,6 +47,7 @@
           <label>Fecha límite</label>
           <input type="date" formControlName="deadline" />
         </div>
+
       </div>
 
       <div class="form-group">
@@ -53,19 +60,12 @@
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn-cancel" (click)="close()">
-          Cancelar
-        </button>
+        <button type="button" class="btn-cancel" (click)="close()">Cancelar</button>
         <button type="submit" class="btn-submit" [disabled]="loading()">
-          {{
-            loading()
-              ? "Guardando..."
-              : editGoal()
-                ? "Actualizar"
-                : "Crear meta"
-          }}
+          {{ loading() ? "Guardando..." : editGoal() ? "Actualizar" : "Crear meta" }}
         </button>
       </div>
+
     </form>
   </div>
 </div>
