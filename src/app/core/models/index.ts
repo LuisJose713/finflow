@@ -156,3 +156,30 @@ export interface AddContributionRequest {
   note?: string;
 }
  
+
+// Agregar pre-Tarea
+
+export type PlannedExpenseStatus = 'pending' | 'done' | 'cancelled';
+
+export interface PlannedExpense {
+  id: string;
+  userId: number;
+  title: string;
+  amount: number;
+  categoryId?: number;
+  dueDate?: string;
+  notes?: string;
+  status: PlannedExpenseStatus;
+  executedTransactionId?: string;
+  remindAt?: string;
+  createdAt: string;
+}
+
+export interface CreatePlannedExpenseRequest {
+  title: string;
+  amount: number;
+  categoryId?: number;
+  dueDate?: string;
+  notes?: string;
+  remindAt?: string;
+}

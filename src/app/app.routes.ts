@@ -57,6 +57,15 @@ export const routes: Routes = [
     canActivate: [authGuard],
 
   },
+   {
+    path:"planned-expenses",
+    loadComponent: () =>
+      import("./features/planned-expenses/planned-expenses.component").then(
+        (m) => m.PlannedExpensesComponent,
+      ),
+    canActivate: [authGuard],
+
+  },
   {
     path: "**",
     redirectTo: "/login",
