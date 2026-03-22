@@ -1,10 +1,9 @@
-import { Component, inject, OnInit, signal, ElementRef, ViewChild, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, signal, computed, effect } from '@angular/core';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { TransactionService } from '../../../core/services/transaction.service';
+import { DashboardRefreshService } from '../../../core/services/dashboard-refresh.service';
 import { TransactionStats } from '../../../core/models';
 import { AppCurrencyPipe } from '../../../shared/pipes/currency.pipe';
-import { DecimalPipe } from '@angular/common';
-
 
 @Component({
   selector: 'app-transaction-stats',
@@ -13,32 +12,29 @@ import { DecimalPipe } from '@angular/common';
   templateUrl: './transaction-stats.component.html',
   styleUrls: ['./transaction-stats.component.scss'],
 })
-export class TransactionStatsComponent implements OnInit {
-  private transactionService = inject(TransactionService);
+export class TransactionStatsComponent {
+  private txService = inject(TransactionService);
+  private refresh   = inject(DashboardRefreshService);
 
- @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
-
-
-  stats = signal<TransactionStats | null>(null);
+  stats   = signal<TransactionStats | null>(null);
   loading = signal(true);
 
-  /** Getter seguro para el template */
-  get safeStats(): TransactionStats {
-    return this.stats() ?? {
-      totalIncome: 0,
-      totalExpenses: 0,
-      balance: 0,
-      savingsRate: 0,
-    };
+  safeStats = computed<TransactionStats>(() => this.stats() ?? {
+    totalIncome: 0, totalExpenses: 0, balance: 0, savingsRate: 0,
+  });
+
+  constructor() {
+    effect(() => {
+      this.refresh.version();
+      this.load();
+    }, { allowSignalWrites: true }); // 👈
   }
 
-  ngOnInit() {
-    this.transactionService.getStats().subscribe({
-      next: (data) => {
-        this.stats.set(data);
-        this.loading.set(false);
-      },
-      error: () => this.loading.set(false),
+  load() {
+    this.loading.set(true);
+    this.txService.getStats().subscribe({
+      next:  data => { this.stats.set(data); this.loading.set(false); },
+      error: ()   => this.loading.set(false),
     });
   }
 }

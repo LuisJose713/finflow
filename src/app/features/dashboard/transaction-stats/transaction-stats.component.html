@@ -1,4 +1,4 @@
- <div class="stats-grid">
+<div class="stats-grid">
   @if (loading()) {
     @for (i of [1, 2, 3, 4]; track i) {
       <div class="stat-card skeleton"></div>
@@ -8,7 +8,7 @@
       <div class="stat-icon">↑</div>
       <div class="stat-info">
         <span class="stat-label">Ingresos totales</span>
-        <span class="stat-value">{{ safeStats.totalIncome | appCurrency }}</span>
+        <span class="stat-value">{{ safeStats().totalIncome | appCurrency }}</span>
       </div>
     </div>
 
@@ -16,15 +16,15 @@
       <div class="stat-icon">↓</div>
       <div class="stat-info">
         <span class="stat-label">Gastos totales</span>
-        <span class="stat-value">{{ safeStats.totalExpenses | appCurrency }}</span>
+        <span class="stat-value">{{ safeStats().totalExpenses | appCurrency }}</span>
       </div>
     </div>
 
-    <div class="stat-card balance" [class.negative]="safeStats.balance < 0">
+    <div class="stat-card balance" [class.negative]="safeStats().balance < 0">
       <div class="stat-icon">⚖</div>
       <div class="stat-info">
         <span class="stat-label">Balance</span>
-        <span class="stat-value">{{ safeStats.balance | appCurrency }}</span>
+        <span class="stat-value">{{ safeStats().balance | appCurrency }}</span>
       </div>
     </div>
 
@@ -32,10 +32,8 @@
       <div class="stat-icon">🎯</div>
       <div class="stat-info">
         <span class="stat-label">Tasa de ahorro</span>
-        <span class="stat-value">{{ safeStats.savingsRate | number: '1.1-1' }}%</span>
+        <span class="stat-value">{{ safeStats().savingsRate | number: '1.1-1' }}%</span>
       </div>
     </div>
   }
-</div> 
-
-
+</div>

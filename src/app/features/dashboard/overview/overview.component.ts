@@ -1,20 +1,12 @@
 import {
-  Component,
-  inject,
-  OnInit,
-  signal,
-  ElementRef,
-  viewChild,
-  OnDestroy,
+  Component, inject, signal, computed, effect,
+  ElementRef, viewChild, afterNextRender,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TransactionService } from '../../../core/services/transaction.service';
+import { DashboardRefreshService } from '../../../core/services/dashboard-refresh.service';
 
-interface MonthlyData {
-  month: string;
-  income: number;
-  expenses: number;
-}
+interface MonthlyData { month: string; income: number; expenses: number; }
 
 @Component({
   selector: 'app-overview',
@@ -23,45 +15,68 @@ interface MonthlyData {
   templateUrl: './overview.component.html',
   styleUrl: './overview.component.scss',
 })
-export class OverviewComponent implements OnInit, OnDestroy {
-  private transactionService = inject(TransactionService);
+export class OverviewComponent {
+  private txService = inject(TransactionService);
+  private refresh   = inject(DashboardRefreshService);
 
   chartCanvas = viewChild<ElementRef<HTMLCanvasElement>>('chartCanvas');
 
-  loading = signal(true);
+  loading     = signal(true);
   monthlyData = signal<MonthlyData[]>([]);
-  filter = signal<'all' | 'income' | 'expense'>('all');
+  filter      = signal<'all' | 'income' | 'expense'>('all');
+  private chartReady = signal(false); // 👈 indica que el canvas ya está en el DOM
 
-  // Expose Math to template
   readonly Math = Math;
 
-  private animationId: number | null = null;
+  totalIncome   = computed(() => this.monthlyData().reduce((a, s) => a + s.income,   0));
+  totalExpenses = computed(() => this.monthlyData().reduce((a, s) => a + s.expenses, 0));
+  netValue      = computed(() => this.totalIncome() - this.totalExpenses());
 
-  // Chart colors — keep in sync with your CSS vars if desired
-  private readonly C_INC      = '#22c55e';
+  private animationId: number | null = null;
+  private readonly C_INC       = '#22c55e';
   private readonly C_INC_TRACK = 'rgba(34, 197, 94, 0.15)';
-  private readonly C_EXP      = '#ef4444';
+  private readonly C_EXP       = '#ef4444';
   private readonly C_EXP_TRACK = 'rgba(239, 68, 68, 0.15)';
 
-  ngOnInit() {
-    this.transactionService.getMonthlyStats().subscribe({
-      next: (data) => {
-        const mapped = data.map((s: any) => ({
-          month: this.formatMonth(s.month),
-          income: s.income,
-          expenses: s.expenses,
-        }));
-        this.monthlyData.set(mapped);
-        this.loading.set(false);
-        // Wait a tick for @if to render the canvas
-        setTimeout(() => this.renderChart(), 0);
-      },
-      error: () => this.loading.set(false),
+  constructor() {
+    // Carga datos cuando el refresh dispara
+    effect(() => {
+      this.refresh.version();
+      this.load();
+    }, { allowSignalWrites: true });
+
+    // Renderiza el chart cuando los datos Y el canvas están listos
+    effect(() => {
+      const hasData  = this.monthlyData().length > 0;
+      const isReady  = this.chartReady();
+      const notLoading = !this.loading();
+      if (hasData && isReady && notLoading) {
+        this.renderChart();
+      }
+    }, { allowSignalWrites: true });
+
+    // Marca el canvas como listo después del primer render del DOM
+    afterNextRender(() => {
+      this.chartReady.set(true);
     });
   }
 
-  ngOnDestroy() {
-    this.cancelAnimation();
+  load() {
+    this.loading.set(true);
+    this.chartReady.set(false); // resetea para forzar re-render
+    this.txService.getMonthlyStats().subscribe({
+      next: data => {
+        this.monthlyData.set(data.map((s: any) => ({
+          month:    this.formatMonth(s.month),
+          income:   s.income,
+          expenses: s.expenses,
+        })));
+        this.loading.set(false);
+        // Espera que el @if renderice el canvas
+        setTimeout(() => this.chartReady.set(true), 50);
+      },
+      error: () => this.loading.set(false),
+    });
   }
 
   setFilter(f: 'all' | 'income' | 'expense') {
@@ -72,109 +87,49 @@ export class OverviewComponent implements OnInit, OnDestroy {
   renderChart() {
     const canvasRef = this.chartCanvas();
     if (!canvasRef) return;
-
     this.cancelAnimation();
 
     const canvas = canvasRef.nativeElement;
-    const ctx = canvas.getContext('2d');
+    const ctx    = canvas.getContext('2d');
     if (!ctx) return;
 
-    const W = canvas.width;
-    const H = canvas.height;
-    const cx = W / 2;
-    const cy = H / 2;
+    const W = canvas.width, H = canvas.height;
+    const cx = W / 2, cy = H / 2;
+    const TAU = Math.PI * 2, START = -Math.PI / 2;
 
-    const outerR = W * 0.44;
-    const outerW = W * 0.12;
-    const innerR = W * 0.30;
-    const innerW = W * 0.12;
-
-    const TAU   = Math.PI * 2;
-    const START = -Math.PI / 2; // top
-
-    const income  = this.totalIncome;
-    const expense = this.totalExpenses;
+    const income  = this.totalIncome();
+    const expense = this.totalExpenses();
     const expFrac = income > 0 ? Math.min(expense / income, 1) : 0;
-
     const showIncome  = this.filter() !== 'expense';
     const showExpense = this.filter() !== 'income';
 
-    const DURATION = 900;
     const startTime = performance.now();
+    const easeOut   = (t: number) => 1 - Math.pow(1 - t, 3);
 
-    const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
-
-    const drawRing = (
-      r: number,
-      lineW: number,
-      fraction: number,
-      color: string,
-      trackColor: string,
-    ) => {
-      // Track
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, TAU);
-      ctx.strokeStyle = trackColor;
-      ctx.lineWidth = lineW;
-      ctx.lineCap = 'round';
-      ctx.stroke();
-
-      if (fraction <= 0) return;
-
-      // Filled arc
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, START, START + TAU * fraction);
-      ctx.strokeStyle = color;
-      ctx.lineWidth = lineW;
-      ctx.lineCap = 'round';
-      ctx.stroke();
+    const drawRing = (r: number, lw: number, frac: number, col: string, track: string) => {
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU);
+      ctx.strokeStyle = track; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.stroke();
+      if (frac <= 0) return;
+      ctx.beginPath(); ctx.arc(cx, cy, r, START, START + TAU * frac);
+      ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.stroke();
     };
 
     const tick = (now: number) => {
-      const elapsed = now - startTime;
-      const t       = Math.min(elapsed / DURATION, 1);
-      const p       = easeOut(t);
-
+      const p = easeOut(Math.min((now - startTime) / 900, 1));
       ctx.clearRect(0, 0, W, H);
-
-      if (showIncome) {
-        drawRing(outerR, outerW, p, this.C_INC, this.C_INC_TRACK);
-      }
-
-      if (showExpense) {
-        drawRing(innerR, innerW, expFrac * p, this.C_EXP, this.C_EXP_TRACK);
-      }
-
-      if (t < 1) {
-        this.animationId = requestAnimationFrame(tick);
-      }
+      if (showIncome)  drawRing(W*.44, W*.12, p,           this.C_INC, this.C_INC_TRACK);
+      if (showExpense) drawRing(W*.30, W*.12, expFrac * p, this.C_EXP, this.C_EXP_TRACK);
+      if (p < 1) this.animationId = requestAnimationFrame(tick);
     };
-
     this.animationId = requestAnimationFrame(tick);
   }
 
   private cancelAnimation() {
-    if (this.animationId !== null) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = null;
-    }
+    if (this.animationId !== null) { cancelAnimationFrame(this.animationId); this.animationId = null; }
   }
 
-  private formatMonth(key: string): string {
-    const [year, month] = key.split('-');
-    const date = new Date(+year, +month - 1);
-    return date.toLocaleString('es', { month: 'short', year: '2-digit' });
-  }
-
-  get totalIncome(): number {
-    return this.monthlyData().reduce((acc, s) => acc + s.income, 0);
-  }
-
-  get totalExpenses(): number {
-    return this.monthlyData().reduce((acc, s) => acc + s.expenses, 0);
-  }
-
-  get netValue(): number {
-    return this.totalIncome - this.totalExpenses;
+  private formatMonth(key: string) {
+    const [y, m] = key.split('-');
+    return new Date(+y, +m - 1).toLocaleString('es', { month: 'short', year: '2-digit' });
   }
 }

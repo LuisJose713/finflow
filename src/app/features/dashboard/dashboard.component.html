@@ -5,13 +5,11 @@
     <header class="page-header">
       <div class="header-left">
         <h1>Dashboard</h1>
-        <p class="greeting"> Hola, {{ firstName() || 'Usuario' }} 👋  </p>
+        <p class="greeting">Hola, {{ firstName() || "Usuario" }} 👋</p>
       </div>
       <div class="header-actions">
         <button class="btn-export" (click)="exportPdf()">⬇ Exportar PDF</button>
-        <app-add-transaction
-          (created)="onTransactionCreated()"
-        ></app-add-transaction>
+        <app-add-transaction> </app-add-transaction>
       </div>
     </header>
 

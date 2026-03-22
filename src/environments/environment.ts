@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8080', // ruta principal back
+  apiUrl: 'http://localhost:8081', // ruta principal back
 
 };
