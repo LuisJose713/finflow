@@ -1,7 +1,70 @@
-<div class="overview-card">
+<!-- <div class="overview-card">
   <div class="card-header">
     <h2>Resumen mensual</h2>
     <span class="month-badge">Mar 2026</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab" [class.active]="filter() === 'all'" (click)="setFilter('all')">
+      Todo
+    </button>
+    <button class="tab" [class.active]="filter() === 'income'" (click)="setFilter('income')">
+      Ingresos
+    </button>
+    <button class="tab" [class.active]="filter() === 'expense'" (click)="setFilter('expense')">
+      Egresos
+    </button>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card income">
+      <span class="stat-label">Total ingresos</span>
+      <span class="stat-value income">+${{ totalIncome().toLocaleString('es-CO') }}</span>
+    </div>
+    <div class="stat-card expense">
+      <span class="stat-label">Total egresos</span>
+      <span class="stat-value expense">−${{ totalExpenses().toLocaleString('es-CO') }}</span>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="chart-skeleton"></div>
+  } @else {
+    <div class="chart-wrap">
+      <canvas #chartCanvas width="320" height="320"></canvas>
+      <div class="chart-center">
+        <span class="net-label">Neto</span>
+        <span class="net-value" [class.positive]="netValue() >= 0" [class.negative]="netValue() < 0">
+          {{ netValue() >= 0 ? '+' : '−' }}${{ Math.abs(netValue()).toLocaleString('es-CO') }}
+        </span>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item">
+        <span class="legend-dot income"></span>
+        Ingresos
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot expense"></span>
+        Egresos
+      </div>
+    </div>
+  }
+</div> -->
+
+<div class="overview-card">
+  <div class="card-header">
+    <h2>Resumen</h2>
+
+    <div class="scope-toggle">
+      <button class="scope-btn" [class.active]="scope() === 'month'" (click)="setScope('month')">
+        Este mes
+      </button>
+      <button class="scope-btn" [class.active]="scope() === 'all'" (click)="setScope('all')">
+        Todo
+      </button>
+    </div>
   </div>
 
   <div class="tabs">
