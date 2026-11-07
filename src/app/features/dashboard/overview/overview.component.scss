@@ -511,3 +511,14 @@
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* v2: compact insight panel, no oversized blank canvas */
+.overview-card { padding:clamp(1.1rem,2vw,1.75rem); border-radius:22px; background:var(--bg-secondary); box-shadow:0 18px 50px rgba(0,0,0,.08); }
+.card-header h2 { font-size:1.15rem; letter-spacing:-.035em; }
+.tabs { border:1px solid var(--border); }
+.stat-card { border-radius:15px; }
+.chart-wrap { max-width:230px; margin:0 auto 1rem; }
+.chart-wrap canvas { max-height:230px; }
+.chart-skeleton { max-width:230px; }
+.legend { padding-bottom:.25rem; }
+@media(max-width:600px){ .overview-card { padding:1.1rem; } .card-header { gap:.7rem; flex-wrap:wrap; } .stats { gap:.6rem; } .stat-card { padding:.8rem; } .stat-value { font-size:1.1rem; } }
