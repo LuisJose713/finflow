@@ -2,7 +2,7 @@
 .app-container {
   display: flex;
   min-height: 100vh;
-  background: var(--bg-base);
+  background: var(--bg-secondary);
 }
 
 /* ── Sidebar ── */
@@ -53,7 +53,7 @@
   .brand {
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--text-primary);
+    color: #f8fafc;
     flex: 1;
     white-space: nowrap;
     overflow: hidden;
@@ -63,7 +63,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--text-muted);
+    color: #cbd5e1;
     font-size: 0.9rem;
     margin-left: auto;
 
@@ -93,20 +93,20 @@
     border-radius: 0.6rem;
 
     text-decoration: none;
-    color: var(--text-muted);
+    color: #cbd5e1;
     font-size: 0.9rem;
     font-weight: 500;
 
     transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(99, 102, 241, 0.08);
-      color: var(--text-primary);
+      background: rgba(96, 165, 250, 0.16);
+      color: #ffffff;
     }
 
     &.active {
-      background: rgba(99, 102, 241, 0.15);
-      color: var(--primary);
+      background: rgba(96, 165, 250, 0.2);
+      color: #bfdbfe;
       font-weight: 600;
 
       &::before {
@@ -231,4 +231,10 @@
   .main-content {
     padding: 1rem;
   }
+}
+.sidebar :focus-visible { outline-color: #bfdbfe; }
+.sidebar .nav-item { min-height: 44px; }
+@media (max-width: 768px) {
+  .mobile-menu-btn { min-width: 44px; min-height: 44px; }
+  .main-content { min-width: 0; }
 }
