@@ -14,8 +14,8 @@ import { Category } from '../../core/models';
 export class BudgetsComponent implements OnInit {
  private readonly api=inject(BudgetService);
  private readonly categoryApi=inject(CategoryService);
- readonly year=signal(new Date().getFullYear());
- readonly month=signal(new Date().getMonth()+1);
+ readonly year=signal(new Date(new Date().toLocaleString('en-US',{timeZone:'America/Bogota'})).getFullYear());
+ readonly month=signal(new Date(new Date().toLocaleString('en-US',{timeZone:'America/Bogota'})).getMonth()+1);
  readonly budgets=signal<MonthlyBudget[]>([]);
  readonly categories=signal<Category[]>([]);
  readonly loading=signal(true);
@@ -26,6 +26,7 @@ export class BudgetsComponent implements OnInit {
  selectedCategory:number|null=null;
  amount:number|null=null;
  readonly period= computed(()=>new Intl.DateTimeFormat('es-CO',{month:'long',year:'numeric'}).format(new Date(this.year(),this.month()-1,1)));
+ readonly selectedCategoryName=computed(()=>this.budgets().find(b=>b.id===this.editing())?.categoryName ?? 'Categoría');
  readonly available= computed(()=>this.categories().filter(c=>c.type.toLowerCase()==='expense' && !this.budgets().some(b=>b.categoryId===c.id)));
  readonly totalLimit= computed(()=>this.budgets().reduce((sum,b)=>sum+Number(b.limitAmount),0));
  readonly totalSpent= computed(()=>this.budgets().reduce((sum,b)=>sum+Number(b.spent),0));
