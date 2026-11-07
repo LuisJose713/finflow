@@ -1,26 +1,19 @@
 <div class="app-shell">
   <app-navbar></app-navbar>
   <main class="main-content">
-    <div class="dashboard-topline"><span class="live-dot"></span> FINFLOW / CENTRO FINANCIERO <span class="topline-version">WEB 2.0</span></div>
+    <div class="dashboard-topline"><span class="live-dot"></span> FINFLOW <span class="topline-version">PANEL PERSONAL</span></div>
     <header class="page-header">
       <div class="header-left">
         <span class="eyebrow">TU ESPACIO FINANCIERO</span>
-        <h1>Tu dinero, <span class="gradient-word">en perspectiva.</span></h1>
-        <p class="greeting">Hola, {{ firstName() || "Usuario" }} 👋 · Cada decisión cuenta.</p>
+        <h1>Tu dinero, <span class="gradient-word">bajo control.</span></h1>
+        <p class="greeting">Hola, {{ firstName() || "Usuario" }} 👋 · Tu panorama financiero empieza aquí.</p>
       </div>
       <div class="header-actions">
         <button class="btn-export" (click)="exportPdf()">↓ Exportar informe</button>
         <app-add-transaction></app-add-transaction>
       </div>
     </header>
-    <section class="dashboard-intro" aria-label="Resumen de tus finanzas">
-      <div class="intro-content">
-        <span class="intro-kicker"><span class="intro-sparkle">✦</span> FINANZAS EN ORDEN</span>
-        <h2>Construye tu próximo capítulo financiero.</h2>
-        <p>Visualiza tus movimientos, sigue tus metas y toma decisiones con claridad. Todo en un mismo lugar.</p>
-      </div>
-      <div class="intro-decoration" aria-hidden="true"><span class="orbit orbit-one"></span><span class="orbit orbit-two"></span><span class="orbit-center">F</span></div>
-    </section>
+    <section class="premium-hero" aria-label="Bienvenida financiera"><div class="premium-hero-copy"><span class="premium-overline">TU CENTRO DE CONTROL</span><h2>Una visión clara.<br><em>Mejores decisiones.</em></h2><p>Tu patrimonio, tus movimientos y tus próximos objetivos en un solo lugar.</p><div class="premium-hero-actions"><a routerLink="/transactions" class="premium-link">Explorar movimientos <span aria-hidden="true">↗</span></a><a routerLink="/goals" class="premium-link secondary">Ver mis metas <span aria-hidden="true">→</span></a></div></div><div class="premium-hero-art" aria-hidden="true"><div class="premium-orbit outer"></div><div class="premium-orbit inner"></div><span class="premium-monogram">F<span>·</span></span></div></section>
     <section class="section stats-section" aria-label="Indicadores financieros">
       <div class="section-heading"><div><span class="eyebrow">PANORAMA GENERAL</span><h2>Tus números de un vistazo</h2></div><span class="section-caption">Información actualizada</span></div>
       <app-transaction-stats></app-transaction-stats>
