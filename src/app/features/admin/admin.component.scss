@@ -31,3 +31,44 @@
 .ae-vqor-credit strong { letter-spacing:.12em; color:#b18a4e; }
 @media(max-width:1080px) { .admin-kpi-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:680px) { .admin-heading { flex-direction:column; align-items:flex-start; } .admin-emblem { display:none; } .admin-kpi-grid { grid-template-columns:1fr; } .admin-month-bars { gap:.3rem; } .admin-section { padding:1rem; } }
+
+/* FinFlow Atelier — layout fluid without overflowing the sidebar viewport */
+:host{min-width:0;flex:1 1 auto}
+.admin-workspace{width:100%;max-width:1560px;margin-inline:auto;min-width:0;overflow-x:clip}
+.admin-heading,.admin-section,.admin-kpi,.admin-month-column{min-width:0}
+.admin-heading{isolation:isolate}
+.admin-heading>div:first-child{min-width:0;flex:1}
+.admin-heading h1,.admin-heading p,.admin-kpi strong{overflow-wrap:anywhere}
+.admin-section-heading{flex-wrap:wrap;align-items:flex-start}
+.admin-section-heading>div{min-width:0}
+.admin-kpi-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.admin-month-bars{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;grid-template-columns:repeat(6,minmax(90px,1fr))}
+.admin-month-column{min-width:90px}
+.admin-month-column span,.admin-month-column small{white-space:nowrap}
+.admin-bar-track{height:clamp(110px,14vw,175px)}
+.admin-personal-link:focus-visible{outline:3px solid #fff;outline-offset:3px}
+@media(max-width:1280px){
+  .admin-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:768px){
+  .admin-workspace{padding-top:5.25rem!important;padding-inline:clamp(.85rem,3.4vw,1.5rem)!important}
+  .admin-heading{padding:1.45rem;gap:.8rem;border-radius:18px}
+  .admin-emblem{display:none}
+  .admin-section{padding:1.25rem}
+  .admin-section-heading{gap:.5rem}
+  .admin-section-heading h2{font-size:1.15rem}
+  .admin-activity-section{overflow:hidden}
+  .admin-month-bars{grid-template-columns:repeat(6,minmax(84px,1fr));padding-block:1rem .5rem}
+  .admin-month-column{min-width:84px}
+  .admin-bar-track{height:125px}
+}
+@media(max-width:480px){
+  .admin-heading h1{font-size:clamp(1.6rem,8vw,2.15rem)}
+  .admin-personal-link{width:100%;justify-content:center;min-height:44px}
+  .admin-kpi-grid{grid-template-columns:minmax(0,1fr)}
+  .admin-kpi{min-height:122px;padding:1.15rem}
+  .admin-kpi strong{font-size:1.9rem}
+  .admin-section{border-radius:16px;padding:1rem}
+  .admin-privacy-note{padding-inline:.25rem;text-align:left}
+  .section-tag{max-width:100%;white-space:normal}
+}

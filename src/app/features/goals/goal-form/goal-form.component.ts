@@ -1,4 +1,5 @@
 import { Component, inject, signal, output } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { GoalService } from '../../../core/services/goal.service';
@@ -21,6 +22,7 @@ export class GoalFormComponent {
   saved     = output<void>();
   isOpen    = signal(false);
   loading   = signal(false);
+  error     = signal('');
 
   // Signals de display para los campos con formato
   targetDisplay  = signal('');
@@ -42,6 +44,7 @@ export class GoalFormComponent {
   }
 
   open(goal?: Goal) {
+    this.error.set('');
     this.editGoal.set(goal ?? null);
     if (goal) {
       this.form.patchValue({
@@ -62,6 +65,7 @@ export class GoalFormComponent {
   }
 
   close() {
+    this.error.set('');
     this.isOpen.set(false);
     this.editGoal.set(null);
     this.form.reset({ currentAmount: null });
@@ -88,8 +92,11 @@ export class GoalFormComponent {
   }
 
   onSubmit() {
+    if (this.loading()) return;
+    this.error.set('');
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.error.set('Completa el título, un monto objetivo válido y la fecha límite.');
       return;
     }
     this.loading.set(true);
@@ -97,12 +104,20 @@ export class GoalFormComponent {
     const goal = this.editGoal();
 
     const data: CreateGoalRequest = {
-      title:         raw.title!,
+      title:         raw.title!.trim(),
       targetAmount:  raw.targetAmount!,
       currentAmount: raw.currentAmount ?? 0,
       deadline:      raw.deadline!,
       description:   raw.description ?? '',
     };
+
+    if (data.title.length < 2 || !Number.isFinite(data.targetAmount) || data.targetAmount <= 0 ||
+        !Number.isFinite(data.currentAmount ?? 0) || (data.currentAmount ?? 0) < 0 ||
+        (data.currentAmount ?? 0) > data.targetAmount) {
+      this.error.set('Revisa el título y los valores: el ahorro inicial debe estar entre cero y el objetivo.');
+      this.loading.set(false);
+      return;
+    }
 
     const request$ = goal
       ? this.goalService.update(goal.id, data)
@@ -115,8 +130,14 @@ export class GoalFormComponent {
         this.close();
         this.loading.set(false);
       },
-      error: () => {
-        this.toast.error('Error al guardar la meta');
+      error: (err: HttpErrorResponse) => {
+        const message = err.status === 401 ? 'La sesión expiró. Inicia sesión nuevamente.'
+          : err.status === 400 ? 'Revisa el monto, el título y la fecha límite.'
+          : err.status === 409 ? 'No se pudo guardar la meta por un conflicto de datos.'
+          : err.status === 0 ? 'No hay conexión con el servidor. Reintenta en unos momentos.'
+          : 'La meta no pudo guardarse. Verifica el servidor e inténtalo otra vez.';
+        this.error.set(message);
+        this.toast.error(message);
         this.loading.set(false);
       },
     });

@@ -24,19 +24,18 @@ export class AdminComponent implements OnInit {
 
   ngOnInit() { this.refresh(); }
   refresh() {
-    if (this.auth.currentUser()?.role !== 'ADMIN') {
-      this.error.set('Acceso reservado a la cuenta administradora.');
-      this.loading.set(false);
-      return;
-    }
+    // El backend verifica ROLE_ADMIN. No bloquear por un perfil local aún sin hidratar.
     this.loading.set(true);
     this.error.set('');
     this.api.getOverview().subscribe({
       next: data => { this.overview.set(data); this.loading.set(false); },
       error: err => {
+        this.overview.set(null);
         this.error.set(err.status === 403
-          ? 'No tienes permisos para consultar estas estadísticas.'
-          : 'No fue posible obtener las estadísticas. Inténtalo nuevamente.');
+          ? 'Esta cuenta no tiene permiso de administración.'
+          : err.status === 401
+          ? 'Tu sesión expiró. Inicia sesión nuevamente.'
+          : 'No pudimos cargar las estadísticas. Comprueba tu conexión e inténtalo otra vez.');
         this.loading.set(false);
       }
     });

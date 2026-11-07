@@ -30,10 +30,9 @@ export class CategoriesComponent implements OnInit {
   name = '';
   type: CategoryType = 'Expense';
 
-  readonly mine = computed(() =>
-    this.categories().filter(c => c.userId != null &&
-      Number(c.userId) === Number(this.auth.currentUser()?.id))
-  );
+  // GET /categories ya devuelve solo las categorías propias y las del sistema.
+  // No dependemos de un perfil guardado en localStorage para mostrarlas.
+  readonly mine = computed(() => this.categories().filter(c => c.userId != null));
   readonly global = computed(() =>
     this.categories().filter(c => c.userId == null)
   );
@@ -56,7 +55,7 @@ export class CategoriesComponent implements OnInit {
   }
 
   startEdit(category: Category) {
-    if (category.userId == null || Number(category.userId) !== Number(this.auth.currentUser()?.id)) return;
+    if (category.userId == null) return; // El backend valida al propietario.
     this.editId.set(category.id);
     this.name = category.name;
     this.type = category.type === 'Income' ? 'Income' : 'Expense';
@@ -71,7 +70,7 @@ export class CategoriesComponent implements OnInit {
   }
 
   save() {
-    const name = this.name.trim();
+    const name = this.name.trim().replace(/\s+/g, ' ');
     if (name.length < 2 || name.length > 80) {
       this.error.set('El nombre debe tener entre 2 y 80 caracteres.');
       return;
@@ -95,14 +94,16 @@ export class CategoriesComponent implements OnInit {
       error: (err: HttpErrorResponse) => {
         this.saving.set(false);
         this.error.set(err.status === 409
-          ? 'La categoría ya existe o está en uso.'
-          : 'No fue posible guardar. Revisa los datos e inténtalo nuevamente.');
+          ? 'Ya existe esta categoría o no puede modificarse por estar en uso.'
+          : err.status === 401 ? 'Tu sesión expiró. Inicia sesión nuevamente.'
+          : err.status === 400 ? String(err.error?.error ?? 'Revisa el nombre y el tipo de categoría.')
+          : 'No se pudo guardar. Comprueba la conexión e inténtalo de nuevo.');
       },
     });
   }
 
   remove(category: Category) {
-    if (category.userId == null || Number(category.userId) !== Number(this.auth.currentUser()?.id)) return;
+    if (category.userId == null) return; // El backend valida al propietario.
     if (!window.confirm('¿Eliminar la categoría "' + category.name + '"? No se eliminarán tus movimientos.')) return;
     this.error.set('');
     this.notice.set('');
@@ -115,6 +116,7 @@ export class CategoriesComponent implements OnInit {
       error: (err: HttpErrorResponse) => {
         this.error.set(err.status === 409
           ? 'No puedes eliminar una categoría con movimientos, presupuestos o gastos asociados.'
+          : err.status === 403 || err.status === 404 ? 'Esta categoría no se puede modificar.'
           : 'No pudimos eliminar la categoría.');
       },
     });
