@@ -351,3 +351,35 @@ body { background:var(--ff-canvas); }
 @media(max-width:1000px) { .premium-hero-art { flex-basis:170px; } }
 @media(max-width:760px) { .premium-hero-art { display:none; } .premium-hero { min-height:0; } .premium-hero h2 { font-size:2.2rem; } }
 @media(prefers-reduced-motion:reduce) { .premium-link { transition:none; } }
+
+
+/* Responsive application shell (shared by ALL routed pages).
+   Previously only the Dashboard's component stylesheet declared flex layout,
+   leaving Accounts, Admin, Recurring etc. below the full-height sidebar.
+   Keep this in global styles so Angular view encapsulation cannot hide it. */
+.app-shell {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+  min-height: 100dvh;
+}
+.app-shell > app-navbar {
+  align-self: flex-start;
+}
+.app-shell > .main-content {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+@media (max-width: 768px) {
+  .app-shell {
+    display: block;
+  }
+  .app-shell > .main-content {
+    width: 100%;
+    min-width: 0;
+    padding-top: 5.25rem;
+  }
+}

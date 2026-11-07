@@ -67,3 +67,171 @@
 .sidebar-brand-credit { margin:0 .45rem .25rem; padding:.8rem .5rem .2rem; text-align:center; font-size:.62rem; line-height:1.5; color:#8fa3bd; letter-spacing:.03em; }
 .sidebar-brand-credit strong { color:#dcc29a; letter-spacing:.14em; }
 .sidebar-brand-credit small { display:block; font-size:.53rem; font-weight:650; color:#71849c; margin-top:.2rem; letter-spacing:.04em; }
+
+
+/* Theme/footer must fit the ACTUAL sidebar width. Component styles are
+   encapsulated by Angular, so target the component host and pass [compact]
+   rather than trying to style .theme-btn inside another component. */
+.sidebar { min-width:0; }
+.sidebar-footer {
+  width:100%;
+  min-width:0;
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  padding:1rem .2rem .35rem;
+  gap:.65rem;
+  flex-shrink:0;
+}
+.sidebar-footer app-theme-switcher,
+.sidebar-footer app-logout-button {
+  display:block;
+  width:100%;
+  min-width:0;
+  max-width:100%;
+}
+.sidebar.collapsed { padding-inline:.5rem; }
+.sidebar.collapsed .sidebar-footer {
+  width:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:1rem 0 .35rem;
+  gap:0;
+}
+.sidebar.collapsed .sidebar-footer app-theme-switcher {
+  flex:0 0 44px;
+  width:44px;
+  max-width:100%;
+}
+@media (max-width:768px) {
+  .sidebar,
+  .sidebar.collapsed { padding-inline:.85rem; }
+  .sidebar-footer,
+  .sidebar.collapsed .sidebar-footer {
+    width:100%;
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    gap:.6rem;
+    justify-items:stretch;
+    padding:1rem .1rem .35rem;
+  }
+  .sidebar-footer app-theme-switcher,
+  .sidebar.collapsed .sidebar-footer app-theme-switcher {
+    width:100%;
+    flex:auto;
+    max-width:100%;
+  }
+}
+
+
+/* FinFlow adaptive sliding navigation.
+   The width transition applies to the HOST as well as the aside so the
+   routed content can resize without horizontal overflow or jumping. */
+:host {
+  --sidebar-open-width: clamp(220px, 20vw, 246px);
+  flex: 0 0 var(--sidebar-open-width);
+  width: var(--sidebar-open-width);
+  min-width: 0;
+  transition: flex-basis 220ms ease, width 220ms ease;
+}
+:host:has(.sidebar.collapsed) {
+  flex: 0 0 72px;
+  width: 72px;
+}
+.sidebar {
+  width: 100%;
+  max-width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+.sidebar-header { min-width: 0; }
+.sidebar .nav {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+}
+.sidebar-brand-credit { flex: 0 0 auto; overflow-wrap: anywhere; }
+.sidebar.collapsed .nav-item { padding-inline: .4rem; }
+.sidebar.collapsed .nav-icon { margin-inline: auto; }
+.sidebar.collapsed .sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: .55rem;
+  margin-top: auto;
+  width: 100%;
+  padding: .85rem 0 .35rem;
+}
+.sidebar.collapsed .sidebar-footer app-theme-switcher,
+.sidebar.collapsed .sidebar-footer app-logout-button {
+  flex: 0 0 auto;
+  display: block;
+  width: 44px;
+  max-width: 100%;
+}
+.sidebar.collapsed .collapse-btn {
+  width: 40px;
+  height: 36px;
+  padding: 0;
+}
+@media (max-width: 768px) {
+  :host,
+  :host:has(.sidebar.collapsed) {
+    flex: 0 0 0;
+    width: 0;
+    height: 0;
+    transition: none;
+  }
+  .sidebar,
+  .sidebar.collapsed {
+    width: min(320px, calc(100vw - 16px));
+    max-width: calc(100vw - 16px);
+    height: 100dvh;
+    overflow: hidden;
+    box-shadow: 18px 0 60px rgba(0, 0, 0, .25);
+    padding: 1.1rem .85rem;
+    transition: transform 220ms ease;
+  }
+  .sidebar .nav {
+    overflow-y: auto;
+    min-height: 0;
+    scrollbar-width: thin;
+  }
+  .sidebar .collapse-btn { display: none; }
+  .sidebar-footer,
+  .sidebar.collapsed .sidebar-footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: .6rem;
+    padding: .8rem 0 .35rem;
+  }
+  .sidebar-footer app-theme-switcher,
+  .sidebar-footer app-logout-button,
+  .sidebar.collapsed .sidebar-footer app-theme-switcher,
+  .sidebar.collapsed .sidebar-footer app-logout-button {
+    width: 100%;
+    max-width: 100%;
+  }
+  .mobile-menu-btn {
+    top: max(1rem, env(safe-area-inset-top, 0px));
+    left: max(1rem, env(safe-area-inset-left, 0px));
+    box-shadow: 0 8px 24px rgba(20, 36, 68, .2);
+  }
+  .mobile-menu-btn.menu-open {
+    left: calc(min(320px, 100vw - 16px) - 56px);
+    background: #1b2b43;
+    border-color: #7a8ca8;
+    font-size: 1.75rem;
+  }
+  .sidebar.open .sidebar-header {
+    padding-right: 3.25rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :host, .sidebar { transition: none; }
+}
