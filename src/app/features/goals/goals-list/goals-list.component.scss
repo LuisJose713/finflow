@@ -210,3 +210,13 @@
 .goal-footer { margin-top:auto; }
 .btn-icon { min-width:38px; min-height:38px; border-radius:10px; }
 @media(max-width:768px){ .main-content { padding:4.5rem 1rem 1.5rem; } }
+
+
+/* v3 goal cards */
+.goal-card { padding:1.5rem; gap:1.1rem; }
+.goal-header h3 { font-family:'Inter',sans-serif; font-weight:750; }
+.goal-desc { line-height:1.6; color:var(--text-secondary); }
+.progress-section { gap:.65rem; }
+.progress-bar { height:9px; background:var(--bg-primary); }
+.goal-footer { gap:.8rem; }
+.deadline { color:var(--text-secondary); }

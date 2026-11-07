@@ -271,3 +271,14 @@
 .message-bubble { border-radius:17px; padding:.95rem 1.15rem; }
 .input-area { border-radius:17px; min-height:64px; }
 @media(max-width:768px){ .main-content { padding:4.5rem 1rem 1.5rem; max-height:none; min-height:100dvh; } .message-bubble { max-width:90%; } }
+
+
+/* v3 financial advisor */
+.cards-grid { gap:1rem; }
+.advisor-card { border-radius:18px; min-height:110px; }
+.advisor-card strong { font-family:'Inter',sans-serif; font-size:.95rem; font-weight:750; }
+.advisor-card p { color:var(--text-secondary); line-height:1.5; }
+.messages-wrapper { border-radius:20px; background:var(--bg-secondary); }
+.message.assistant .message-bubble { background:var(--bg-primary); }
+.message.user .message-bubble { background:linear-gradient(120deg,#3278ed,#665fe0); }
+.input-area { background:var(--bg-secondary); border-radius:17px; }

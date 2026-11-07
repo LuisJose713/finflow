@@ -202,3 +202,118 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
     transition: none;
   }
 }
+
+
+/* FinFlow Design System v3 — unified application-wide surfaces and controls. */
+:root {
+  --ff-accent:#477cff;
+  --ff-accent-soft:rgba(88,132,255,.13);
+  --ff-radius:20px;
+  --ff-radius-sm:12px;
+  --ff-shadow:0 20px 55px rgba(8,16,37,.10);
+}
+.dark {
+  --bg-primary:#121d31;
+  --bg-secondary:#0c1424;
+  --surface-raised:#1a2943;
+  --border:#2b3c58;
+  --text-primary:#f0f5ff;
+  --text-secondary:#b2c1dc;
+  --text-muted:#91a3c1;
+  --primary:#91b7ff;
+  --primary-dark:#719bff;
+  --ff-shadow:0 20px 55px rgba(0,0,0,.16);
+}
+:where(.app-shell) { background:var(--bg-primary); }
+:where(.app-shell > .main-content) {
+  min-width:0;
+  width:100%;
+  max-width:1900px;
+  padding:clamp(1.25rem,3vw,3rem);
+  background:radial-gradient(ellipse 65% 22% at 90% 0%,rgba(77,113,231,.10),transparent 80%),var(--bg-primary);
+}
+:where(.app-shell .page-header) { align-items:center; gap:1.25rem; margin-bottom:1.75rem; }
+:where(.app-shell .page-header h1) {
+  font-family:'Inter','Segoe UI',system-ui,sans-serif;
+  font-size:clamp(1.8rem,3vw,2.65rem);
+  font-weight:800;
+  letter-spacing:-.055em;
+  line-height:1.12;
+}
+:where(.app-shell .page-header .subtitle,.app-shell .page-header .greeting) {
+  color:var(--text-secondary);
+  font-size:.9rem;
+  line-height:1.6;
+}
+:where(.app-shell .goal-card,.app-shell .summary-card,.app-shell .filters-card,
+  .app-shell .advisor-card,.app-shell .expense-card,.app-shell .tx-item,
+  .app-shell .overview-card,.app-shell .transactions-card) {
+  border:1px solid var(--border);
+  border-radius:var(--ff-radius);
+  box-shadow:var(--ff-shadow);
+}
+:where(.app-shell .goal-card,.app-shell .summary-card,.app-shell .filters-card,
+  .app-shell .advisor-card,.app-shell .expense-card,.app-shell .tx-item) {
+  background:var(--bg-secondary);
+}
+:where(.app-shell .goal-card,.app-shell .advisor-card,.app-shell .expense-card,.app-shell .tx-item) {
+  transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease;
+}
+:where(.app-shell .goal-card,.app-shell .advisor-card,.app-shell .expense-card,.app-shell .tx-item):hover {
+  border-color:rgba(119,160,255,.46);
+}
+:where(.app-shell .btn-primary,.app-shell .btn-new,.app-shell .btn-send) {
+  border:0;
+  border-radius:var(--ff-radius-sm);
+  background:linear-gradient(110deg,#3477ed,#6b61dc);
+  color:#fff;
+  font-weight:750;
+  box-shadow:0 8px 22px rgba(52,102,223,.18);
+}
+:where(.app-shell .btn-ghost,.app-shell .btn-clear,.app-shell .btn-export,.app-shell .btn-clear-lg) {
+  border:1px solid var(--border);
+  border-radius:var(--ff-radius-sm);
+  background:var(--bg-secondary);
+  color:var(--text-primary);
+}
+:where(.app-shell .search-input,.app-shell .filter-select,.app-shell input:not([type="checkbox"]):not([type="radio"]),
+  .app-shell select,.app-shell textarea) {
+  min-height:44px;
+  border:1px solid var(--border);
+  border-radius:var(--ff-radius-sm);
+  background:var(--bg-primary);
+  color:var(--text-primary);
+}
+:where(.app-shell input,.app-shell select,.app-shell textarea):focus-visible {
+  outline:2px solid #8daaff;
+  outline-offset:2px;
+}
+:where(.app-shell .filter-tabs,.app-shell .tabs) {
+  border:1px solid var(--border);
+  border-radius:13px;
+  background:var(--bg-secondary);
+}
+:where(.app-shell .tab.active) {
+  background:var(--ff-accent-soft);
+  color:var(--text-primary);
+}
+:where(.app-shell .empty-state) {
+  border:1px dashed var(--border);
+  border-radius:18px;
+  color:var(--text-secondary);
+}
+:where(.app-shell .progress-fill) { background:linear-gradient(90deg,#448cff,#8b78f5); }
+:where(.app-shell .status-badge) { border-radius:999px; }
+:where(.app-shell .tx-item,.app-shell .expense-card) { min-height:70px; }
+:where(.app-shell .btn-delete,.app-shell .btn-icon) { min-width:36px; min-height:36px; }
+@media(max-width:768px) {
+  :where(.app-shell > .main-content) { padding:4.5rem 1rem 1.5rem; }
+  :where(.app-shell .page-header) { align-items:flex-start; }
+  :where(.app-shell .page-header h1) { font-size:clamp(1.6rem,6vw,2.15rem); }
+  :where(.app-shell .summary-cards) { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(max-width:480px) {
+  :where(.app-shell .summary-cards) { grid-template-columns:minmax(0,1fr); }
+  :where(.app-shell .header-actions) { width:100%; flex-wrap:wrap; }
+  :where(.app-shell .tx-item,.app-shell .expense-card) { flex-wrap:wrap; }
+}

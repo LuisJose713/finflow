@@ -156,3 +156,12 @@ form {
 .prefixed {
   padding-left: 1.5rem;
 }
+
+
+/* FinFlow v3 unified modal language */
+.modal-backdrop,.modal-overlay { background:rgba(4,10,24,.72); backdrop-filter:blur(7px); }
+.modal { border:1px solid var(--border); border-radius:22px; background:var(--bg-secondary); box-shadow:0 30px 90px rgba(0,0,0,.30); color:var(--text-primary); font-family:'Inter','Segoe UI',sans-serif; }
+.modal-header h2 { font-family:'Inter','Segoe UI',sans-serif; font-weight:800; letter-spacing:-.035em; }
+.modal input,.modal select,.modal textarea { border-radius:12px; border:1px solid var(--border); background:var(--bg-primary); color:var(--text-primary); min-height:44px; }
+.modal input:focus-visible,.modal select:focus-visible,.modal textarea:focus-visible { outline:2px solid #8daaff; outline-offset:2px; }
+@media(max-width:540px) { .modal { max-width:100%; max-height:92dvh; overflow-y:auto; } }
