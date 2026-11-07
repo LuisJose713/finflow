@@ -1,3 +1,4 @@
+@use '../../../styles/responsive-dialog' as responsive;
 .app-shell {
   display: flex;
   min-height: 100vh;
@@ -514,3 +515,7 @@
 .expense-title { font-family:'Inter',sans-serif; font-weight:700; }
 .expense-amount { font-family:'Inter',sans-serif; font-weight:750; }
 @media(max-width:600px) { .expense-card { gap:.7rem; } .expense-right { flex-wrap:wrap; justify-content:flex-end; } }
+
+
+// Unified mobile bottom-sheet, responsive form and scroll-safe actions.
+@include responsive.dialog();
