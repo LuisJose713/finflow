@@ -23,6 +23,7 @@ export class LoginComponent {
 
   loading = signal(false);
   errorMsg = signal('');
+  showPassword = signal(false);
 
   form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
