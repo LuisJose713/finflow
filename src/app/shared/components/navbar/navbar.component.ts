@@ -33,6 +33,7 @@ export class NavbarComponent {
 
   navItems: NavItem[] = [
     { path: '/dashboard', label: 'Dashboard', icon: '📊' },
+    { path: '/disponible', label: 'Mi dinero disponible', icon: '✦' },
     { path: '/goals',     label: 'Metas',     icon: '🎯' },
     { path: '/accounts', label: 'Cuentas y billeteras', icon: '◫' },
     { path: '/recurring', label: 'Recurrentes', icon: '↻' },
