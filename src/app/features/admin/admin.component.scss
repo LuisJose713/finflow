@@ -72,3 +72,11 @@
   .admin-privacy-note{padding-inline:.25rem;text-align:left}
   .section-tag{max-width:100%;white-space:normal}
 }
+
+/* Design tokens adapt automatically to the global theme. */
+:host {
+  --ff-surface: var(--bg-primary);
+  --ff-ink: var(--text-primary);
+  --ff-hairline: var(--border);
+  --ff-canvas: var(--bg-secondary);
+}

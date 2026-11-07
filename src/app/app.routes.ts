@@ -1,6 +1,10 @@
-import { Routes } from "@angular/router";
+import { Router, Routes } from "@angular/router";
+import { inject } from '@angular/core';
+import { environment } from '../environments/environment';
 import { authGuard } from "./core/guards/auth.guard";
 import { guestGuard } from "./core/guards/guest.guard";
+
+const budgetsReadyGuard = () => environment.budgetsReady || inject(Router).createUrlTree(["/dashboard"]);
 
 export const routes: Routes = [
   {
@@ -69,7 +73,7 @@ export const routes: Routes = [
   {
     path: "budgets",
     loadComponent: () => import("./features/budgets/budgets.component").then(m => m.BudgetsComponent),
-    canActivate: [authGuard],
+    canActivate: [authGuard, budgetsReadyGuard],
   },
   {
     path: "categories",
