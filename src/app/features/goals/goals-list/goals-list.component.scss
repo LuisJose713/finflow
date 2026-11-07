@@ -196,3 +196,17 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
+
+
+/* FinFlow v2 goals workspace */
+.main-content { min-width:0; width:100%; padding:clamp(1.25rem,3vw,3rem); background:radial-gradient(ellipse at top right,rgba(83,112,224,.09),transparent 38%),var(--bg-primary); }
+.page-header h1 { font-size:clamp(1.8rem,3vw,2.7rem); font-weight:800; letter-spacing:-.055em; }
+.btn-new { min-height:46px; border-radius:12px; padding:.75rem 1.35rem; background:linear-gradient(110deg,#3975e8,#7665e5); box-shadow:0 8px 22px rgba(71,104,220,.2); }
+.goals-grid { grid-template-columns:repeat(auto-fill,minmax(min(100%,310px),1fr)); gap:1.25rem; }
+.goal-card { border-radius:21px; padding:1.6rem; min-height:240px; background:var(--bg-secondary); box-shadow:0 14px 40px rgba(0,0,0,.07); }
+.goal-header h3 { font-size:1.13rem; letter-spacing:-.025em; }
+.progress-bar { height:10px; }
+.progress-fill { background:linear-gradient(90deg,#4a9bff,#8b7cff); }
+.goal-footer { margin-top:auto; }
+.btn-icon { min-width:38px; min-height:38px; border-radius:10px; }
+@media(max-width:768px){ .main-content { padding:4.5rem 1rem 1.5rem; } }
