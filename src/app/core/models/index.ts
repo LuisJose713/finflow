@@ -4,6 +4,7 @@ export interface User {
   name: string;
   email: string;
   createdAt?: string;
+  role?: 'ADMIN' | 'USER';
 }
 
 export interface AuthResponse {
@@ -20,6 +21,7 @@ export interface RegisterRequest {
   name: string;
   email: string;
   password: string;
+  confirmPassword?: string;
 }
 
 // ─── Transaction ───────────────────────────────────────────────────────────
@@ -127,6 +129,7 @@ export interface Category {
   id: number;
   name: string;
   type: string;
+  userId?: number | null;
 }
 
 
