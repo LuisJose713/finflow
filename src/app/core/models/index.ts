@@ -97,6 +97,7 @@ export interface UpdateGoalRequest {
 /** Abonar a una meta */
 export interface AddContributionRequest {
   amount: number;
+  note?: string;
 }
 // ─── Advisor ───────────────────────────────────────────────────────────────
 export interface AdvisorMessage {
@@ -111,14 +112,6 @@ export interface AdvisorCard {
   description: string;
   icon: string;
   prompt: string;
-}
-
-// ─── Pagination ────────────────────────────────────────────────────────────
-export interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
 }
 
 //---- Category -----------------
@@ -140,23 +133,6 @@ export interface GoalContribution {
   createdAt: string;
 }
  
-// UpdateGoalRequest — todos opcionales
-export interface UpdateGoalRequest {
-  title?: string;
-  targetAmount?: number;
-  currentAmount?: number;
-  deadline?: string;
-  description?: string;
-  status?: GoalStatus;
-}
- 
-// AddContributionRequest — con note opcional
-export interface AddContributionRequest {
-  amount: number;
-  note?: string;
-}
- 
-
 // Agregar pre-Tarea
 
 export type PlannedExpenseStatus = 'pending' | 'done' | 'cancelled';
