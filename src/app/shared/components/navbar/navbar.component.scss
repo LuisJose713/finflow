@@ -63,3 +63,7 @@
 .sidebar.collapsed .sidebar-footer app-theme-switcher .theme-btn { padding:.7rem; }
 @media(min-width:769px) { .sidebar { overflow:hidden; } }
 @media(max-width:768px) { .sidebar-footer { display:grid; } .sidebar.collapsed .sidebar-footer { display:grid; } .sidebar.collapsed .sidebar-footer app-theme-switcher { width:100%; } }
+
+.sidebar-brand-credit { margin:0 .45rem .25rem; padding:.8rem .5rem .2rem; text-align:center; font-size:.62rem; line-height:1.5; color:#8fa3bd; letter-spacing:.03em; }
+.sidebar-brand-credit strong { color:#dcc29a; letter-spacing:.14em; }
+.sidebar-brand-credit small { display:block; font-size:.53rem; font-weight:650; color:#71849c; margin-top:.2rem; letter-spacing:.04em; }
