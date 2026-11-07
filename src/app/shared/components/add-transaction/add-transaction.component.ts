@@ -3,6 +3,7 @@ import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { CategoryService } from '../../../core/services/category.service';
+import { AccountService, FinancialAccount } from '../../../core/services/account.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { DashboardRefreshService } from '../../../core/services/dashboard-refresh.service';
 import { CreateTransactionRequest, TransactionType, Category } from '../../../core/models';
@@ -18,12 +19,14 @@ export class AddTransactionComponent implements OnInit {
   private fb             = inject(FormBuilder);
   private txService      = inject(TransactionService);
   private categoryService= inject(CategoryService);
+  private accountService = inject(AccountService);
   private toast          = inject(ToastService);
   private refresh        = inject(DashboardRefreshService);
 
   isOpen         = signal(false);
   loading        = signal(false);
   allCategories  = signal<Category[]>([]);
+  accounts = signal<FinancialAccount[]>([]);
   filteredCategories = signal<Category[]>([]);
   amountDisplay  = signal('');
 
@@ -33,6 +36,7 @@ export class AddTransactionComponent implements OnInit {
     amount:      [null as number | null, [Validators.required, Validators.min(0.01)]],
     type:        ['expense' as TransactionType, Validators.required],
     categoryId:  [null as number | null, Validators.required],
+    accountId:   [null as number | null],
     description: ['', [Validators.required, Validators.minLength(2)]],
     date:        [new Date().toISOString().split('T')[0], Validators.required],
     currency:    ['COP'],
@@ -42,6 +46,9 @@ export class AddTransactionComponent implements OnInit {
   get f() { return this.form.controls; }
 
   ngOnInit() {
+    this.accountService.list().subscribe({
+      next: accounts => this.accounts.set(accounts.filter(a => !a.archived && a.currency === 'COP')),
+    });
     this.categoryService.getAll().subscribe({
       next: cats => {
         this.allCategories.set(cats);
@@ -75,13 +82,19 @@ export class AddTransactionComponent implements OnInit {
     this.form.get('amount')?.setValue(numeric, { emitEvent: false });
   }
 
-  open()  { this.amountDisplay.set(''); this.isOpen.set(true); }
+  open()  {
+    this.amountDisplay.set('');
+    this.accountService.list().subscribe({
+      next: accounts => this.accounts.set(accounts.filter(a => !a.archived && a.currency === 'COP')),
+    });
+    this.isOpen.set(true);
+  }
 
   close() {
     this.isOpen.set(false);
     this.amountDisplay.set('');
     this.form.reset({
-      type: 'expense', categoryId: null,
+      type: 'expense', categoryId: null, accountId: null,
       date: new Date().toISOString().split('T')[0],
       currency: 'COP', status: 'completed',
     });

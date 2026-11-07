@@ -33,6 +33,7 @@ export interface Transaction {
   amount: number;
   type: TransactionType;
   categoryId: number;
+  accountId?: number | null;
   description: string;
   date: string;
   currency: string;
@@ -44,6 +45,7 @@ export interface CreateTransactionRequest {
   amount: number;
   type: TransactionType;
   categoryId: number;
+  accountId?: number | null;
   description: string;
   date: string;
   currency?: string;

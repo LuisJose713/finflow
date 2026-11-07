@@ -1,0 +1,77 @@
+<div class="app-shell">
+  <app-navbar></app-navbar>
+  <main class="main-content account-page">
+    <header class="account-hero">
+      <div><span class="account-kicker">FINFLOW · TU DINERO, EN ORDEN</span>
+      <h1>Cuentas y billeteras</h1>
+      <p>Organiza tu efectivo, banco y ahorro. Las transferencias no inflan tus ingresos ni gastos.</p></div>
+      <span class="account-emblem" aria-hidden="true">F·</span>
+    </header>
+    <p class="account-message bad" *ngIf="error()" role="alert">{{error()}}</p>
+    <p class="account-message good" *ngIf="message()" role="status">{{message()}}</p>
+    <p *ngIf="loading()" class="account-loading" role="status">Cargando tus cuentas…</p>
+    <ng-container *ngIf="!loading()">
+      <section class="account-summary" aria-label="Resumen de cuentas">
+        <div><span>Saldo en tus cuentas activas</span><strong>{{balance()|currency:'COP':'symbol-narrow':'1.0-2'}}</strong>
+        <small>Solo movimientos vinculados a una billetera; valores en COP</small></div>
+        <div class="account-badge">{{active().length}} cuentas activas</div>
+      </section>
+      <div class="accounts-grid">
+        <section class="account-panel" aria-labelledby="account-list-heading">
+          <div class="panel-header"><div><span class="account-overline">PATRIMONIO PERSONAL</span><h2 id="account-list-heading">Mis cuentas</h2></div></div>
+          <div *ngIf="accounts().length===0" class="account-empty"><span aria-hidden="true">◎</span>
+            <h3>Organiza tu dinero desde aquí</h3><p>Crea una billetera e identifica dónde está cada peso.</p></div>
+          <ul class="account-list">
+            <li *ngFor="let a of accounts()" [class.archived]="a.archived">
+              <div class="account-line"><div><strong>{{a.name}}</strong>
+                <span>{{label(a.type)}} · {{a.currency}}</span></div>
+                <span class="account-state">{{a.archived?'Archivada':'Activa'}}</span></div>
+              <div class="account-amount">{{a.balance|currency:'COP':'symbol-narrow':'1.0-2'}}</div>
+              <div class="account-line account-bottom"><small>Inicial: {{a.openingBalance|currency:'COP':'symbol-narrow':'1.0-2'}}</small>
+                <button type="button" (click)="archive(a)">{{a.archived?'Reactivar':'Archivar'}}</button></div>
+            </li>
+          </ul>
+        </section>
+        <section class="account-panel" aria-labelledby="account-create-heading">
+          <span class="account-overline">TU ESPACIO</span><h2 id="account-create-heading">Nueva billetera</h2>
+          <p>Registra el saldo que tienes hoy. Las transacciones antiguas no se asignan automáticamente.</p>
+          <form (ngSubmit)="create()" novalidate>
+            <label for="acc-name">Nombre</label>
+            <input id="acc-name" [(ngModel)]="name" name="name" maxlength="80" placeholder="Ej. Cuenta nómina" required/>
+            <label for="acc-type">Tipo</label>
+            <select id="acc-type" [(ngModel)]="type" name="type"><option *ngFor="let t of types" [ngValue]="t.value">{{t.label}}</option></select>
+            <label for="acc-initial">Saldo inicial (COP)</label>
+            <input id="acc-initial" [(ngModel)]="opening" name="opening" type="number" min="0" step="0.01" inputmode="decimal" required/>
+            <button type="submit" class="account-primary" [disabled]="saving()">{{saving()?'Guardando…':'Crear billetera'}}</button>
+          </form>
+        </section>
+        <section class="account-panel" aria-labelledby="account-transfer-heading">
+          <span class="account-overline">MOVER SIN DUPLICAR</span><h2 id="account-transfer-heading">Transferir entre cuentas</h2>
+          <p>Los traslados cambian dos saldos, pero no se cuentan como ingresos o gastos nuevos.</p>
+          <form (ngSubmit)="transfer()" novalidate>
+            <label for="from-account">Desde</label>
+            <select id="from-account" [(ngModel)]="fromId" name="from" required><option [ngValue]="null">Origen</option>
+              <option *ngFor="let a of active()" [ngValue]="a.id">{{a.name}}</option></select>
+            <label for="to-account">Hacia</label>
+            <select id="to-account" [(ngModel)]="toId" name="to" required><option [ngValue]="null">Destino</option>
+              <option *ngFor="let a of active()" [ngValue]="a.id">{{a.name}}</option></select>
+            <label for="transfer-amount">Importe (COP)</label>
+            <input id="transfer-amount" type="number" [(ngModel)]="amount" name="amount" min="0.01" step="0.01" inputmode="decimal" required/>
+            <label for="transfer-note">Nota (opcional)</label>
+            <input id="transfer-note" [(ngModel)]="note" name="note" maxlength="255" placeholder="Ej. Ahorro del mes"/>
+            <button type="submit" class="account-primary" [disabled]="saving()||active().length<2">Transferir</button>
+          </form>
+        </section>
+      </div>
+      <section class="account-panel transfer-history">
+        <div class="panel-header"><div><span class="account-overline">REGISTRO</span><h2>Transferencias recientes</h2></div></div>
+        <div class="account-empty" *ngIf="transfers().length===0">Aún no tienes transferencias.</div>
+        <ul *ngIf="transfers().length>0" class="transfer-list"><li *ngFor="let t of transfers()">
+          <div><strong>{{nameOf(t.fromAccountId)}} → {{nameOf(t.toAccountId)}}</strong><small>{{t.date}} · {{t.note||'Sin nota'}}</small></div>
+          <strong>{{t.amount|currency:'COP':'symbol-narrow':'1.0-2'}}</strong>
+        </li></ul>
+      </section>
+    </ng-container>
+    <footer class="account-footer">FinFlow · Creado por <strong>AEVQOR</strong></footer>
+  </main>
+</div>
