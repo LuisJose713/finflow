@@ -23,7 +23,16 @@ async function mockApi(page:any) {
       : path === '/privacy/status' ? {accepted:false,version:mockPolicy.version,policyReady:true}
       : path === '/auth/me' ? {id:99,name:'Usuario QA',email:'qa@example.com',role:'USER'}
       : {error:'QA mocked endpoint'};
-    await route.fulfill({status:200,headers:{'access-control-allow-origin':'*','content-type':'application/json'},body:JSON.stringify(payload)});
+    await route.fulfill({
+      status: 200,
+      headers: {
+        'access-control-allow-origin':'*',
+        'access-control-allow-methods':'GET,POST,OPTIONS',
+        'access-control-allow-headers':'Authorization,Content-Type',
+        'content-type':'application/json'
+      },
+      body:JSON.stringify(payload)
+    });
   });
 }
 
