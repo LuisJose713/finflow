@@ -1,5 +1,5 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap, catchError, throwError } from 'rxjs';
 import {
@@ -30,8 +30,8 @@ export class AuthService {
       .post<AuthResponse>(`${this.apiUrl}/login`, credentials)
       .pipe(
         tap((res) => this.saveSession(res)),
-        catchError((err) =>
-          throwError(() => err.error?.message ?? 'Login failed')
+        catchError((err: HttpErrorResponse) =>
+          throwError(() => this.authErrorMessage(err, 'login'))
         )
       );
   }
@@ -41,8 +41,8 @@ export class AuthService {
       .post<AuthResponse>(`${this.apiUrl}/register`, data)
       .pipe(
         tap((res) => this.saveSession(res)),
-        catchError((err) =>
-          throwError(() => err.error?.message ?? 'Registration failed')
+        catchError((err: HttpErrorResponse) =>
+          throwError(() => this.authErrorMessage(err, 'register'))
         )
       );
   }
@@ -66,6 +66,22 @@ export class AuthService {
   }
 
   // ── Private helpers ───────────────────────────────────────────────────────
+  private authErrorMessage(err: HttpErrorResponse, action: 'login' | 'register'): string {
+    if (err.status === 0) return 'No pudimos conectar con el servidor. Inténtalo nuevamente.';
+    if (err.status === 429) return 'Demasiados intentos. Espera un momento antes de continuar.';
+    if (action === 'login') {
+      if (err.status === 401 || err.status === 403) return 'Correo electrónico o contraseña incorrectos.';
+      return 'No pudimos iniciar sesión. Inténtalo nuevamente.';
+    }
+    if (err.status === 409) {
+      const detail = String(err.error?.error ?? '').toLowerCase();
+      if (detail.includes('nombre')) return 'Este nombre de usuario ya está en uso.';
+      if (detail.includes('email') || detail.includes('correo')) return 'Este correo electrónico ya está registrado.';
+      return 'El correo electrónico o nombre de usuario ya está registrado.';
+    }
+    return 'No pudimos crear tu cuenta. Inténtalo nuevamente.';
+  }
+
   private saveSession(res: AuthResponse) {
     localStorage.setItem('token', res.token);
     localStorage.setItem('user', JSON.stringify(res.user));
