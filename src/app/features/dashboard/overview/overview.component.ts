@@ -3,7 +3,6 @@
 //   ElementRef, viewChild, afterNextRender,
 // } from '@angular/core';
 // import { CommonModule } from '@angular/common';
-import { AppCurrencyPipe } from '../../../shared/pipes/currency.pipe';
 // import { TransactionService } from '../../../core/services/transaction.service';
 // import { DashboardRefreshService } from '../../../core/services/dashboard-refresh.service';
 
