@@ -327,3 +327,15 @@
 .tx-item:hover { transform:translateY(-2px); border-color:rgba(132,161,255,.45); }
 .btn-delete { min-width:40px; min-height:40px; }
 @media(max-width:650px){ .main-content { padding:4.5rem 1rem 1.5rem; } .filters-row .filter-select { flex:1 1 45%; min-width:0; } .header-actions { width:100%; } .tx-item { padding:.8rem; } }
+
+
+/* v3 transaction workspace */
+.main-content { gap:1.35rem; }
+.filters-card { padding:1.25rem; gap:1rem; }
+.tx-item { padding:1rem 1.15rem; border-radius:15px; }
+.tx-icon { width:44px; height:44px; border-radius:13px; }
+.tx-title { font-family:'Inter',sans-serif; font-weight:700; }
+.tx-meta { color:var(--text-muted); }
+.tx-amount { font-family:'Inter',sans-serif; font-size:.95rem; font-weight:750; }
+.btn-delete { opacity:1; min-width:36px; min-height:36px; border-radius:10px; }
+@media(max-width:600px) { .tx-item { gap:.7rem; } .tx-right { margin-left:auto; } }
