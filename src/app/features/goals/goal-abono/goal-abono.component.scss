@@ -1,3 +1,4 @@
+@use '../../../../styles/responsive-dialog' as responsive;
 // Reutiliza las mismas variables y clases del goal-form
 // Solo agrega los estilos específicos del abono
 
@@ -252,3 +253,7 @@
 .modal input,.modal select,.modal textarea { border-radius:12px; border:1px solid var(--border); background:var(--bg-primary); color:var(--text-primary); min-height:44px; }
 .modal input:focus-visible,.modal select:focus-visible,.modal textarea:focus-visible { outline:2px solid #8daaff; outline-offset:2px; }
 @media(max-width:540px) { .modal { max-width:100%; max-height:92dvh; overflow-y:auto; } }
+
+
+// Unified mobile bottom-sheet, responsive form and scroll-safe actions.
+@include responsive.dialog();
