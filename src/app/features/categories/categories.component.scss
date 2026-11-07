@@ -83,3 +83,10 @@
   .system-category-list{gap:.45rem}
   .category-chip{font-size:.76rem}
 }
+
+/* Design tokens adapt automatically to the global theme. */
+:host {
+  --ff-surface: var(--bg-primary);
+  --ff-ink: var(--text-primary);
+  --ff-hairline: var(--border);
+}

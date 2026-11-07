@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { LogoutButtonComponent } from '../logout-button/logout-button.component';
 import { ThemeSwitcherComponent } from '../theme-switcher/theme-switcher.component';
+import { environment } from '../../../../environments/environment';
 
 interface NavItem {
   path: string;
@@ -38,7 +39,7 @@ export class NavbarComponent {
     { path: '/planned-expenses', label: 'Gastos Planeados', icon: '📅' },
     { path: '/categories', label: 'Mis categorías', icon: '▦' },
     { path: '/budgets', label: 'Presupuestos', icon: '▥' }
-  ];
+  ].filter(item => environment.budgetsReady || item.path !== '/budgets');
 
   toggleCollapse() {
     this.collapsed.update(v => !v);
