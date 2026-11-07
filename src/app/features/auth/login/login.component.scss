@@ -53,3 +53,11 @@
 @media(max-width:920px) { .auth-wrapper { grid-template-columns:minmax(0,1fr); place-items:center; padding:1.5rem; } .auth-showcase { display:none; } }
 @media(max-width:500px) { .auth-wrapper { padding:1rem; } .auth-card { padding:1.65rem 1.25rem; border-radius:18px; } }
 @media(prefers-reduced-motion:reduce) { .form-group input,.btn-primary { transition:none; } }
+
+/* Accessible password visibility on both auth screens */
+.password-input-wrap { position:relative; display:flex; align-items:center; }
+.password-input-wrap input { padding-right:6.6rem; }
+.password-visibility-toggle { position:absolute; right:.4rem; min-width:5.3rem; height:35px; border:0; border-radius:7px; background:transparent; color:#465b76; font-size:.79rem; font-weight:750; cursor:pointer; }
+.password-visibility-toggle:hover { color:#132640; background:#e8edf5; }
+.password-visibility-toggle:focus-visible { outline:2px solid #b18a4e; outline-offset:2px; }
+.password-match-indicator { margin:-.25rem 0 .9rem; font-size:.78rem; font-weight:650; color:#1b7c50; }
