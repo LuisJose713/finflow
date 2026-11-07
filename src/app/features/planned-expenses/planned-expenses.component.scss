@@ -501,3 +501,16 @@
 .expense-card:hover { transform:translateY(-2px); border-color:rgba(132,161,255,.45); }
 @media(max-width:768px){ .main-content { padding:4.5rem 1rem 1.5rem; } }
 @media(max-width:480px){ .summary-cards { grid-template-columns:1fr; } }
+
+
+/* v3 planned expense workspace */
+.main-content { gap:1.35rem; }
+.summary-cards { gap:1rem; }
+.summary-card { padding:1.3rem 1.5rem; }
+.summary-label { color:var(--text-secondary); }
+.summary-value { font-family:'Inter',sans-serif; font-weight:750; font-size:clamp(1.15rem,2vw,1.55rem); }
+.filter-tabs { padding:5px; }
+.expense-card { border-radius:15px; padding:1rem 1.2rem; }
+.expense-title { font-family:'Inter',sans-serif; font-weight:700; }
+.expense-amount { font-family:'Inter',sans-serif; font-weight:750; }
+@media(max-width:600px) { .expense-card { gap:.7rem; } .expense-right { flex-wrap:wrap; justify-content:flex-end; } }
