@@ -383,3 +383,101 @@ body { background:var(--ff-canvas); }
     padding-top: 5.25rem;
   }
 }
+
+
+/* Universal responsive financial forms — account, budget, category,
+   recurrence and security panels have a shared minimum touch size and
+   do not overflow the actual remaining width next to the navigation. */
+:where(
+  .account-panel, .budget-panel, .categories-panel,
+  .recurring-panel, .security-panel,
+  .account-panel form, .budget-panel form,
+  .category-form-panel form, .recurring-panel form, .security-panel form
+) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+:where(
+  .account-panel, .budget-panel, .category-form-panel,
+  .recurring-panel, .security-panel
+) :is(input, select, textarea) {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 46px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+:where(
+  .account-panel, .budget-panel, .categories-panel,
+  .recurring-panel, .security-panel
+) :is(label, h2, p, small) {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+:where(
+  .account-panel, .budget-panel, .category-form-panel,
+  .recurring-panel, .security-panel
+) :is(button[type='submit'], .account-primary, .budget-primary,
+      .primary-action, .recurring-primary, .security-primary,
+      .security-secondary) {
+  min-height: 46px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+:where(
+  .account-panel, .budget-panel, .categories-panel,
+  .recurring-panel, .security-panel,
+  .account-page, .budget-page, .recurring-page,
+  .categories-workspace, .security-page
+) {
+  container-type: inline-size;
+}
+
+@media (max-width: 640px) {
+  :where(
+    .account-panel, .budget-panel, .categories-panel,
+    .recurring-panel, .security-panel
+  ) {
+    padding: clamp(.9rem, 3vw, 1.2rem);
+  }
+
+  :where(
+    .account-panel, .budget-panel, .category-form-panel,
+    .recurring-panel, .security-panel
+  ) :is(button[type='submit'], .account-primary, .budget-primary,
+        .primary-action, .recurring-primary, .security-primary,
+        .security-secondary) {
+    width: 100%;
+  }
+
+  :where(
+    .budget-list-heading, .panel-heading,
+    .recurring-panel-header, .account-line
+  ) {
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: .7rem;
+  }
+
+  :where(
+    .account-page, .budget-page, .recurring-page,
+    .categories-workspace, .security-page
+  ) :is(h1, h2, .account-amount, .budget-kpis strong, .recurring-item-money) {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(
+    .account-panel, .budget-panel, .categories-panel,
+    .recurring-panel, .security-panel
+  ) :is(button, input, select, textarea) {
+    transition: none;
+  }
+}
