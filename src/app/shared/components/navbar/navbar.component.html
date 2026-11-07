@@ -4,7 +4,7 @@
   <div class="sidebar-header">
     <span class="logo" aria-hidden="true">F<span class="brand-dot">·</span></span>
     <span class="brand" *ngIf="!collapsed() || mobileOpen()">FinFlow<small>PERSONAL FINANCE</small></span>
-    <button class="collapse-btn" type="button" (click)="toggleCollapse()" [attr.aria-label]="collapsed() ? 'Expandir menú' : 'Contraer menú'">{{ collapsed() ? '→' : '←' }}</button>
+    <button class="collapse-btn" type="button" (click)="toggleCollapse()" [attr.title]="collapsed() ? 'Expandir menú' : 'Contraer menú'" [attr.aria-label]="collapsed() ? 'Expandir menú' : 'Contraer menú'">{{ collapsed() ? '→' : '←' }}</button>
   </div>
   <div class="nav-group-label" *ngIf="!collapsed() || mobileOpen()">ESPACIO DE TRABAJO</div><nav class="nav" aria-label="Secciones">
     <a *ngFor="let item of navItems" [routerLink]="item.path" routerLinkActive="active" class="nav-item" [title]="item.label" (click)="closeMobile()">
@@ -19,6 +19,6 @@
   <div class="sidebar-brand-credit" *ngIf="!collapsed() || mobileOpen()">Creado por <strong>AEVQOR</strong><small>Precision. Architecture. Innovation.</small></div>
   <div class="sidebar-footer">
     <app-theme-switcher [compact]="collapsed() && !mobileOpen()"></app-theme-switcher>
-    <app-logout-button *ngIf="!collapsed() || mobileOpen()"></app-logout-button>
+    <app-logout-button [compact]="collapsed() && !mobileOpen()"></app-logout-button>
   </div>
 </aside>
