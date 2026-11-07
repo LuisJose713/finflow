@@ -26,7 +26,7 @@ function passwordMatchValidator(
     <div class="auth-wrapper">
       <div class="auth-card">
         <div class="auth-header">
-          <h1>FinanceApp</h1>
+          <h1>FinFlow</h1>
           <p>Crea tu cuenta gratis</p>
         </div>
 
@@ -50,6 +50,8 @@ function passwordMatchValidator(
             <input
               id="email"
               type="email"
+              autocomplete="email"
+              inputmode="email"
               formControlName="email"
               placeholder="tu@correo.com"
               [class.input-error]="email?.invalid && email?.touched"
@@ -64,6 +66,7 @@ function passwordMatchValidator(
             <input
               id="password"
               type="password"
+              autocomplete="new-password"
               formControlName="password"
               placeholder="••••••••"
               [class.input-error]="password?.invalid && password?.touched"
@@ -78,6 +81,7 @@ function passwordMatchValidator(
             <input
               id="confirmPassword"
               type="password"
+              autocomplete="new-password"
               formControlName="confirmPassword"
               placeholder="••••••••"
               [class.input-error]="
@@ -94,7 +98,7 @@ function passwordMatchValidator(
           </div>
 
           @if (errorMsg()) {
-            <div class="alert-error">{{ errorMsg() }}</div>
+            <div class="alert-error" role="alert" aria-live="polite">{{ errorMsg() }}</div>
           }
 
           <button type="submit" class="btn-primary" [disabled]="loading()">
