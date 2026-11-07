@@ -6,7 +6,7 @@ import { environment } from '../../../environments/environment';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
-  const apiBase = environment.apiUrl.replace(/\\/$/, '');
+  const apiBase = environment.apiUrl.replace(/\/$/, '');
   const isApiRequest = req.url.startsWith(`${apiBase}/`);
   const isPublicAuthRequest = isApiRequest &&
     (req.url === `${apiBase}/auth/login` || req.url === `${apiBase}/auth/register`);
