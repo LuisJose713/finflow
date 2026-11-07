@@ -70,6 +70,14 @@
         </div>
 
         <div class="form-group">
+          <label for="transaction-account">Billetera (opcional)</label>
+          <select id="transaction-account" formControlName="accountId">
+            <option [ngValue]="null">Sin billetera asignada</option>
+            <option *ngFor="let account of accounts()" [ngValue]="account.id">{{account.name}}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
           <label>Fecha</label>
           <input type="date" formControlName="date" />
         </div>
