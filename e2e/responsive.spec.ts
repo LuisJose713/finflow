@@ -58,3 +58,59 @@ for (const width of widths) {
     await page.screenshot({path:`screenshots/consent-${width}.png`,fullPage:true});
   });
 }
+
+/* Layout contract: all supported field groups stack at tablet width and below.
+ * Exercise actual global CSS rather than inspecting the SCSS source alone.
+ */
+for (const width of [320,375,430,768,820,1024]) {
+  test(`field groups are single-column on compact screens: ${width}px`, async ({page}) => {
+    await page.setViewportSize({width,height:780});
+    await mockApi(page);
+    await page.goto('/pricing',{waitUntil:'domcontentloaded'});
+    await expect(page.getByRole('heading',{name:/Tu tranquilidad financiera/})).toBeVisible();
+
+    const result = await page.evaluate(() => {
+      const shell=document.createElement('div');
+      shell.className='app-shell';
+      const form=document.createElement('form');
+      const groups=['form-grid','field-row','form-pair','form-columns'];
+      for (const klass of groups) {
+        const group=document.createElement('div');
+        group.className=klass;
+        group.style.display='grid';
+        group.style.gridTemplateColumns='repeat(2,minmax(0,1fr))';
+        for (let n=0;n<2;n++) {
+          const field=document.createElement('div');
+          field.className='form-group';
+          const input=document.createElement('input');
+          input.value='Field '+n;
+          field.appendChild(input);
+          group.appendChild(field);
+        }
+        form.appendChild(group);
+      }
+      shell.appendChild(form);
+      document.body.appendChild(shell);
+      const measured=groups.map((klass) => {
+        const group=form.querySelector('.'+klass)!;
+        const children=group.children;
+        return {
+          klass,
+          colWidths:getComputedStyle(group).gridTemplateColumns.split(' ').length,
+          secondBelowFirst:(children[1] as HTMLElement).getBoundingClientRect().top >=
+            (children[0] as HTMLElement).getBoundingClientRect().bottom - 1,
+          fieldFits: Array.from(children).every(child =>
+            (child as HTMLElement).getBoundingClientRect().right <= group.getBoundingClientRect().right + 1)
+        };
+      });
+      shell.remove();
+      return measured;
+    });
+    if (width<=820) for (const group of result) {
+      expect(group.colWidths,`${width} ${group.klass}: columns`).toBe(1);
+      expect(group.secondBelowFirst,`${width} ${group.klass}: vertical order`).toBe(true);
+      expect(group.fieldFits,`${width} ${group.klass}: clipped field`).toBe(true);
+    }
+    else for (const group of result) expect(group.colWidths).toBe(2);
+  });
+}
