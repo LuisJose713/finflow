@@ -1,6 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, OnInit, computed, inject, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
+import { RouterLink } from "@angular/router";
 import { forkJoin } from "rxjs";
 import { AccountService, FinancialAccount } from "../../core/services/account.service";
 import { PlannedExpenseService } from "../../core/services/planned-expense.service";
@@ -11,7 +12,7 @@ import { addLocalDays, calculateAvailable, todayLocalISO } from "../../core/util
 @Component({
   selector: "app-disponible",
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent],
+  imports: [CommonModule, FormsModule, RouterLink, NavbarComponent],
   templateUrl: "./disponible.component.html",
   styleUrls: ["./disponible.component.scss"]
 })
