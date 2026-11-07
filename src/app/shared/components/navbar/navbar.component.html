@@ -1,4 +1,4 @@
-<button class="mobile-menu-btn" type="button" (click)="toggleMobile()" [attr.aria-expanded]="mobileOpen()" aria-controls="finflow-sidebar" [attr.aria-label]="mobileOpen() ? 'Cerrar menú' : 'Abrir menú'">☰</button>
+<button class="mobile-menu-btn" [class.menu-open]="mobileOpen()" type="button" (click)="toggleMobile()" [attr.aria-expanded]="mobileOpen()" aria-controls="finflow-sidebar" [attr.aria-label]="mobileOpen() ? 'Cerrar menú' : 'Abrir menú'">{{ mobileOpen() ? '×' : '☰' }}</button>
 <div class="overlay" *ngIf="mobileOpen()" (click)="closeMobile()" aria-hidden="true"></div>
 <aside id="finflow-sidebar" class="sidebar" [class.collapsed]="collapsed() && !mobileOpen()" [class.open]="mobileOpen()" aria-label="Navegación principal">
   <div class="sidebar-header">
