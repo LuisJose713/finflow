@@ -317,3 +317,37 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   :where(.app-shell .header-actions) { width:100%; flex-wrap:wrap; }
   :where(.app-shell .tx-item,.app-shell .expense-card) { flex-wrap:wrap; }
 }
+
+/* FinFlow Atelier — premium navigation, page composition and accessibility */
+:root { --ff-ink:#111d35; --ff-gold:#c6a46c; --ff-canvas:#f5f7fb; --ff-surface:#fff; --ff-hairline:#e6eaf2; }
+.dark { --ff-ink:#f4f6ff; --ff-canvas:#0b1120; --ff-surface:#141e32; --ff-hairline:#2b3850; }
+body { background:var(--ff-canvas); }
+.app-shell { background:var(--ff-canvas)!important; }
+.app-shell > .main-content { background:var(--ff-canvas)!important; }
+.premium-overline { display:block; font-size:.67rem; letter-spacing:.2em; font-weight:800; color:#b38d51; }
+.premium-page-intro { position:relative; overflow:hidden; padding:clamp(1.6rem,3vw,2.5rem); margin-bottom:1.7rem; background:var(--ff-surface); border:1px solid var(--ff-hairline); border-radius:22px; }
+.premium-page-intro:after { content:""; position:absolute; right:-75px; top:-125px; width:300px; height:300px; border:1px solid rgba(169,138,89,.22); border-radius:50%; box-shadow:0 0 0 44px rgba(169,138,89,.045),0 0 0 88px rgba(169,138,89,.025); pointer-events:none; }
+.premium-page-intro h2 { margin:.7rem 0 .6rem; font-size:clamp(1.4rem,2.8vw,2.25rem); letter-spacing:-.055em; font-weight:750; color:var(--ff-ink); }
+.premium-page-intro p { max-width:52ch; color:var(--text-secondary); font-size:.91rem; }
+.premium-hero { position:relative; display:flex; align-items:center; justify-content:space-between; gap:2rem; padding:clamp(2rem,4vw,3.8rem); margin:0 0 2.2rem; min-height:290px; overflow:hidden; isolation:isolate; border-radius:26px; background:linear-gradient(120deg,#0b1730,#162b49 60%,#22394d); color:white; box-shadow:0 24px 70px rgba(9,23,47,.15); }
+.premium-hero:before { content:""; position:absolute; inset:0; background:radial-gradient(ellipse at 80% 20%,rgba(198,164,108,.15),transparent 45%); z-index:-1; }
+.premium-hero-copy { position:relative; z-index:1; max-width:670px; }
+.premium-hero .premium-overline { color:#ddc496; }
+.premium-hero h2 { font-size:clamp(2rem,4vw,3.7rem); line-height:1.08; letter-spacing:-.065em; font-weight:760; margin:.9rem 0 1rem; }
+.premium-hero h2 em { color:#e1c28f; font-style:normal; }
+.premium-hero p { color:#b9c9dc; max-width:49ch; font-size:.93rem; line-height:1.7; }
+.premium-hero-actions { display:flex; flex-wrap:wrap; gap:1rem; margin-top:1.7rem; }
+.premium-link { display:inline-flex; align-items:center; gap:1rem; padding:.85rem 1.2rem; border-radius:10px; background:#e8d3ad; color:#15243c; font-weight:750; font-size:.83rem; }
+.premium-link.secondary { background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.2); color:white; }
+.premium-link:hover { opacity:1; filter:brightness(1.07); }
+.premium-hero-art { position:relative; flex:0 0 240px; height:240px; display:grid; place-items:center; }
+.premium-orbit { position:absolute; inset:8px; border:1px solid rgba(222,195,147,.3); border-radius:50%; transform:rotate(-30deg) scaleY(.7); }
+.premium-orbit.inner { inset:42px; transform:rotate(45deg) scaleY(.72); }
+.premium-monogram { width:110px; height:110px; display:grid; place-items:center; border:1px solid rgba(230,207,167,.55); border-radius:28px; background:linear-gradient(145deg,#294466,#13223b); box-shadow:0 20px 60px rgba(0,0,0,.2); font-size:4rem; font-weight:700; letter-spacing:-.1em; }
+.premium-monogram span { color:#e5c38d; }
+.app-shell .page-header { border-bottom:1px solid var(--ff-hairline); padding-bottom:1.5rem; }
+.app-shell .page-header h1 { color:var(--ff-ink); }
+.app-shell .goal-card,.app-shell .filters-card,.app-shell .summary-card,.app-shell .expense-card,.app-shell .tx-item { background:var(--ff-surface); border-color:var(--ff-hairline); box-shadow:0 8px 28px rgba(15,30,55,.035); }
+@media(max-width:1000px) { .premium-hero-art { flex-basis:170px; } }
+@media(max-width:760px) { .premium-hero-art { display:none; } .premium-hero { min-height:0; } .premium-hero h2 { font-size:2.2rem; } }
+@media(prefers-reduced-motion:reduce) { .premium-link { transition:none; } }

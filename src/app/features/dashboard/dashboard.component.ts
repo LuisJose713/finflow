@@ -1,4 +1,5 @@
 import { Component, inject, ViewChild, signal, computed } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ExportPdfService } from '../../core/services/export-pdf.service';
 import { ToastService } from '../../core/services/toast.service';
@@ -13,6 +14,7 @@ import { RecentTransactionsComponent } from './recent-transactions/recent-transa
   selector: 'app-dashboard',
   standalone: true,
   imports: [
+    RouterLink,
     NavbarComponent,
     AddTransactionComponent,
     ToastContainerComponent,
