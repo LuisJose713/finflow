@@ -36,7 +36,8 @@ export class NavbarComponent {
     { path: '/advisor',   label: 'Asesor IA', icon: '🤖' },
     { path: '/transactions', label: 'Transacciones', icon: '💳' },
     { path: '/planned-expenses', label: 'Gastos Planeados', icon: '📅' },
-    { path: '/categories', label: 'Mis categorías', icon: '▦' }
+    { path: '/categories', label: 'Mis categorías', icon: '▦' },
+    { path: '/budgets', label: 'Presupuestos', icon: '▥' }
   ];
 
   toggleCollapse() {
