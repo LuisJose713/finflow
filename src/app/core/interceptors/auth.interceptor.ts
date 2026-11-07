@@ -17,10 +17,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
+  // The backend derives ownership exclusively from the verified JWT.
+  // Never forward caller-controlled identity headers to FinFlow.
+  const safeRequest = req.headers.has('X-User-Id')
+    ? req.clone({ headers: req.headers.delete('X-User-Id') })
+    : req;
   const token = localStorage.getItem('token');
   const authenticatedRequest = token
-    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-    : req;
+    ? safeRequest.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+    : safeRequest;
 
   return next(authenticatedRequest).pipe(
     catchError((error: HttpErrorResponse) => {
