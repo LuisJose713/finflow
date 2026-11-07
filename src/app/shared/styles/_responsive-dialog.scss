@@ -108,6 +108,18 @@
     min-width: 0;
   }
 
+  /* One field per row for smaller windows and tablets too. */
+  @media (max-width: 820px) {
+    .form-grid,
+    .field-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    :is(.form-grid, .field-row) > * {
+      min-width: 0;
+      grid-column: 1 / -1;
+    }
+  }
+
   @media (max-width: 600px) {
     .modal-backdrop,
     .modal-overlay {

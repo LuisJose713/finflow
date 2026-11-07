@@ -21,6 +21,10 @@ export const routes: Routes = [
     canActivate: [guestGuard],
   },
   {
+    path: "pricing",
+    loadComponent: () => import("./features/pricing/pricing.component").then(m => m.PricingComponent),
+  },
+  {
     path: "register",
     loadComponent: () =>
       import("./features/auth/register/register.component").then(
@@ -71,6 +75,11 @@ export const routes: Routes = [
 
   },
   {
+    path: "profile",
+    redirectTo: "/security",
+    pathMatch: "full",
+  },
+  {
     path: "security",
     loadComponent: () => import("./features/security/security.component").then(m=>m.SecurityComponent),
     canActivate: [authGuard],
@@ -93,6 +102,11 @@ export const routes: Routes = [
   {
     path: "categories",
     loadComponent: () => import("./features/categories/categories.component").then(m => m.CategoriesComponent),
+    canActivate: [authGuard],
+  },
+  {
+    path: "admin/billing",
+    loadComponent: () => import("./features/admin-billing/admin-billing.component").then(m=>m.AdminBillingComponent),
     canActivate: [authGuard],
   },
   {

@@ -415,3 +415,38 @@ body { background:var(--ff-canvas); }
     min-height: 44px;
   }
 }
+
+/* Universal single-column form layout for compact viewports.
+ * Applies to responsive groups, not button bars, charts or table grids.
+ * 820px also covers iPad portrait / small split-screen windows.
+ */
+@media (max-width: 820px) {
+  :where(.app-shell, .auth-wrapper, .pricing-page) form
+    :is(.form-grid, .field-row, .form-pair, .form-columns, .form-fields, .fields-grid) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) !important;
+    min-width: 0;
+    width: 100%;
+  }
+
+  :where(.app-shell, .auth-wrapper, .pricing-page) form
+    :is(.form-grid, .field-row, .form-pair, .form-columns, .form-fields, .fields-grid) > * {
+    min-width: 0;
+    max-width: 100%;
+    grid-column: 1 / -1;
+  }
+
+  :where(.app-shell, .auth-wrapper, .pricing-page) form
+    :is(.form-group, .form-field, .field, .input-wrap) {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  :where(.app-shell, .auth-wrapper, .pricing-page) form
+    :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+}

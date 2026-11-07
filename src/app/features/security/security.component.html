@@ -8,6 +8,28 @@
   <p *ngIf="error()" class="security-message error" role="alert">{{error()}}</p>
   <p *ngIf="message()" class="security-message success" role="status">{{message()}}</p>
   <div class="security-grid">
+   <section class="security-panel" aria-labelledby="profile-title">
+    <span class="security-kicker">MI CUENTA</span><h2 id="profile-title">Actualizar perfil</h2>
+    <p>Actualiza tu nombre o dirección de correo. Para proteger tu identidad, exige tu contraseña actual y te pedirá iniciar sesión nuevamente después de guardar.</p>
+    <form (ngSubmit)="updateProfile()">
+      <label for="profile-name">Nombre</label>
+      <input id="profile-name" [(ngModel)]="profileName" name="name" maxlength="80" autocomplete="name" required/>
+      <label for="profile-email">Correo electrónico</label>
+      <input id="profile-email" [(ngModel)]="profileEmail" name="email" type="email" maxlength="254" autocomplete="email" required/>
+      <label for="profile-password">Contraseña actual para confirmar</label>
+      <input id="profile-password" [(ngModel)]="profilePassword" name="current" type="password" autocomplete="current-password" required/>
+      <button type="submit" class="security-primary" [disabled]="profileBusy() || busy()">Guardar perfil y cerrar sesiones</button>
+    </form>
+    <p class="security-note">Si cambias tu correo, te enviaremos un código de ocho dígitos a la nueva dirección. No actualizaremos el correo hasta verificarlo. La verificación requiere configurar primero el servicio de correo seguro.</p>
+    <div *ngIf="emailPending()" class="email-check">
+      <h3>Confirmar nuevo correo</h3>
+      <p>Introduce el código recibido en tu nuevo correo. Caduca a los 15 minutos.</p>
+      <label for="email-verification-code">Código de ocho dígitos</label>
+      <input id="email-verification-code" type="text" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" [(ngModel)]="verificationCode" name="verificationCode" autocomplete="one-time-code"/>
+      <button type="button" class="security-primary" [disabled]="profileBusy() || verificationCode.length!==8" (click)="confirmEmail()">Confirmar correo</button>
+      <button type="button" class="security-secondary" (click)="emailPending.set(false);verificationCode=''">Cancelar</button>
+    </div>
+   </section>
    <section class="security-panel" aria-labelledby="change-password-title">
     <span class="security-kicker">ACCESO PERSONAL</span><h2 id="change-password-title">Cambiar contraseña</h2>
     <p>Utiliza una contraseña nueva de al menos 12 caracteres. Al cambiarla, se invalidarán los tokens anteriores.</p>

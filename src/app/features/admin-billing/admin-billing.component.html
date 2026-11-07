@@ -1,0 +1,89 @@
+<div class="app-shell"><app-navbar></app-navbar>
+<main class="main-content billing-admin">
+<header class="billing-hero">
+  <div><span class="eyebrow">AEVQOR · MONETIZACIÓN</span><h1>Planes y promociones</h1>
+  <p>Controla los precios de FinFlow sin cambiar código. Los cobros reales permanecen deshabilitados hasta verificar la pasarela.</p>
+  <a routerLink="/admin">Volver a Administración</a></div>
+</header>
+<p *ngIf="loading()" role="status" class="feedback">Cargando configuración…</p>
+<p *ngIf="error()" role="alert" class="feedback error">{{error()}}</p>
+<p *ngIf="message()" role="status" class="feedback success">{{message()}}</p>
+<section class="panel" aria-labelledby="plans-title">
+  <header><span class="eyebrow">TARIFAS EDITABLES · COP</span><h2 id="plans-title">Planes</h2><p>Free siempre gratuito. Los cambios afectarán las próximas cotizaciones, no compras pasadas.</p></header>
+  <div class="plans-grid">
+    <article *ngFor="let plan of plans()" class="plan-edit">
+      <span class="plan-code">{{plan.code}}</span>
+      <label [for]="'title-'+plan.code">Nombre</label>
+      <input [id]="'title-'+plan.code" [(ngModel)]="plan.title" [name]="'title-'+plan.code" maxlength="90"/>
+      <label [for]="'desc-'+plan.code">Descripción</label>
+      <textarea [id]="'desc-'+plan.code" [(ngModel)]="plan.description" [name]="'desc-'+plan.code" rows="2" maxlength="240"></textarea>
+      <label [for]="'price-'+plan.code">Precio (COP)</label>
+      <input [id]="'price-'+plan.code" type="number" [(ngModel)]="plan.priceCop" [name]="'price-'+plan.code"
+           min="0" max="10000000" step="100" [disabled]="plan.code === 'FREE'"/>
+      <label class="check"><input type="checkbox" [(ngModel)]="plan.active" [name]="'active-'+plan.code" [disabled]="plan.code==='FREE'"/> Disponible</label>
+      <button type="button" (click)="savePlan(plan)" [disabled]="saving()">Guardar cambios</button>
+    </article>
+  </div>
+</section>
+<section class="billing-columns">
+  <div class="panel">
+    <header><span class="eyebrow">DESCUENTOS Y LANZAMIENTOS</span><h2>Crear o editar promoción</h2><p>Promociones por tiempo, plan, porcentaje o valor fijo. Los códigos se validan en el servidor.</p></header>
+    <form (ngSubmit)="savePromotion()">
+      <label for="promo-code">Código de promoción</label>
+      <input id="promo-code" name="code" [(ngModel)]="promotion.code" [disabled]="editing()" maxlength="32" placeholder="LANZAMIENTO20" required/>
+      <label for="promo-title">Nombre</label>
+      <input id="promo-title" name="title" [(ngModel)]="promotion.title" maxlength="90" required/>
+      <div class="form-pair">
+        <div><label for="promo-plan">Plan</label>
+        <select id="promo-plan" name="plan" [(ngModel)]="promotion.planCode">
+          <option value="MONTHLY">Pro mensual</option><option value="YEARLY">Pro anual</option><option value="LIFETIME">Pro de por vida</option>
+        </select></div>
+        <div><label for="promo-type">Tipo</label>
+        <select id="promo-type" name="type" [(ngModel)]="promotion.discountType">
+          <option value="PERCENT">Porcentaje (%)</option><option value="FIXED">Importe fijo (COP)</option>
+        </select></div>
+      </div>
+      <label for="promo-value">Descuento</label>
+      <input id="promo-value" name="value" type="number" [(ngModel)]="promotion.discountValue" min="1" step="1" required/>
+      <div class="form-pair">
+        <div><label for="promo-start">Inicio</label><input id="promo-start" name="start" type="datetime-local" [(ngModel)]="promotion.startsAt" required/></div>
+        <div><label for="promo-end">Fin</label><input id="promo-end" name="end" type="datetime-local" [(ngModel)]="promotion.endsAt" required/></div>
+      </div>
+      <label for="promo-limit">Límite de usos (opcional)</label>
+      <input id="promo-limit" name="max" type="number" min="1" [(ngModel)]="promotion.maxRedemptions"/>
+      <label class="check"><input type="checkbox" [(ngModel)]="promotion.active" name="enabled"/> Promoción activa</label>
+      <label class="check"><input type="checkbox" [(ngModel)]="promotion.published" name="public"/> Mostrar a todos los usuarios</label>
+      <p class="warning">Los límites de redenciones solo se descontarán cuando esté integrada la verificación de pagos. Crear una promoción no cobra ni activa Pro.</p>
+      <button type="submit" [disabled]="saving()">{{editing()?'Guardar promoción':'Crear promoción'}}</button>
+      <button type="button" class="neutral" (click)="newPromotion()">Nueva campaña / Cancelar edición</button>
+    </form>
+  </div>
+  <div class="panel">
+    <header><span class="eyebrow">HISTORIAL DE CAMPAÑAS</span><h2>Promociones creadas</h2></header>
+    <p *ngIf="!promotions().length" class="empty">Todavía no tienes promociones.</p>
+    <div *ngFor="let promo of promotions()" class="promo-item">
+      <div><strong>{{promo.title}}</strong><small>{{promo.code}} · {{promo.planCode}}</small>
+        <small>{{promo.discountType==='PERCENT'?promo.discountValue+'%':formatCop(promo.discountValue)}}</small>
+        <small>Usos {{promo.redemptionCount}} / {{promo.maxRedemptions || 'Sin límite'}}</small>
+        <small>{{promo.active?'Activa':'Pausada'}} · {{promo.published?'Pública':'Solo con código'}}</small></div>
+      <div class="promo-actions"><button type="button" (click)="edit(promo)">Editar</button>
+        <button type="button" (click)="togglePromotion(promo)" [disabled]="saving()">{{promo.active?'Pausar':'Reactivar'}}</button></div>
+    </div>
+    <hr/>
+    <h2>Conceder Pro manualmente</h2>
+    <p>Por ejemplo, una cortesía que tú decidas. Requiere usuario registrado y queda auditada.</p>
+    <form (ngSubmit)="grant()">
+      <label for="grant-user">ID del usuario</label>
+      <input id="grant-user" name="userId" type="number" min="1" [(ngModel)]="grantUserId" required/>
+      <label for="grant-plan">Plan</label>
+      <select id="grant-plan" name="grantPlan" [(ngModel)]="grantPlan">
+        <option value="MONTHLY">1 mes</option><option value="YEARLY">1 año</option><option value="LIFETIME">De por vida</option>
+      </select>
+      <label for="grant-reason">Motivo (mínimo 8 caracteres)</label>
+      <textarea id="grant-reason" name="reason" [(ngModel)]="grantReason" rows="2" maxlength="240" required></textarea>
+      <button type="submit" [disabled]="saving() || !grantUserId || grantReason.trim().length<8">Asignar acceso</button>
+    </form>
+  </div>
+</section>
+<footer class="billing-footer">FinFlow · AEVQOR · Solo gestión de facturación, sin acceso a movimientos privados.</footer>
+</main></div>
