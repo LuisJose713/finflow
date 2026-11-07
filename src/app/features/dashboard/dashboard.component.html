@@ -1,27 +1,37 @@
 <div class="app-shell">
   <app-navbar></app-navbar>
-
   <main class="main-content">
+    <div class="dashboard-topline"><span class="live-dot"></span> FINFLOW / CENTRO FINANCIERO <span class="topline-version">WEB 2.0</span></div>
     <header class="page-header">
       <div class="header-left">
-        <h1>Dashboard</h1>
-        <p class="greeting">Hola, {{ firstName() || "Usuario" }} 👋</p>
+        <span class="eyebrow">TU ESPACIO FINANCIERO</span>
+        <h1>Tu dinero, <span class="gradient-word">en perspectiva.</span></h1>
+        <p class="greeting">Hola, {{ firstName() || "Usuario" }} 👋 · Cada decisión cuenta.</p>
       </div>
       <div class="header-actions">
-        <button class="btn-export" (click)="exportPdf()">⬇ Exportar PDF</button>
-        <app-add-transaction> </app-add-transaction>
+        <button class="btn-export" (click)="exportPdf()">↓ Exportar informe</button>
+        <app-add-transaction></app-add-transaction>
       </div>
     </header>
-
-    <section class="section">
+    <section class="dashboard-intro" aria-label="Resumen de tus finanzas">
+      <div class="intro-content">
+        <span class="intro-kicker"><span class="intro-sparkle">✦</span> FINANZAS EN ORDEN</span>
+        <h2>Construye tu próximo capítulo financiero.</h2>
+        <p>Visualiza tus movimientos, sigue tus metas y toma decisiones con claridad. Todo en un mismo lugar.</p>
+      </div>
+      <div class="intro-decoration" aria-hidden="true"><span class="orbit orbit-one"></span><span class="orbit orbit-two"></span><span class="orbit-center">F</span></div>
+    </section>
+    <section class="section stats-section" aria-label="Indicadores financieros">
+      <div class="section-heading"><div><span class="eyebrow">PANORAMA GENERAL</span><h2>Tus números de un vistazo</h2></div><span class="section-caption">Información actualizada</span></div>
       <app-transaction-stats></app-transaction-stats>
     </section>
-
-    <section class="section grid-two">
-      <app-overview></app-overview>
-      <app-recent-transactions #recentTx></app-recent-transactions>
+    <section class="section analytics-section" aria-label="Actividad financiera">
+      <div class="section-heading"><div><span class="eyebrow">ACTIVIDAD</span><h2>Entiende cómo se mueve tu dinero</h2></div></div>
+      <div class="grid-two">
+        <app-overview></app-overview>
+        <app-recent-transactions #recentTx></app-recent-transactions>
+      </div>
     </section>
   </main>
-
   <app-toast-container></app-toast-container>
 </div>
