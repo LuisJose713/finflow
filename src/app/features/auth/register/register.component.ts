@@ -74,14 +74,17 @@ function passwordMatchValidator(
 
           <div class="form-group">
             <label for="password">Contraseña</label>
-            <input
+            <div class="password-input-wrap">
+<input
               id="password"
-              type="password"
+              [type]="showPassword() ? 'text' : 'password'"
               autocomplete="new-password"
               formControlName="password"
               placeholder="••••••••"
               [class.input-error]="password?.invalid && password?.touched"
             />
+<button class="password-visibility-toggle" type="button" (click)="showPassword.set(!showPassword())" [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'" [attr.aria-pressed]="showPassword()">{{ showPassword() ? 'Ocultar' : 'Mostrar' }}</button>
+</div>
             @if (password?.invalid && password?.touched) {
               <span class="error-msg">Mínimo 8 caracteres</span>
             }
@@ -89,20 +92,23 @@ function passwordMatchValidator(
 
           <div class="form-group">
             <label for="confirmPassword">Confirmar contraseña</label>
-            <input
+            <div class="password-input-wrap">
+<input
               id="confirmPassword"
-              type="password"
+              [type]="showConfirmPassword() ? 'text' : 'password'"
               autocomplete="new-password"
               formControlName="confirmPassword"
               placeholder="••••••••"
               [class.input-error]="
                 form.errors?.['passwordMismatch'] &&
-                form.get('confirmPassword')?.touched
+                (form.get('confirmPassword')?.touched || form.get('confirmPassword')?.dirty)
               "
             />
+<button class="password-visibility-toggle" type="button" (click)="showConfirmPassword.set(!showConfirmPassword())" [attr.aria-label]="showConfirmPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'" [attr.aria-pressed]="showConfirmPassword()">{{ showConfirmPassword() ? 'Ocultar' : 'Mostrar' }}</button>
+</div>
             @if (
               form.errors?.['passwordMismatch'] &&
-              form.get('confirmPassword')?.touched
+              (form.get('confirmPassword')?.touched || form.get('confirmPassword')?.dirty)
             ) {
               <span class="error-msg">Las contraseñas no coinciden</span>
             }
@@ -112,6 +118,9 @@ function passwordMatchValidator(
             <div class="alert-error" role="alert" aria-live="polite">{{ errorMsg() }}</div>
           }
 
+          @if (form.get('password')?.value && form.get('confirmPassword')?.value && !form.errors?.['passwordMismatch']) {
+            <p class="password-match-indicator" role="status">Las contraseñas coinciden.</p>
+          }
           <button type="submit" class="btn-primary" [disabled]="loading()">
             {{ loading() ? 'Creando cuenta...' : 'Crear cuenta' }}
           </button>
@@ -121,6 +130,7 @@ function passwordMatchValidator(
           ¿Ya tienes cuenta?
           <a routerLink="/login">Inicia sesión</a>
         </p>
+        <p class="auth-creator-credit">Creado por <strong>AEVQOR</strong></p>
       </div>
     </div>
   `,
@@ -134,6 +144,8 @@ export class RegisterComponent {
 
   loading = signal(false);
   errorMsg = signal('');
+  showPassword = signal(false);
+  showConfirmPassword = signal(false);
 
   form = this.fb.group(
     {
@@ -158,9 +170,9 @@ export class RegisterComponent {
     this.loading.set(true);
     this.errorMsg.set('');
 
-    const { name, email, password } = this.form.getRawValue() as any;
+    const { name, email, password, confirmPassword } = this.form.getRawValue();
 
-    this.auth.register({ name, email, password }).subscribe({
+    this.auth.register({ name: name!, email: email!, password: password!, confirmPassword: confirmPassword! }).subscribe({
       next: () => {
         this.toast.success('¡Cuenta creada exitosamente!');
         this.router.navigate(['/dashboard']);
