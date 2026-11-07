@@ -45,3 +45,44 @@
 .account-footer strong{color:#b18a4f;letter-spacing:.12em}
 @media(max-width:1200px){.accounts-grid{grid-template-columns:1fr 1fr}.accounts-grid>.account-panel:first-child{grid-column:1/-1}}
 @media(max-width:768px){.account-page{padding-top:5.25rem!important;padding-inline:clamp(.85rem,3.4vw,1.5rem)!important}.accounts-grid{grid-template-columns:minmax(0,1fr)}.accounts-grid>.account-panel:first-child{grid-column:auto}.account-emblem{display:none}.account-hero{border-radius:18px;padding:1.35rem}.account-summary{padding:1.1rem}.account-panel{padding:1.15rem}}
+
+
+/* Layout is sized against the usable width next to the 246px sidebar,
+   not only against full browser width. Avoid squeezed form columns. */
+.account-hero > div:first-child,
+.account-summary > div:first-child,
+.accounts-grid > *,
+.account-line > *,
+.transfer-list li > * { min-width: 0; }
+.account-hero h1,
+.account-hero p,
+.account-summary strong,
+.account-amount,
+.account-line strong,
+.transfer-list strong,
+.transfer-list small { overflow-wrap: anywhere; }
+.account-summary { min-width: 0; }
+.account-badge { flex-shrink: 0; }
+.account-panel form { min-width: 0; }
+.account-panel input,
+.account-panel select { display: block; max-width: 100%; box-sizing: border-box; }
+.account-list li { min-width: 0; }
+.account-line > div { flex: 1 1 180px; }
+@media (max-width: 1480px) {
+  .accounts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .accounts-grid > .account-panel:first-child { grid-column: 1 / -1; }
+}
+@media (max-width: 1120px) {
+  .accounts-grid { grid-template-columns: minmax(0, 1fr); }
+  .accounts-grid > .account-panel:first-child { grid-column: auto; }
+}
+@media (max-width: 600px) {
+  .account-hero { align-items: flex-start; }
+  .account-hero h1 { font-size: clamp(1.65rem, 7vw, 2.1rem); }
+  .account-summary { align-items: flex-start; flex-direction: column; }
+  .account-badge { align-self: flex-start; }
+  .account-line { align-items: flex-start; }
+  .account-panel { padding: 1rem; }
+  .transfer-list li { align-items: flex-start; flex-direction: column; gap: .45rem; }
+  .transfer-list li > div { max-width: 100%; }
+}
