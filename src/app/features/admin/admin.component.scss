@@ -80,3 +80,45 @@
   --ff-hairline: var(--border);
   --ff-canvas: var(--bg-secondary);
 }
+
+
+/* Prevent KPI labels and six-month chart from forcing page wider than
+   the available content area alongside the fixed sidebar. */
+.admin-workspace,
+.admin-heading,
+.admin-section,
+.admin-section-heading,
+.admin-kpi-grid,
+.admin-kpi,
+.admin-month-bars { min-width: 0; }
+.admin-heading > div:first-child { min-width: 0; flex: 1 1 0; }
+.admin-kpi { overflow-wrap: anywhere; }
+.admin-section-heading > div { min-width: 0; }
+.admin-section-heading h2,
+.admin-section-heading .section-overline,
+.admin-month-column { overflow-wrap: anywhere; }
+.admin-month-bars {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+}
+@media (max-width: 1120px) {
+  .admin-heading { gap: 1rem; }
+  .admin-emblem { width: 90px; height: 90px; flex: 0 0 90px; font-size: 2.8rem; }
+  .admin-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 950px) {
+  .admin-kpi-grid { grid-template-columns: minmax(0, 1fr); }
+  .admin-heading { align-items: flex-start; }
+  .admin-emblem { display: none; }
+}
+@media (max-width: 600px) {
+  .admin-heading { padding: 1.1rem; }
+  .admin-section { padding: 1rem; }
+  .admin-month-bars { grid-template-columns: repeat(6, minmax(84px, 1fr)); }
+  .admin-personal-link { max-width: 100%; }
+  .admin-section-heading { flex-wrap: wrap; align-items: flex-start; }
+  .section-tag { white-space: normal; }
+}
