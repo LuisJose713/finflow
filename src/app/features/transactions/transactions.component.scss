@@ -313,3 +313,17 @@
 // ── Animations ────────────────────────────────────────────
 @keyframes fadeUp   { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes shimmer  { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* FinFlow v2 transactions workspace */
+.main-content { min-width:0; width:100%; padding:clamp(1.25rem,3vw,3rem); gap:1.4rem; background:radial-gradient(ellipse at top right,rgba(83,112,224,.09),transparent 38%),var(--bg-primary); }
+.page-header { padding-bottom:.6rem; }
+.header-text h1 { font-family:Inter,system-ui,sans-serif; font-size:clamp(1.8rem,3vw,2.7rem); letter-spacing:-.055em; font-weight:800; }
+.header-text .subtitle { font-family:inherit; font-size:.9rem; margin-top:.45rem; }
+.filters-card { border-radius:22px; padding:clamp(1rem,2vw,1.6rem); box-shadow:0 14px 40px rgba(0,0,0,.06); gap:1rem; }
+.search-input { font-family:inherit; min-height:48px; border-radius:12px; background:var(--bg-primary); }
+.filter-select { font-family:inherit; min-height:44px; border-radius:11px; background:var(--bg-primary); }
+.btn-export { min-height:44px; border-radius:12px; }
+.tx-item { min-height:78px; border-radius:15px; padding:1rem 1.2rem; }
+.tx-item:hover { transform:translateY(-2px); border-color:rgba(132,161,255,.45); }
+.btn-delete { min-width:40px; min-height:40px; }
+@media(max-width:650px){ .main-content { padding:4.5rem 1rem 1.5rem; } .filters-row .filter-select { flex:1 1 45%; min-width:0; } .header-actions { width:100%; } .tx-item { padding:.8rem; } }

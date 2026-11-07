@@ -486,3 +486,18 @@
 @keyframes fadeIn   { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp  { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes shimmer  { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* FinFlow v2 planned spending */
+.main-content { min-width:0; width:100%; padding:clamp(1.25rem,3vw,3rem); background:radial-gradient(ellipse at top right,rgba(83,112,224,.09),transparent 38%),var(--bg-primary); }
+.page-header h1 { font-family:Inter,system-ui,sans-serif; font-size:clamp(1.8rem,3vw,2.7rem); letter-spacing:-.055em; font-weight:800; }
+.page-header .subtitle { font-size:.9rem; margin-top:.5rem; }
+.btn-primary { min-height:46px; border-radius:12px; background:linear-gradient(110deg,#3975e8,#7665e5); }
+.summary-cards { gap:1rem; }
+.summary-card { min-height:142px; border-radius:20px; padding:1.5rem; box-shadow:0 14px 40px rgba(0,0,0,.07); }
+.summary-value { font-family:Inter,system-ui,sans-serif; font-size:clamp(1.4rem,2.3vw,2rem); font-weight:800; letter-spacing:-.04em; }
+.filter-tabs { padding:.4rem; border:1px solid var(--border); border-radius:14px; overflow-x:auto; }
+.tab { min-height:42px; border-radius:10px; white-space:nowrap; }
+.expense-card { min-height:82px; border-radius:16px; padding:1.1rem 1.35rem; }
+.expense-card:hover { transform:translateY(-2px); border-color:rgba(132,161,255,.45); }
+@media(max-width:768px){ .main-content { padding:4.5rem 1rem 1.5rem; } }
+@media(max-width:480px){ .summary-cards { grid-template-columns:1fr; } }

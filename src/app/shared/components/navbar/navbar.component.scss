@@ -238,3 +238,18 @@
   .mobile-menu-btn { min-width: 44px; min-height: 44px; }
   .main-content { min-width: 0; }
 }
+
+
+/* v2 navigation */
+.sidebar { width:246px; padding:1.25rem .85rem; background:linear-gradient(180deg,#111c37,#0c1429 70%); border-right:1px solid rgba(146,170,231,.12); box-shadow:none; }
+.app-container.collapsed .sidebar { width:72px; }
+.sidebar-header { padding:.55rem .65rem 1.5rem; margin-bottom:1.25rem; }
+.sidebar-header .brand { font-size:1.28rem; letter-spacing:-.045em; }
+.nav { gap:.45rem; }
+.nav .nav-item { min-height:48px; padding:.75rem .9rem; border-radius:12px; font-weight:650; }
+.nav .nav-item.active { background:linear-gradient(95deg,rgba(73,116,223,.34),rgba(99,102,241,.15)); color:#e5edff; }
+.nav .nav-item.active::before { left:-4px; width:3px; background:#82b6ff; }
+.nav .nav-item:hover { background:rgba(123,151,226,.15); }
+.sidebar-footer { padding:.95rem .3rem .2rem; }
+.mobile-menu-btn { border:1px solid rgba(132,169,255,.3); }
+@media(max-width:768px){ .sidebar { width:min(280px,85vw); } .main-content { padding:0; } }

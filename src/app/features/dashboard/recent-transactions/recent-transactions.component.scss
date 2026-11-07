@@ -150,3 +150,17 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
+
+
+/* v2: transaction activity panel */
+.transactions-card { min-height:330px; padding:clamp(1.1rem,2vw,1.75rem); border-radius:22px; background:var(--bg-secondary); box-shadow:0 18px 50px rgba(0,0,0,.08); }
+.card-header { justify-content:space-between; }
+.card-header h2 { font-size:1.15rem; letter-spacing:-.035em; }
+.badge { border:1px solid var(--border); padding:.35rem .7rem; }
+.transaction-item { min-height:65px; border:1px solid var(--border); border-radius:13px; background:var(--bg-primary); }
+.tx-icon { width:40px; height:40px; border-radius:12px; }
+.btn-delete { opacity:1; min-width:34px; min-height:34px; }
+.empty-state { display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:220px; border:1px dashed var(--border); border-radius:16px; }
+.empty-state::before { content:'↗'; display:grid; place-items:center; width:52px; height:52px; margin-bottom:1rem; border-radius:17px; color:#a7c4ff; background:rgba(99,102,241,.12); font-size:1.5rem; }
+.empty-state p { color:var(--text-primary); font-weight:700; }
+@media(max-width:550px){ .transaction-item { gap:.5rem; padding:.65rem; } .tx-amount { font-size:.8rem; } }

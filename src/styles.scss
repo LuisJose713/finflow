@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════
-   Global Styles — FinanceApp Angular
+   Global Styles — FinFlow Angular
    ═══════════════════════════════════════════════════ */
 
 /* ── CSS Variables (Light) ── */
@@ -132,5 +132,73 @@ img, svg { max-width: 100%; }
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* FinFlow UI v2 — shared design language across existing feature modules.
+   Scoped to application surfaces; preserves component behavior and dark mode. */
+:root {
+  --radius-card: 1.125rem;
+  --shadow-card: 0 12px 38px rgba(15, 23, 42, .07);
+}
+body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+button:not(:disabled) { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+button, input, select, textarea { max-width: 100%; }
+input, select, textarea { accent-color: var(--primary); }
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+:where(.main-content) { min-width: 0; }
+:where(.page-header) h1 {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  font-size: clamp(1.5rem, 2.7vw, 2rem);
+  letter-spacing: -.035em;
+  line-height: 1.2;
+}
+:where(.page-header) .subtitle,
+:where(.page-header) .greeting { line-height: 1.6; }
+:where(.goal-card, .summary-card, .filters-card, .advisor-card, .expense-card, .tx-item) {
+  border-radius: var(--radius-card);
+}
+:where(.goal-card, .summary-card, .filters-card, .advisor-card) {
+  box-shadow: var(--shadow-card);
+}
+:where(.goal-card, .advisor-card, .expense-card, .tx-item) {
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+:where(.goal-card, .advisor-card, .expense-card, .tx-item):hover {
+  border-color: color-mix(in srgb, var(--primary) 32%, var(--border));
+}
+:where(.btn-primary, .btn-new, .btn-export, .btn-clear, .btn-ghost, .filter-select, .tab) {
+  min-height: 44px;
+}
+:where(.btn-primary, .btn-new) { border-radius: .75rem; }
+:where(.search-input, .filter-select) { min-height: 44px; }
+:where(.goals-grid, .summary-cards, .cards-grid) { min-width: 0; }
+:where(.message-bubble, .goal-card, .expense-card, .tx-item) { overflow-wrap: anywhere; }
+:where(.progress-fill) { background: linear-gradient(90deg, #2563eb, #6366f1); }
+:where(.empty-state) { border-radius: var(--radius-card); }
+@media (max-width: 768px) {
+  :where(.main-content) { padding: 1rem; }
+  :where(.page-header) { gap: 1rem; }
+  :where(.page-header) .header-actions { flex-wrap: wrap; }
+  :where(.goals-grid, .cards-grid) { grid-template-columns: minmax(0, 1fr); }
+  :where(.summary-cards) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  :where(.message-bubble) { max-width: 92%; }
+}
+@media (max-width: 480px) {
+  :where(.summary-cards) { grid-template-columns: minmax(0, 1fr); }
+  :where(.filters-row) { align-items: stretch; }
+  :where(.filters-row) > * { flex: 1 1 100%; }
+  :where(.header-actions) > button { min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :where(.goal-card, .advisor-card, .expense-card, .tx-item) {
+    animation: none;
+    transition: none;
   }
 }
