@@ -1,0 +1,47 @@
+name: Responsive browser checks
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  responsive:
+    name: Responsive layouts 320–1280px
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - name: Install application dependencies
+        run: npm ci
+      - name: Install isolated browser test dependencies
+        run: npm install --no-save --no-package-lock @playwright/test@1.49.1
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+      - name: Start Angular
+        run: |
+          npm run start -- --host 127.0.0.1 > /tmp/finflow-angular.log 2>&1 &
+          for i in $(seq 1 80); do
+            if curl -fsS http://127.0.0.1:4200/login >/dev/null; then exit 0; fi
+            sleep 2
+          done
+          tail -100 /tmp/finflow-angular.log
+          exit 1
+      - name: Check responsive layouts
+        run: npx playwright test --config=playwright.config.ts
+      - name: Upload screenshots and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: responsive-screenshots
+          path: |
+            test-results/
+            screenshots/
+          if-no-files-found: ignore
