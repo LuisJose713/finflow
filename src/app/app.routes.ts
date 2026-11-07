@@ -21,6 +21,10 @@ export const routes: Routes = [
     canActivate: [guestGuard],
   },
   {
+    path: "pricing",
+    loadComponent: () => import("./features/pricing/pricing.component").then(m => m.PricingComponent),
+  },
+  {
     path: "register",
     loadComponent: () =>
       import("./features/auth/register/register.component").then(
