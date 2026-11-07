@@ -122,3 +122,107 @@
     max-width:100%;
   }
 }
+
+
+/* FinFlow adaptive sliding navigation.
+   The width transition applies to the HOST as well as the aside so the
+   routed content can resize without horizontal overflow or jumping. */
+:host {
+  --sidebar-open-width: clamp(220px, 20vw, 246px);
+  flex: 0 0 var(--sidebar-open-width);
+  width: var(--sidebar-open-width);
+  min-width: 0;
+  transition: flex-basis 220ms ease, width 220ms ease;
+}
+:host:has(.sidebar.collapsed) {
+  flex: 0 0 72px;
+  width: 72px;
+}
+.sidebar {
+  width: 100%;
+  max-width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+.sidebar-header { min-width: 0; }
+.sidebar .nav {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+}
+.sidebar-brand-credit { flex: 0 0 auto; overflow-wrap: anywhere; }
+.sidebar.collapsed .nav-item { padding-inline: .4rem; }
+.sidebar.collapsed .nav-icon { margin-inline: auto; }
+.sidebar.collapsed .sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: .55rem;
+  margin-top: auto;
+  width: 100%;
+  padding: .85rem 0 .35rem;
+}
+.sidebar.collapsed .sidebar-footer app-theme-switcher,
+.sidebar.collapsed .sidebar-footer app-logout-button {
+  flex: 0 0 auto;
+  display: block;
+  width: 44px;
+  max-width: 100%;
+}
+.sidebar.collapsed .collapse-btn {
+  width: 40px;
+  height: 36px;
+  padding: 0;
+}
+@media (max-width: 768px) {
+  :host,
+  :host:has(.sidebar.collapsed) {
+    flex: 0 0 0;
+    width: 0;
+    height: 0;
+    transition: none;
+  }
+  .sidebar,
+  .sidebar.collapsed {
+    width: min(320px, calc(100vw - 16px));
+    max-width: calc(100vw - 16px);
+    height: 100dvh;
+    overflow: hidden;
+    box-shadow: 18px 0 60px rgba(0, 0, 0, .25);
+    padding: 1.1rem .85rem;
+    transition: transform 220ms ease;
+  }
+  .sidebar .nav {
+    overflow-y: auto;
+    min-height: 0;
+    scrollbar-width: thin;
+  }
+  .sidebar .collapse-btn { display: none; }
+  .sidebar-footer,
+  .sidebar.collapsed .sidebar-footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: .6rem;
+    padding: .8rem 0 .35rem;
+  }
+  .sidebar-footer app-theme-switcher,
+  .sidebar-footer app-logout-button,
+  .sidebar.collapsed .sidebar-footer app-theme-switcher,
+  .sidebar.collapsed .sidebar-footer app-logout-button {
+    width: 100%;
+    max-width: 100%;
+  }
+  .mobile-menu-btn {
+    top: max(1rem, env(safe-area-inset-top, 0px));
+    left: max(1rem, env(safe-area-inset-left, 0px));
+    box-shadow: 0 8px 24px rgba(20, 36, 68, .2);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :host, .sidebar { transition: none; }
+}
