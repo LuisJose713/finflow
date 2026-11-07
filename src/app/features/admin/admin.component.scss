@@ -1,0 +1,33 @@
+:host { display:block; min-height:100dvh; }
+.admin-workspace { padding-bottom:3rem; }
+.admin-heading { position:relative; display:flex; justify-content:space-between; gap:2rem; align-items:center; padding:clamp(1.6rem,3vw,2.8rem); margin-bottom:1.5rem; background:linear-gradient(120deg,#101f39,#1d3a59); color:white; border-radius:22px; overflow:hidden; }
+.admin-eyebrow,.section-overline { font-size:.64rem; font-weight:800; letter-spacing:.2em; color:#d8b983; }
+.admin-heading h1 { color:white; font-size:clamp(1.8rem,3vw,2.8rem); font-weight:800; letter-spacing:-.06em; margin:.65rem 0 .5rem; }
+.admin-heading p { max-width:54ch; font-size:.88rem; color:#b9c9dd; line-height:1.75; margin:0 0 1.5rem; }
+.admin-personal-link { display:inline-flex; align-items:center; gap:1rem; padding:.75rem 1.1rem; text-decoration:none; background:#e6cfa8; color:#152844; font-size:.82rem; font-weight:800; border-radius:9px; }
+.admin-personal-link:hover { background:#f0dbb5; }
+.admin-emblem { width:130px; height:130px; flex:0 0 130px; display:grid; place-items:center; border-radius:30px; border:1px solid rgba(226,203,167,.35); box-shadow:0 0 0 32px rgba(226,203,167,.05),0 0 0 66px rgba(226,203,167,.03); font-size:4rem; font-weight:850; color:#e6cfa8; }
+.admin-section { background:var(--ff-surface,#fff); border:1px solid var(--ff-hairline,#dde4ed); border-radius:20px; padding:clamp(1.2rem,2.5vw,2rem); margin-bottom:1.2rem; color:var(--ff-ink,#13233a); }
+.admin-section-heading { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1.4rem; }
+.admin-section-heading h2 { font-size:1.25rem; letter-spacing:-.04em; margin:.5rem 0 0; }
+.section-tag { padding:.45rem .85rem; border-radius:999px; background:rgba(193,156,100,.1); color:#a68554; font-size:.7rem; font-weight:700; white-space:nowrap; }
+.admin-kpi-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.85rem; }
+.admin-kpi { min-height:137px; display:flex; flex-direction:column; padding:1.15rem; background:var(--ff-canvas,#f6f8fb); border:1px solid var(--ff-hairline,#e4e9f0); border-radius:14px; }
+.admin-kpi>span { font-size:.75rem; font-weight:720; color:var(--text-secondary,#667b91); }
+.admin-kpi strong { font-size:clamp(1.6rem,2.9vw,2.4rem); font-weight:800; letter-spacing:-.06em; color:var(--ff-ink,#13233a); margin:.65rem 0 .3rem; line-height:1; }
+.admin-kpi small { color:var(--text-secondary,#8795a6); font-size:.68rem; margin-top:auto; line-height:1.45; }
+.admin-month-bars { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:clamp(.6rem,2vw,1.8rem); align-items:end; padding:1.5rem 0 .5rem; }
+.admin-month-column { display:flex; flex-direction:column; gap:.35rem; text-align:center; align-items:center; min-width:0; }
+.admin-bar-track { width:100%; max-width:76px; height:175px; background:rgba(163,181,200,.09); border-radius:10px; display:flex; flex-direction:column; justify-content:flex-end; overflow:hidden; }
+.admin-month-bar { width:100%; min-height:3px; background:linear-gradient(180deg,#c3a271,#1a3958); border-radius:8px 8px 0 0; }
+.admin-month-column strong { margin-top:.3rem; font-size:.78rem; }
+.admin-month-column span { font-size:.68rem; font-weight:700; }
+.admin-month-column small { font-size:.61rem; color:var(--text-secondary,#8593a7); }
+.admin-state { padding:2rem; text-align:center; background:var(--ff-surface,#fff); border-radius:16px; }
+.admin-error { color:#b53b45; }
+.admin-error button { border:1px solid #c2c8d1; border-radius:8px; padding:.65rem 1rem; cursor:pointer; }
+.admin-privacy-note { font-size:.78rem; text-align:center; line-height:1.65; color:var(--text-secondary,#718196); margin:1.5rem auto; max-width:70ch; }
+.ae-vqor-credit { text-align:center; padding:1.2rem; font-size:.7rem; letter-spacing:.04em; color:var(--text-secondary,#718196); }
+.ae-vqor-credit strong { letter-spacing:.12em; color:#b18a4e; }
+@media(max-width:1080px) { .admin-kpi-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:680px) { .admin-heading { flex-direction:column; align-items:flex-start; } .admin-emblem { display:none; } .admin-kpi-grid { grid-template-columns:1fr; } .admin-month-bars { gap:.3rem; } .admin-section { padding:1rem; } }
