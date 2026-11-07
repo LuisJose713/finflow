@@ -1,3 +1,4 @@
+@use '../../../../styles/responsive-dialog' as responsive;
 // Reuses the same modal pattern as add-transaction
 @use '../../../shared/components/add-transaction/add-transaction.component' as *;
 
@@ -178,3 +179,7 @@ form {
  .modal-footer button{min-height:46px}
  .btn-submit{order:-1}
 }
+
+
+// Unified mobile bottom-sheet, responsive form and scroll-safe actions.
+@include responsive.dialog();
