@@ -1,0 +1,218 @@
+/*
+ * FinFlow responsive dialog mixin.
+ * Shared by transactions, goals, contributions, history and planned expenses.
+ * Uses a scrollable content area and keeps actions reachable on short screens.
+ */
+@mixin apply($width: 520px) {
+  .modal-backdrop,
+  .modal-overlay {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 16px;
+    padding-top: max(16px, env(safe-area-inset-top));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+
+  .modal {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    max-width: $width;
+    max-height: min(860px, calc(100dvh - 32px));
+    overflow: hidden;
+    overscroll-behavior: contain;
+  }
+
+  .modal > form {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .modal > .modal-body {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .modal-header {
+    flex: 0 0 auto;
+    min-width: 0;
+    gap: .75rem;
+    padding: 1rem 1.4rem;
+    background: var(--bg-secondary);
+  }
+
+  .modal-header h2,
+  .modal-header .header-info,
+  .modal-header .abono-title {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .modal-header .btn-close,
+  .modal-header .modal-close {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .form-grid,
+  .field-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .form-grid > *,
+  .field-row > *,
+  .modal-body > *,
+  .modal .form-group,
+  .modal .field,
+  .modal .input-wrap {
+    min-width: 0;
+  }
+
+  .modal :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 44px;
+    font-size: 1rem;
+  }
+
+  .modal textarea {
+    resize: vertical;
+  }
+
+  .modal-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    flex: 0 0 auto;
+    gap: .65rem;
+    padding: 1rem 1.4rem;
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+    background: var(--bg-secondary);
+  }
+
+  .modal-footer button {
+    min-height: 46px;
+    min-width: 0;
+  }
+
+  @media (max-width: 600px) {
+    .modal-backdrop,
+    .modal-overlay {
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .modal,
+    .modal.modal-sm {
+      width: 100%;
+      max-width: none;
+      max-height: calc(100dvh - env(safe-area-inset-top));
+      margin: 0;
+      border-radius: 22px 22px 0 0;
+    }
+
+    .modal-header {
+      padding: 1rem max(1rem, env(safe-area-inset-right))
+        1rem max(1rem, env(safe-area-inset-left));
+    }
+
+    .modal > form {
+      padding-right: max(1rem, env(safe-area-inset-right));
+      padding-left: max(1rem, env(safe-area-inset-left));
+      scrollbar-gutter: auto;
+    }
+
+    .modal > form > .modal-body {
+      padding-right: 0;
+      padding-left: 0;
+    }
+
+    .modal > .modal-body {
+      padding: 1rem;
+    }
+
+    .form-grid,
+    .field-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .modal-footer {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      width: 100%;
+      padding: 1rem 0 calc(1rem + env(safe-area-inset-bottom));
+    }
+
+    .modal > .modal-footer {
+      padding-right: max(1rem, env(safe-area-inset-right));
+      padding-left: max(1rem, env(safe-area-inset-left));
+    }
+
+    .modal-footer > button {
+      width: 100%;
+    }
+
+    .modal .summary-amounts,
+    .modal .contribution-item {
+      flex-wrap: wrap;
+      gap: .6rem;
+    }
+
+    .modal .contribution-date {
+      white-space: normal;
+    }
+
+    .modal .amount-value,
+    .modal .contribution-amount {
+      overflow-wrap: anywhere;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .modal-footer {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .modal-footer :is(.btn-submit, .btn-primary) {
+      order: -1;
+    }
+
+    .modal-header {
+      padding-inline: .85rem;
+    }
+  }
+
+  @media (max-height: 520px) and (min-width: 601px) {
+    .modal-backdrop,
+    .modal-overlay {
+      align-items: flex-start;
+      padding: 8px;
+    }
+
+    .modal {
+      max-height: calc(100dvh - 16px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .modal,
+    .modal-backdrop,
+    .modal-overlay {
+      animation: none;
+    }
+  }
+}

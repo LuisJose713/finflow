@@ -514,3 +514,14 @@
 .expense-title { font-family:'Inter',sans-serif; font-weight:700; }
 .expense-amount { font-family:'Inter',sans-serif; font-weight:750; }
 @media(max-width:600px) { .expense-card { gap:.7rem; } .expense-right { flex-wrap:wrap; justify-content:flex-end; } }
+
+/* Short and narrow viewports: cards and the expense form must never overflow. */
+.expense-card,.expense-info,.expense-right { min-width: 0; }
+.expense-title,.expense-amount { overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .summary-cards { grid-template-columns: minmax(0,1fr); }
+  .expense-card { flex-wrap: wrap; align-items: flex-start; }
+  .expense-info { flex: 1 1 165px; }
+  .expense-right { flex: 1 1 100%; justify-content: space-between; min-width: 0; }
+  .modal-body { gap: 1rem; }
+}

@@ -339,3 +339,22 @@
 .tx-amount { font-family:'Inter',sans-serif; font-size:.95rem; font-weight:750; }
 .btn-delete { opacity:1; min-width:36px; min-height:36px; border-radius:10px; }
 @media(max-width:600px) { .tx-item { gap:.7rem; } .tx-right { margin-left:auto; } }
+
+/* Transaction list: keep description, amount and actions legible at phone widths. */
+.tx-info,.tx-right { min-width: 0; }
+.tx-amount { overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .filters-row > .filter-select { flex: 1 1 calc(50% - .5rem); min-width: 0; }
+  .tx-item { display: grid; grid-template-columns: 44px minmax(0,1fr); align-items: center; gap: .65rem; }
+  .tx-info { min-width: 0; }
+  .tx-title { white-space: normal; overflow-wrap: anywhere; }
+  .tx-meta { overflow-wrap: anywhere; }
+  .tx-right { grid-column: 2; margin: 0; width: 100%; justify-content: space-between; }
+  .tx-amount { font-size: .9rem; }
+  .btn-delete { opacity: 1; min-width: 44px; min-height: 44px; }
+}
+@media (max-width: 400px) {
+  .filters-row > .filter-select, .filters-row > .btn-clear { flex: 1 1 100%; width: 100%; }
+  .header-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .btn-export { justify-content: center; }
+}

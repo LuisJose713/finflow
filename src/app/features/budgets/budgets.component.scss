@@ -46,3 +46,19 @@
 .budget-panel,.budget-grid,.budget-kpis article{min-width:0}
 .budget-line strong,.budget-kpis strong{overflow-wrap:anywhere}
 @media(max-width:768px){.budget-page{padding-top:5.25rem!important;padding-inline:clamp(.85rem,3.4vw,1.5rem)!important}.budget-grid{grid-template-columns:minmax(0,1fr)}.budget-hero{padding:1.3rem;border-radius:18px}.budget-symbol{display:none}.budget-kpis{grid-template-columns:minmax(0,1fr)}.budget-panel{padding:1.2rem}.budget-line{flex-wrap:wrap}.budget-line button{min-height:44px}}
+
+/* Budget creation and list controls sized for actual available width. */
+.budget-grid,.budget-panel,.budget-list li,.budget-line { min-width: 0; }
+.budget-panel input,.budget-panel select { min-width: 0; max-width: 100%; font-size: 1rem; }
+.budget-line > * { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .month-selector { gap: .65rem; }
+  .month-selector strong { min-width: 0; flex: 1; }
+  .month-selector button { min-width: 44px; flex-shrink: 0; }
+  .budget-panel { padding: 1rem; }
+  .budget-line { align-items: flex-start; }
+  .budget-status { white-space: normal; }
+  .budget-line.lower > div { display: flex; width: 100%; gap: .6rem; }
+  .budget-line.lower button { flex: 1; border: 1px solid var(--border); min-height: 44px; }
+  .budget-primary,.budget-secondary { width: 100%; }
+}

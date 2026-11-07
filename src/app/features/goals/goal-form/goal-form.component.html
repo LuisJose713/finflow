@@ -1,7 +1,7 @@
 <div *ngIf="isOpen()" class="modal-backdrop" (click)="close()">
-  <div class="modal" (click)="$event.stopPropagation()">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="goal-form-title" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>{{ editGoal() ? "Editar meta" : "Nueva meta" }}</h2>
+      <h2 id="goal-form-title">{{ editGoal() ? "Editar meta" : "Nueva meta" }}</h2>
       <button type="button" class="btn-close" (click)="close()" aria-label="Cerrar formulario">✕</button>
     </div>
 
