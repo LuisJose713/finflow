@@ -1,0 +1,242 @@
+// FinFlow shared responsive dialog contract.
+// Imported into modal components so Angular's style encapsulation cannot
+// override the layout when a form is opened from a different routed page.
+@mixin dialog {
+  .modal-backdrop,
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: safe center;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: clamp(.7rem, 2vw, 1.5rem);
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    max-width: min(100%, var(--finflow-dialog-max, 560px));
+    max-height: min(90dvh, 860px);
+    margin: auto;
+    overflow: hidden;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 24px 75px rgba(3, 10, 24, .28);
+  }
+
+  .modal.modal-sm {
+    max-width: min(100%, 420px);
+  }
+
+  .modal-header {
+    flex: 0 0 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: clamp(1rem, 2.6vw, 1.4rem);
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-header > :first-child:not(button) {
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow-wrap: anywhere;
+  }
+
+  .modal-header h2,
+  .modal-header h2 span {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    line-height: 1.3;
+  }
+
+  .modal-close,
+  .btn-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+
+  .modal > form {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal > .modal-body,
+  .modal form > .modal-body {
+    min-width: 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    flex: 1 1 auto;
+  }
+
+  .modal .form-grid,
+  .modal .field-row {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(.7rem, 1.8vw, 1rem);
+  }
+
+  .modal .full-width {
+    grid-column: 1 / -1;
+  }
+
+  .modal .form-group,
+  .modal .field,
+  .modal .input-wrap,
+  .modal .header-info,
+  .modal .abono-title,
+  .modal .summary-amounts,
+  .modal .amount-block,
+  .modal .contribution-info {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .modal :is(input, select, textarea) {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 44px;
+    box-sizing: border-box;
+    font-size: 1rem; // prevents auto zoom on iPhone form focus
+  }
+
+  .modal textarea {
+    resize: vertical;
+  }
+
+  .modal .modal-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: .7rem;
+    min-width: 0;
+    margin-top: auto;
+    padding: 1rem clamp(1rem, 2.6vw, 1.4rem);
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+  }
+
+  .modal .modal-footer button {
+    min-width: 0;
+    min-height: 44px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .modal :is(.contribution-item, .history-list, .summary-amounts, .goal-summary) {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  @media (max-width: 640px) {
+    .modal-backdrop,
+    .modal-overlay {
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .modal,
+    .modal.modal-sm {
+      width: 100%;
+      max-width: 100%;
+      max-height: calc(100dvh - max(10px, env(safe-area-inset-top, 0px)));
+      margin: auto 0 0;
+      border-radius: 20px 20px 0 0;
+      border-bottom: 0;
+    }
+
+    .modal-header {
+      padding: .95rem 1rem;
+    }
+
+    .modal > form {
+      padding: 1rem;
+    }
+
+    .modal > .modal-body,
+    .modal form > .modal-body {
+      padding: 1rem;
+    }
+
+    .modal .form-grid,
+    .modal .field-row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: .75rem;
+    }
+
+    .modal .modal-footer {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: .6rem;
+      padding: .8rem 1rem calc(.85rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    .modal .modal-footer > button,
+    .modal form > .modal-footer > button {
+      width: 100%;
+      min-height: 48px;
+    }
+
+    .modal .modal-footer button[type='submit'],
+    .modal .modal-footer .btn-primary,
+    .modal .modal-footer .btn-submit {
+      order: -1;
+    }
+
+    .modal .summary-amounts {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .6rem;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .modal .summary-amounts {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-height: 520px) and (min-width: 641px) {
+    .modal { max-height: 96dvh; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .modal,
+    .modal-backdrop,
+    .modal-overlay {
+      animation: none;
+      transition: none;
+    }
+  }
+}
