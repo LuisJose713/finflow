@@ -130,6 +130,7 @@ function passwordMatchValidator(
           ¿Ya tienes cuenta?
           <a routerLink="/login">Inicia sesión</a>
         </p>
+        <p class="auth-creator-credit">Creado por <strong>AEVQOR</strong></p>
       </div>
     </div>
   `,
