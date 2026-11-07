@@ -1,0 +1,60 @@
+<div class="app-shell">
+ <app-navbar></app-navbar>
+ <main class="main-content recurring-page">
+  <header class="recurring-hero"><div><span class="recurring-kicker">FINFLOW · AUTOMATIZA TU DINERO</span>
+   <h1>Movimientos recurrentes</h1><p>Programa ingresos y gastos mensuales y consulta tus próximos vencimientos.</p></div>
+   <span class="recurring-mark" aria-hidden="true">F·</span></header>
+  <p *ngIf="error()" class="recurring-feedback error" role="alert">{{error()}}</p>
+  <p *ngIf="notice()" class="recurring-feedback success" role="status">{{notice()}}</p>
+  <p *ngIf="loading()" class="recurring-status" role="status">Cargando agenda…</p>
+  <ng-container *ngIf="!loading()">
+   <section *ngIf="reminders().length>0" class="reminders" aria-labelledby="reminders-title">
+     <div><span class="recurring-overline">PRÓXIMOS 7 DÍAS</span><h2 id="reminders-title">Tus recordatorios</h2>
+     <p *ngFor="let r of reminders()"><strong>{{r.title}}</strong> · {{r.nextDueDate}} · {{r.amount|currency:'COP':'symbol-narrow':'1.0-2'}}</p></div>
+     <button type="button" (click)="process()" [disabled]="saving()">Procesar vencidos</button>
+   </section>
+   <div class="recurring-grid">
+     <section class="recurring-panel" aria-labelledby="recurring-new-title">
+       <span class="recurring-overline">ORGANIZA TUS PAGOS</span><h2 id="recurring-new-title">Programar movimiento</h2>
+       <p>Los días 1 al 28 se repiten todos los meses sin errores de calendario.</p>
+       <form (ngSubmit)="create()" novalidate>
+         <label for="recurring-title">Descripción</label>
+         <input id="recurring-title" [(ngModel)]="title" name="title" maxlength="120" placeholder="Ej. Salario o arriendo" required/>
+         <label for="recurring-type">Tipo</label>
+         <select id="recurring-type" name="type" [ngModel]="type" (ngModelChange)="changeType($event)">
+           <option value="expense">Gasto</option><option value="income">Ingreso</option>
+         </select>
+         <label for="recurring-amount">Monto mensual (COP)</label>
+         <input id="recurring-amount" type="number" min="0.01" step="0.01" [(ngModel)]="amount" name="amount" required/>
+         <label for="recurring-category">Categoría</label>
+         <select id="recurring-category" [(ngModel)]="categoryId" name="categoryId" required><option [ngValue]="null">Selecciona</option>
+           <option *ngFor="let c of categoriesForType()" [ngValue]="c.id">{{c.name}}</option></select>
+         <label for="recurring-account">Billetera (opcional)</label>
+         <select id="recurring-account" [(ngModel)]="accountId" name="accountId"><option [ngValue]="null">Sin billetera</option>
+           <option *ngFor="let a of activeAccounts()" [ngValue]="a.id">{{a.name}}</option></select>
+         <label for="recurring-day">Día del mes</label>
+         <input id="recurring-day" type="number" min="1" max="28" step="1" [(ngModel)]="dayOfMonth" name="day" required/>
+         <button class="recurring-primary" type="submit" [disabled]="saving()">{{saving()?'Guardando…':'Programar cada mes'}}</button>
+       </form>
+     </section>
+     <section class="recurring-panel" aria-labelledby="recurring-list-title">
+       <div class="recurring-panel-header"><div><span class="recurring-overline">SEGUIMIENTO</span><h2 id="recurring-list-title">Tu agenda</h2></div>
+         <span class="recurring-count">{{rules().length}}</span></div>
+       <p class="recurring-empty" *ngIf="rules().length===0">Aún no has programado ingresos o gastos recurrentes.</p>
+       <ul *ngIf="rules().length>0" class="recurring-list">
+         <li *ngFor="let r of rules()" [class.paused]="!r.active">
+           <div class="recurring-item-title"><strong>{{r.title}}</strong><span>{{r.active?'Activo':'Pausado'}}</span></div>
+           <div class="recurring-item-money">{{r.amount|currency:'COP':'symbol-narrow':'1.0-2'}}</div>
+           <p>{{r.type==='income'?'Ingreso':'Gasto'}} · {{categoryName(r.categoryId)}} · Día {{r.dayOfMonth}}</p>
+           <small>Próxima fecha: {{r.nextDueDate}} · {{accountName(r.accountId)}}</small>
+           <div class="recurring-actions"><button type="button" (click)="toggle(r)">{{r.active?'Pausar':'Reactivar'}}</button>
+             <button type="button" (click)="remove(r)" class="delete">Eliminar</button></div>
+         </li>
+       </ul>
+     </section>
+   </div>
+   <p class="recurring-note">Las ejecuciones quedan registradas una sola vez por fecha. Los avisos de esta pantalla son internos; no se envían notificaciones push ni correos todavía.</p>
+  </ng-container>
+  <footer class="recurring-footer">FinFlow · Creado por <strong>AEVQOR</strong></footer>
+ </main>
+</div>
