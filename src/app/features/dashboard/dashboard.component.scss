@@ -6,9 +6,12 @@
 
 .main-content {
   flex: 1;
-  padding: 2rem;
+  padding: clamp(1rem, 2.5vw, 2.5rem);
   overflow-y: auto;
   max-width: 1900px;
+  min-width: 0;
+  width: 100%;
+  margin-inline: auto;
 }
 
 .page-header {
@@ -20,7 +23,7 @@
   flex-wrap: wrap;
 
   h1 {
-    font-size: 1.75rem;
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
     font-weight: 700;
     color: var(--text-primary);
     line-height: 1.1;
@@ -62,11 +65,18 @@
 
   &.grid-two {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.5rem;
 
     @media (max-width: 900px) {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
   }
+}
+
+@media (max-width: 600px) {
+  .page-header { gap: 0.875rem; margin-bottom: 1.25rem; }
+  .header-actions { width: 100%; }
+  .btn-export { min-height: 44px; }
+  .section { margin-bottom: 1rem; }
 }
