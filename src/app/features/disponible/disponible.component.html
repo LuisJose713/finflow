@@ -1,0 +1,64 @@
+<div class="app-shell">
+  <app-navbar></app-navbar>
+  <main class="main-content">
+    <div class="eyebrow">FINFLOW DISPONIBLE · PLANIFICACIÓN PERSONAL</div>
+    <header class="hero">
+      <div>
+        <p class="hero-kicker">TU DINERO, CON MÁS CLARIDAD</p>
+        <h1>Lo que tienes.<br><em>Lo que puedes usar.</em></h1>
+        <p>Calcula cuánto queda hasta tu próximo ingreso después de reservar tus compromisos y ahorros. Sin conectar tu banco.</p>
+      </div>
+      <div class="hero-symbol" aria-hidden="true">F<span>·</span></div>
+    </header>
+
+    <section class="panel config" aria-label="Configura tu quincena">
+      <div class="panel-heading"><div><span class="overline">PASO 01</span><h2>Organiza tu próximo ingreso</h2></div>
+        <button type="button" class="subtle-button" (click)="refresh()" [disabled]="loading()">Actualizar saldos</button></div>
+      <div class="config-grid">
+        <label>Próxima fecha de ingreso
+          <input aria-label="Fecha de próximo ingreso" type="date" [(ngModel)]="nextPayday" [min]="today" />
+        </label>
+        <label>Ahorro que quieres reservar (COP)
+          <input aria-label="Ahorro a reservar" type="number" inputmode="decimal" [(ngModel)]="reserve" min="0" max="1000000000000" step="100" />
+        </label>
+      </div>
+      <p class="hint">Los ajustes de este cálculo no se guardan ni se envían al servidor. Los saldos y gastos provienen de tu cuenta FinFlow.</p>
+    </section>
+
+    <div *ngIf="loading()" class="panel status" role="status">Consultando tus saldos y compromisos…</div>
+    <div *ngIf="error()" class="panel error" role="alert">{{ error() }}</div>
+    <ng-container *ngIf="!loading() && !error()">
+      <section class="panel status" *ngIf="!hasAccounts()">
+        <h2>Empieza por tus cuentas</h2>
+        <p>Para evitar un cálculo engañoso, necesitamos que registres al menos una billetera o cuenta con saldo en COP.</p>
+        <a routerLink="/accounts" href="/accounts">Registrar una billetera</a>
+      </section>
+      <section class="panel status error" *ngIf="!reserveValid || !report">
+        <p>Revisa la fecha: debe ser posterior a hoy y estar dentro del próximo año. La reserva debe ser igual o mayor a cero.</p>
+      </section>
+      <ng-container *ngIf="hasAccounts() && report as data">
+        <section class="result" aria-label="Resultado de dinero disponible">
+          <div class="result-intro"><span>HASTA TU PRÓXIMO INGRESO</span><strong>{{ data.daysUntilPayday }} días por delante</strong></div>
+          <p class="result-label">Disponible estimado</p>
+          <p class="result-number" [class.negative]="data.availableCop<0">{{ format(data.availableCop) }}</p>
+          <p *ngIf="data.availableCop >= 0" class="result-explainer">Podrías distribuir hasta <strong>{{ format(data.dailyCop) }} por día</strong> si no aparecen otros gastos.</p>
+          <p *ngIf="data.availableCop < 0" class="result-explainer">Tus compromisos y reservas superan el saldo registrado. Revisa próximas obligaciones antes de gastar.</p>
+        </section>
+
+        <section class="numbers" aria-label="Cómo se calcula el disponible">
+          <article class="panel"><span class="overline">SALDO ACTUAL</span><strong>{{ format(data.balanceCop) }}</strong><p>Cuentas activas en COP.</p></article>
+          <article class="panel"><span class="overline">GASTOS PENDIENTES</span><strong>{{ format(data.pendingCop) }}</strong><p>{{ data.pendingCount }} pagos pendientes con vencimiento anterior al siguiente ingreso.</p></article>
+          <article class="panel"><span class="overline">AHORRO RESERVADO</span><strong>{{ format(data.reserveCop) }}</strong><p>Lo separas para tus prioridades.</p></article>
+        </section>
+        <section class="panel explanation">
+          <h2>Un cálculo que puedes entender</h2>
+          <p>Saldo actual − pagos pendientes − ahorro reservado = dinero disponible estimado.</p>
+          <p *ngIf="data.unplannedCount > 0" class="attention">Tienes {{ data.unplannedCount }} gasto(s) pendiente(s) sin fecha. No se suman automáticamente porque no sabemos cuándo vencerán.</p>
+          <p>Incluye pagos planificados pendientes y vencidos; evita duplicarlos si ya están descontados del saldo. Los movimientos recurrentes y pagos todavía no registrados no se suman. Marca como ejecutados los pagos completados.</p>
+          <p><strong>Importante:</strong> esta es una estimación personal basada en tus registros, no un saldo bancario certificado ni una recomendación de crédito o inversión.</p>
+          <div class="actions"><a routerLink="/planned-expenses" href="/planned-expenses">Revisar gastos planificados</a><a routerLink="/accounts" href="/accounts">Actualizar mis cuentas</a></div>
+        </section>
+      </ng-container>
+    </ng-container>
+  </main>
+</div>
