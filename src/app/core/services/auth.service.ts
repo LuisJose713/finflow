@@ -24,6 +24,20 @@ export class AuthService {
   readonly token = this._token.asReadonly();
   readonly isAuthenticated = computed(() => !!this._token());
 
+  constructor() {
+    // Refresh trusted role/identity from the API after deploy; old stored profiles
+    // may not yet contain the role field. Never rely on this UI check for authorization.
+    if (this._token()) {
+      this.http.get<User>(`${this.apiUrl}/me`).subscribe({
+        next: user => {
+          localStorage.setItem('user', JSON.stringify(user));
+          this._currentUser.set(user);
+        },
+        error: () => { /* Interceptor handles expired sessions. */ }
+      });
+    }
+  }
+
   // ── Auth methods ─────────────────────────────────────────────────────────
   login(credentials: LoginRequest) {
     return this.http
