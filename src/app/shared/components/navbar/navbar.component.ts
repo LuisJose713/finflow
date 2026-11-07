@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router'; 
 import { CommonModule } from '@angular/common'; 
 import { AuthService } from '../../../core/services/auth.service';
@@ -28,7 +28,7 @@ export class NavbarComponent {
 
   auth = inject(AuthService);
 
-  collapsed = signal(false);
+  collapsed = signal(this.readCollapsedPreference());
   mobileOpen = signal(false); // 🔥 CLAVE
 
   navItems: NavItem[] = [
@@ -45,7 +45,24 @@ export class NavbarComponent {
   ].filter(item => environment.budgetsReady || item.path !== '/budgets');
 
   toggleCollapse() {
-    this.collapsed.update(v => !v);
+    const next = !this.collapsed();
+    this.collapsed.set(next);
+    try {
+      if (typeof localStorage !== 'undefined') localStorage.setItem('finflow.sidebar.collapsed', String(next));
+    } catch { /* A blocked storage policy must never break navigation. */ }
+  }
+
+  private readCollapsedPreference(): boolean {
+    try {
+      return typeof localStorage !== 'undefined' && localStorage.getItem('finflow.sidebar.collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closeMobile();
   }
 
   toggleMobile() {
