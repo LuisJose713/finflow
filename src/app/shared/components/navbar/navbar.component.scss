@@ -54,3 +54,12 @@
 .sidebar-footer { margin-top:auto; }
 .sidebar.collapsed .nav-group-label { display:none; }
 @media(max-width:768px) { .sidebar.collapsed .nav-group-label { display:block; } }
+
+/* Unified footer controls, no clipping or theme-dependent contrast loss. */
+.sidebar-footer { display:grid; grid-template-columns:1fr; gap:.55rem; align-items:stretch; padding:1rem .2rem .3rem; }
+.sidebar-footer app-theme-switcher,.sidebar-footer app-logout-button { display:block; min-width:0; width:100%; }
+.sidebar.collapsed .sidebar-footer { display:flex; align-items:center; justify-content:center; }
+.sidebar.collapsed .sidebar-footer app-theme-switcher { width:44px; }
+.sidebar.collapsed .sidebar-footer app-theme-switcher .theme-btn { padding:.7rem; }
+@media(min-width:769px) { .sidebar { overflow:hidden; } }
+@media(max-width:768px) { .sidebar-footer { display:grid; } .sidebar.collapsed .sidebar-footer { display:grid; } .sidebar.collapsed .sidebar-footer app-theme-switcher { width:100%; } }
