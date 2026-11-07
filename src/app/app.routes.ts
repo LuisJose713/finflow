@@ -67,6 +67,16 @@ export const routes: Routes = [
 
   },
   {
+    path: "categories",
+    loadComponent: () => import("./features/categories/categories.component").then(m => m.CategoriesComponent),
+    canActivate: [authGuard],
+  },
+  {
+    path: "admin",
+    loadComponent: () => import("./features/admin/admin.component").then(m => m.AdminComponent),
+    canActivate: [authGuard],
+  },
+  {
     path: "**",
     redirectTo: "/login",
   },
