@@ -146,6 +146,8 @@ for (const width of widths) {
     }
   }, { token: fakeJWT, user });
   const page = await context.newPage();
+  page.setDefaultTimeout(7000);
+  page.setDefaultNavigationTimeout(15000);
 
   for (const route of ['/accounts', '/recurring', '/categories', '/budgets', '/security', '/admin']) {
     try {
@@ -186,6 +188,23 @@ for (const width of widths) {
 
   await page.close();
   await context.close();
+
+  // Both public auth screens share the same stylesheet. Test them without
+  // any fake stored session, including the smallest iPhone viewport.
+  const guest = await browser.newContext({ viewport: { width, height: 780 }, locale: 'es-CO' });
+  const guestPage = await guest.newPage();
+  guestPage.setDefaultTimeout(7000);
+  guestPage.setDefaultNavigationTimeout(15000);
+  for (const authPath of ['/login', '/register']) {
+    try {
+      await guestPage.goto(base + authPath, { waitUntil: 'domcontentloaded' });
+      await guestPage.locator('.auth-card input').first().waitFor({ state: 'visible' });
+      await measureViewport(guestPage, authPath, width);
+    } catch (error) {
+      failures.push(`${width}px ${authPath}: ${error.message.slice(0, 220)}`);
+    }
+  }
+  await guest.close();
   console.log(`Viewport ${width}px checked`);
 }
 await browser.close();
