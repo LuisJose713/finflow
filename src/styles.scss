@@ -383,3 +383,35 @@ body { background:var(--ff-canvas); }
     padding-top: 5.25rem;
   }
 }
+
+/* Responsive hardening for every routed FinFlow workspace. */
+:where(.app-shell, .app-shell > .main-content, .app-shell > .main-content > *) {
+  min-width: 0;
+}
+.app-shell > .main-content :is(.premium-page-intro, .premium-hero,
+  .filters-card, .summary-card, .goal-card, .expense-card, .tx-item) {
+  max-width: 100%;
+}
+.app-shell > .main-content :is(h1, h2, h3, .summary-value) {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 768px) {
+  .app-shell > .main-content {
+    padding-left: clamp(.85rem, 3.5vw, 1.5rem);
+    padding-right: clamp(.85rem, 3.5vw, 1.5rem);
+  }
+  .app-shell > .main-content :is(.filters-row, .header-actions) {
+    min-width: 0;
+  }
+  .app-shell > .main-content :is(input, select, textarea) {
+    max-width: 100%;
+    min-width: 0;
+    font-size: 16px;
+  }
+}
+@media (max-width: 420px) {
+  .premium-page-intro { padding: 1.2rem; }
+  .app-shell > .main-content :is(.btn-new, .btn-add, .btn-primary) {
+    min-height: 44px;
+  }
+}

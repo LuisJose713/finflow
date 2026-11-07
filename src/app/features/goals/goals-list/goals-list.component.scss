@@ -220,3 +220,17 @@
 .progress-bar { height:9px; background:var(--bg-primary); }
 .goal-footer { gap:.8rem; }
 .deadline { color:var(--text-secondary); }
+
+/* Goals remain readable even for long names and amounts. */
+.goal-card,.goal-header,.goal-footer { min-width: 0; }
+.goal-header h3,.goal-desc,.amounts,.deadline { overflow-wrap: anywhere; }
+.goal-footer,.goal-header,.amounts { flex-wrap: wrap; }
+.goal-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; }
+@media (max-width: 600px) {
+  .goals-grid { grid-template-columns: minmax(0,1fr); }
+  .goal-card { padding: 1.15rem; }
+  .page-header > .btn-new { width: 100%; }
+  .goal-footer { align-items: flex-start; gap: .8rem; }
+  .goal-actions { flex: 1 1 100%; justify-content: space-between; gap: .5rem; }
+  .goal-actions .btn-icon { flex: 1; min-height: 44px; border: 1px solid var(--border); }
+}

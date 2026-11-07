@@ -90,3 +90,14 @@
   --ff-ink: var(--text-primary);
   --ff-hairline: var(--border);
 }
+
+/* Category creation and edit actions remain usable on compact phones. */
+.category-form-panel form,.category-form-panel input,.category-form-panel select { min-width: 0; }
+.category-form-panel input,.category-form-panel select { width: 100%; }
+@media (max-width: 600px) {
+  .categories-heading { gap: .75rem; }
+  .categories-panel { min-width: 0; }
+  .category-item-description { flex: 1 1 100%; }
+  .category-actions { width: 100%; }
+  .category-form-panel .primary-action,.category-form-panel .secondary-action { width: 100%; min-height: 46px; }
+}

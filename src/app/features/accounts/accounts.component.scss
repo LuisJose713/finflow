@@ -86,3 +86,13 @@
   .transfer-list li { align-items: flex-start; flex-direction: column; gap: .45rem; }
   .transfer-list li > div { max-width: 100%; }
 }
+
+/* Wallet and transfer forms: controls must not shrink behind the sidebar. */
+.accounts-grid,.account-panel,.account-panel form { min-width: 0; }
+.account-panel :is(input,select) { min-width: 0; width: 100%; max-width: 100%; font-size: 1rem; }
+@media (max-width: 600px) {
+  .account-summary { overflow-wrap: anywhere; }
+  .accounts-grid { grid-template-columns: minmax(0,1fr); }
+  .account-primary { width: 100%; min-height: 48px; }
+  .account-bottom button { min-height: 44px; }
+}

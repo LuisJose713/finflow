@@ -3,10 +3,10 @@
 
 <!-- Modal backdrop -->
 <div *ngIf="isOpen()" class="modal-backdrop" (click)="close()">
-  <div class="modal" (click)="$event.stopPropagation()">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="transaction-dialog-title" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Nueva transacción</h2>
-      <button class="btn-close" (click)="close()">✕</button>
+      <h2 id="transaction-dialog-title">Nueva transacción</h2>
+      <button type="button" class="btn-close" (click)="close()" aria-label="Cerrar formulario">✕</button>
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()">

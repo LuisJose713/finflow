@@ -251,10 +251,10 @@
   <!-- Modal crear/editar -->
   @if (showModal()) {
     <div class="modal-overlay" (click)="closeModal()">
-      <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="planned-expense-dialog-title" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2>{{ editingId() ? "Editar gasto" : "Nuevo gasto planeado" }}</h2>
-          <button class="modal-close" (click)="closeModal()">
+          <h2 id="planned-expense-dialog-title">{{ editingId() ? "Editar gasto" : "Nuevo gasto planeado" }}</h2>
+          <button type="button" class="modal-close" (click)="closeModal()" aria-label="Cerrar formulario">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path
                 d="M18 6L6 18M6 6l12 12"
