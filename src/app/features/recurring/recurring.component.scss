@@ -37,3 +37,42 @@
 .recurring-footer strong{color:#b18a4f;letter-spacing:.14em}
 @media(max-width:1000px){.recurring-grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:768px){.recurring-page{padding-top:5.25rem!important;padding-inline:clamp(.85rem,3.4vw,1.5rem)!important}.recurring-hero{padding:1.3rem}.recurring-mark{display:none}.recurring-panel{padding:1.2rem}.reminders{padding:1.2rem}.reminders button{width:100%}}
+
+
+/* Recurring form and agenda stack before the sidebar squeezes columns. */
+.recurring-page,
+.recurring-hero,
+.recurring-grid,
+.recurring-panel,
+.recurring-panel-header,
+.recurring-item-title,
+.reminders { min-width: 0; }
+.recurring-hero > div:first-child,
+.recurring-panel-header > div:first-child,
+.reminders > div:first-child { min-width: 0; flex: 1 1 auto; }
+.recurring-hero h1,
+.recurring-hero p,
+.recurring-item-title strong,
+.recurring-item-money,
+.recurring-list small,
+.reminders p { overflow-wrap: anywhere; }
+.recurring-panel input,
+.recurring-panel select { display: block; max-width: 100%; box-sizing: border-box; }
+.recurring-list li { min-width: 0; }
+.recurring-panel-header,
+.recurring-item-title { flex-wrap: wrap; }
+.recurring-actions { min-width: 0; }
+@media (max-width: 1250px) {
+  .recurring-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .recurring-hero { gap: .75rem; padding: 1.1rem; }
+  .recurring-hero h1 { font-size: clamp(1.65rem, 7vw, 2.2rem); }
+  .recurring-panel { padding: 1rem; }
+  .recurring-panel-header { align-items: flex-start; }
+  .recurring-item-title { align-items: flex-start; }
+  .recurring-item-title > span { flex: 0 0 auto; }
+  .recurring-actions button { flex: 1 1 130px; }
+  .reminders { flex-direction: column; align-items: stretch; padding: 1rem; gap: .8rem; }
+  .reminders button { width: 100%; }
+}
