@@ -1,7 +1,7 @@
  <div class="auth-wrapper">
       <div class="auth-card">
         <div class="auth-header">
-          <h1>FinanceApp</h1>
+          <h1>FinFlow</h1>
           <p>Inicia sesión en tu cuenta</p>
         </div>
 
@@ -11,6 +11,8 @@
             <input
               id="email"
               type="email"
+              autocomplete="email"
+              inputmode="email"
               formControlName="email"
               placeholder="tu@correo.com"
               [class.input-error]="email?.invalid && email?.touched"
@@ -25,6 +27,7 @@
             <input
               id="password"
               type="password"
+              autocomplete="current-password"
               formControlName="password"
               placeholder="••••••••"
               [class.input-error]="password?.invalid && password?.touched"
@@ -35,7 +38,7 @@
           </div>
 
           @if (errorMsg()) {
-            <div class="alert-error">{{ errorMsg() }}</div>
+            <div class="alert-error" role="alert" aria-live="polite">{{ errorMsg() }}</div>
           }
 
           <button type="submit" class="btn-primary" [disabled]="loading()">
