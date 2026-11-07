@@ -31,7 +31,7 @@
             <select id="budget-category" name="category" [(ngModel)]="selectedCategory" [disabled]="editing()!==null" required>
               <option [ngValue]="null">Elige una categoría</option>
               <option *ngFor="let c of available()" [ngValue]="c.id">{{c.name}}</option>
-              <option *ngIf="editing()!==null" [ngValue]="selectedCategory">Categoría actual</option>
+              <option *ngIf="editing()!==null" [ngValue]="selectedCategory">{{ selectedCategoryName() }}</option>
             </select>
             <label for="budget-amount">Límite mensual (COP)</label>
             <input id="budget-amount" name="amount" [(ngModel)]="amount" type="number" min="0.01"

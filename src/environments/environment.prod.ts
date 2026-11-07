@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  budgetsReady: false, // enable only after monthly_budgets migration and E2E
+  budgetsReady: true, // Neon monthly_budgets migrated 2026-11-07; QA SQL validated
   apiUrl: 'https://finflow-backend-yqhi.onrender.com',
 };
