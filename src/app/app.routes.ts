@@ -71,6 +71,11 @@ export const routes: Routes = [
 
   },
   {
+    path: "security",
+    loadComponent: () => import("./features/security/security.component").then(m=>m.SecurityComponent),
+    canActivate: [authGuard],
+  },
+  {
     path: "recurring",
     loadComponent: () => import("./features/recurring/recurring.component").then(m=>m.RecurringComponent),
     canActivate: [authGuard],

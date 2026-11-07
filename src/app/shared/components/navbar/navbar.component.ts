@@ -36,6 +36,7 @@ export class NavbarComponent {
     { path: '/goals',     label: 'Metas',     icon: '🎯' },
     { path: '/accounts', label: 'Cuentas y billeteras', icon: '◫' },
     { path: '/recurring', label: 'Recurrentes', icon: '↻' },
+    { path: '/security', label: 'Seguridad', icon: '⛨' },
     { path: '/advisor',   label: 'Asesor IA', icon: '🤖' },
     { path: '/transactions', label: 'Transacciones', icon: '💳' },
     { path: '/planned-expenses', label: 'Gastos Planeados', icon: '📅' },
