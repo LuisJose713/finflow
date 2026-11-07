@@ -1,86 +1,19 @@
-<!-- <aside class="sidebar" [class.collapsed]="collapsed()">
+<button class="mobile-menu-btn" type="button" (click)="toggleMobile()" [attr.aria-expanded]="mobileOpen()" aria-controls="finflow-sidebar" [attr.aria-label]="mobileOpen() ? 'Cerrar menú' : 'Abrir menú'">☰</button>
+<div class="overlay" *ngIf="mobileOpen()" (click)="closeMobile()" aria-hidden="true"></div>
+<aside id="finflow-sidebar" class="sidebar" [class.collapsed]="collapsed()" [class.open]="mobileOpen()" aria-label="Navegación principal">
   <div class="sidebar-header">
-    <span class="logo">💰</span>
+    <span class="logo" aria-hidden="true">◈</span>
     <span class="brand" *ngIf="!collapsed()">FinFlow</span>
-    <button class="collapse-btn" (click)="toggleCollapse()">
-      {{ collapsed() ? '→' : '←' }}
-    </button>
+    <button class="collapse-btn" type="button" (click)="toggleCollapse()" [attr.aria-label]="collapsed() ? 'Expandir menú' : 'Contraer menú'">{{ collapsed() ? '→' : '←' }}</button>
   </div>
-
-  <nav class="nav">
-    <a
-      *ngFor="let item of navItems"
-      [routerLink]="item.path"
-      routerLinkActive="active"
-      class="nav-item"
-      [title]="item.label"
-    >
-      <span class="nav-icon">{{ item.icon }}</span>
+  <nav class="nav" aria-label="Secciones">
+    <a *ngFor="let item of navItems" [routerLink]="item.path" routerLinkActive="active" class="nav-item" [title]="item.label" (click)="closeMobile()">
+      <span class="nav-icon" aria-hidden="true">{{ item.icon }}</span>
       <span class="nav-label" *ngIf="!collapsed()">{{ item.label }}</span>
     </a>
   </nav>
-
   <div class="sidebar-footer">
     <app-theme-switcher></app-theme-switcher>
     <app-logout-button *ngIf="!collapsed()"></app-logout-button>
   </div>
-</aside> -->
-
-
-
-<div class="app-container" [class.collapsed]="collapsed()">
-
-  <!-- 🔥 BOTÓN MOBILE -->
-  <button class="mobile-menu-btn" (click)="toggleMobile()">
-    ☰
-  </button>
-
-  <!-- 🔥 OVERLAY -->
-  <div 
-    class="overlay" 
-    *ngIf="mobileOpen()" 
-    (click)="closeMobile()">
-  </div>
-
-  <!-- SIDEBAR -->
-  <aside 
-    class="sidebar" 
-    [class.collapsed]="collapsed()"
-    [class.open]="mobileOpen()"
-  >
-
-    <div class="sidebar-header">
-      <span class="logo">💰</span>
-      <span class="brand" *ngIf="!collapsed()">FinFlow</span>
-
-      <button class="collapse-btn" (click)="toggleCollapse()">
-        {{ collapsed() ? '→' : '←' }}
-      </button>
-    </div>
-
-    <nav class="nav">
-      <a
-        *ngFor="let item of navItems"
-        [routerLink]="item.path"
-        routerLinkActive="active"
-        class="nav-item"
-        (click)="closeMobile()"
-      >
-        <span class="nav-icon">{{ item.icon }}</span>
-        <span *ngIf="!collapsed()">{{ item.label }}</span>
-      </a>
-    </nav>
-
-    <div class="sidebar-footer">
-      <app-theme-switcher></app-theme-switcher>
-      <app-logout-button *ngIf="!collapsed()"></app-logout-button>
-    </div>
-
-  </aside>
-
-  <!-- CONTENIDO -->
-  <main class="main-content">
-    <router-outlet></router-outlet>
-  </main>
-
-</div>
+</aside>
