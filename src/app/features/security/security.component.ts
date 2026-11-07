@@ -24,6 +24,40 @@ export class SecurityComponent {
  confirmPassword='';
  revokePassword='';
  readonly api=environment.apiUrl+'/auth';
+ profileName='';
+ profileEmail='';
+ profilePassword='';
+ readonly profileBusy=signal(false);
+
+ constructor(){
+   const user=this.auth.currentUser();
+   this.profileName=user?.name??'';
+   this.profileEmail=user?.email??'';
+   this.http.get<{name:string;email:string}>(this.api+'/me').subscribe({
+     next:user=>{this.profileName=user.name;this.profileEmail=user.email;},
+     error:()=>{}
+   });
+ }
+
+ updateProfile(){
+   if(this.profileBusy())return;
+   this.error.set('');this.message.set('');
+   if(!this.profileName.trim() || !this.profileEmail.trim() || !this.profilePassword) {
+     this.error.set('Completa nombre, correo y tu contraseña actual.');return;
+   }
+   this.profileBusy.set(true);
+   this.http.put<{logoutRequired:boolean}>(this.api+'/profile',{
+     name:this.profileName.trim(),email:this.profileEmail.trim(),currentPassword:this.profilePassword
+   }).subscribe({
+     next:()=>{this.profileBusy.set(false);this.profilePassword='';this.auth.logout();},
+     error:(err:HttpErrorResponse)=>{this.profileBusy.set(false);
+       this.error.set(err.status===403?'La contraseña actual no coincide.'
+         :err.status===409?'El nombre o correo ya pertenece a otra cuenta.'
+         :err.status===400?'Verifica el nombre y el correo.'
+         :'No pudimos guardar tu perfil.');}
+   });
+ }
+
 
  changePassword(){
    if(this.busy())return;

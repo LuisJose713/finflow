@@ -7,6 +7,9 @@ import {
   ValidationErrors,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { PrivacyPolicy, PrivacyService } from '../../../core/services/privacy.service';
+import { PrivacyPolicyComponent } from '../../../shared/components/privacy-policy.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 
@@ -21,7 +24,7 @@ function passwordMatchValidator(
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, CommonModule, PrivacyPolicyComponent],
   template: `
     <div class="auth-wrapper">
       <section class="auth-showcase" aria-label="Conoce FinFlow">
@@ -121,7 +124,26 @@ function passwordMatchValidator(
           @if (form.get('password')?.value && form.get('confirmPassword')?.value && !form.errors?.['passwordMismatch']) {
             <p class="password-match-indicator" role="status">Las contraseñas coinciden.</p>
           }
-          <button type="submit" class="btn-primary" [disabled]="loading()">
+          <section class="registration-privacy">
+            <h2>Tu privacidad importa</h2>
+            <p *ngIf="!policyReady()" class="registration-warning" role="status">Estamos preparando la política de tratamiento de datos. No se habilitarán nuevas cuentas hasta que los datos legales estén completos.</p>
+            <details *ngIf="policyReady()">
+              <summary>Leer política de tratamiento de datos personales</summary>
+              <app-privacy-policy [policy]="policy()"></app-privacy-policy>
+            </details>
+            <label class="privacy-check">
+              <input type="checkbox" formControlName="privacyAccepted" [disabled]="!policyReady()"/>
+              <span>He leído la política de tratamiento de datos y autorizo el uso de la información necesaria para prestar FinFlow.</span>
+            </label>
+            @if (form.get('privacyAccepted')?.invalid && form.get('privacyAccepted')?.touched) {
+              <span class="error-msg">Debes aceptar la política vigente para registrarte.</span>
+            }
+            <label class="privacy-check">
+              <input type="checkbox" formControlName="marketingConsent"/>
+              <span>Opcional: quiero recibir información comercial y promociones por correo.</span>
+            </label>
+          </section>
+          <button type="submit" class="btn-primary" [disabled]="loading() || !policyReady()">
             {{ loading() ? 'Creando cuenta...' : 'Crear cuenta' }}
           </button>
         </form>
@@ -141,6 +163,16 @@ export class RegisterComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
   private toast = inject(ToastService);
+  private privacy = inject(PrivacyService);
+  readonly policy = signal<PrivacyPolicy | null>(null);
+  readonly policyReady = signal(false);
+
+  constructor() {
+    this.privacy.policy().subscribe({
+      next: p => { this.policy.set(p); this.policyReady.set(p.ready); },
+      error: () => this.policyReady.set(false)
+    });
+  }
 
   loading = signal(false);
   errorMsg = signal('');
@@ -153,6 +185,8 @@ export class RegisterComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required],
+      privacyAccepted: [false, Validators.requiredTrue],
+      marketingConsent: [false],
     },
     { validators: passwordMatchValidator }
   );
@@ -170,9 +204,18 @@ export class RegisterComponent {
     this.loading.set(true);
     this.errorMsg.set('');
 
-    const { name, email, password, confirmPassword } = this.form.getRawValue();
-
-    this.auth.register({ name: name!, email: email!, password: password!, confirmPassword: confirmPassword! }).subscribe({
+    if (!this.policyReady() || !this.policy()) {
+      this.errorMsg.set('Aún no podemos procesar el registro: política de privacidad pendiente.');
+      this.loading.set(false);
+      return;
+    }
+    const { name, email, password, confirmPassword, privacyAccepted, marketingConsent } = this.form.getRawValue();
+    this.auth.register({
+      name: name!, email: email!, password: password!, confirmPassword: confirmPassword!,
+      privacyAccepted: Boolean(privacyAccepted),
+      privacyVersion: this.policy()!.version,
+      marketingConsent: Boolean(marketingConsent)
+    }).subscribe({
       next: () => {
         this.toast.success('¡Cuenta creada exitosamente!');
         this.router.navigate(['/dashboard']);

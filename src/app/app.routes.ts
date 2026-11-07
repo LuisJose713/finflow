@@ -75,6 +75,11 @@ export const routes: Routes = [
 
   },
   {
+    path: "profile",
+    redirectTo: "/security",
+    pathMatch: "full",
+  },
+  {
     path: "security",
     loadComponent: () => import("./features/security/security.component").then(m=>m.SecurityComponent),
     canActivate: [authGuard],

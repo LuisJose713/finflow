@@ -8,6 +8,20 @@
   <p *ngIf="error()" class="security-message error" role="alert">{{error()}}</p>
   <p *ngIf="message()" class="security-message success" role="status">{{message()}}</p>
   <div class="security-grid">
+   <section class="security-panel" aria-labelledby="profile-title">
+    <span class="security-kicker">MI CUENTA</span><h2 id="profile-title">Actualizar perfil</h2>
+    <p>Actualiza tu nombre o dirección de correo. Para proteger tu identidad, exige tu contraseña actual y te pedirá iniciar sesión nuevamente después de guardar.</p>
+    <form (ngSubmit)="updateProfile()">
+      <label for="profile-name">Nombre</label>
+      <input id="profile-name" [(ngModel)]="profileName" name="name" maxlength="80" autocomplete="name" required/>
+      <label for="profile-email">Correo electrónico</label>
+      <input id="profile-email" [(ngModel)]="profileEmail" name="email" type="email" maxlength="254" autocomplete="email" required/>
+      <label for="profile-password">Contraseña actual para confirmar</label>
+      <input id="profile-password" [(ngModel)]="profilePassword" name="current" type="password" autocomplete="current-password" required/>
+      <button type="submit" class="security-primary" [disabled]="profileBusy() || busy()">Guardar perfil y cerrar sesiones</button>
+    </form>
+    <p class="security-note">La verificación de la nueva dirección por correo todavía está pendiente. No se enviará ningún mensaje de confirmación en esta versión.</p>
+   </section>
    <section class="security-panel" aria-labelledby="change-password-title">
     <span class="security-kicker">ACCESO PERSONAL</span><h2 id="change-password-title">Cambiar contraseña</h2>
     <p>Utiliza una contraseña nueva de al menos 12 caracteres. Al cambiarla, se invalidarán los tokens anteriores.</p>

@@ -64,3 +64,13 @@
 
 .auth-creator-credit { margin:1.4rem 0 0; text-align:center; color:#9cabb9; font-size:.7rem; }
 .auth-creator-credit strong { letter-spacing:.13em; color:#a6804b; }
+
+/* Consentimiento explícito en el registro: nunca premarcado. */
+.registration-privacy{display:grid;gap:.7rem;margin:1.3rem 0;padding:1rem;border:1px solid #d9e0e9;border-radius:13px;background:#f8fafc}
+.registration-privacy h2{font-size:1rem;color:#15253d}
+.registration-privacy details{max-height:300px;overflow:auto;padding:.65rem;background:white;border-radius:9px;border:1px solid #dce3ee}
+.registration-privacy summary{cursor:pointer;font-size:.8rem;font-weight:750;color:#27496d}
+.registration-privacy .privacy-doc{padding-top:1rem}
+.registration-privacy .privacy-check{display:flex;align-items:flex-start;gap:.6rem;color:#263a53;font-size:.78rem;line-height:1.5}
+.registration-privacy .privacy-check input{margin-top:2px;flex:none;width:18px;height:18px}
+.registration-privacy .registration-warning{color:#935b2b;font-size:.78rem;line-height:1.5}
