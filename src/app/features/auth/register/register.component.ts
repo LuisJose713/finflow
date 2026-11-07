@@ -24,10 +24,21 @@ function passwordMatchValidator(
   imports: [ReactiveFormsModule, RouterLink],
   template: `
     <div class="auth-wrapper">
+      <section class="auth-showcase" aria-label="Conoce FinFlow">
+      <div class="showcase-brand"><span class="showcase-logo">F<span>·</span></span><span>FinFlow <small>PERSONAL FINANCE</small></span></div>
+      <div class="showcase-copy">
+        <span class="showcase-eyebrow">TU DINERO, CON OTRO NIVEL DE CLARIDAD</span>
+        <h2>La tranquilidad<br>de tener <em>el control.</em></h2>
+        <p>Un espacio para entender cada movimiento, construir tus metas y tomar mejores decisiones financieras.</p>
+        <div class="showcase-chips"><span>Visión clara</span><span>Metas reales</span><span>Tu futuro</span></div>
+      </div>
+      <div class="showcase-foot"><span class="showcase-foot-line"></span><span>INTELIGENCIA FINANCIERA PERSONAL</span></div>
+    </section>
       <div class="auth-card">
         <div class="auth-header">
-          <h1>FinFlow</h1>
-          <p>Crea tu cuenta gratis</p>
+          <div class="auth-brand"><span class="auth-brand-mark">F·</span> FinFlow</div>
+          <h1>Empieza a construir tu futuro</h1>
+          <p>Crea tu cuenta y da el primer paso hacia el control de tus finanzas.</p>
         </div>
 
         <form [formGroup]="form" (ngSubmit)="onSubmit()">
@@ -72,7 +83,7 @@ function passwordMatchValidator(
               [class.input-error]="password?.invalid && password?.touched"
             />
             @if (password?.invalid && password?.touched) {
-              <span class="error-msg">Mínimo 6 caracteres</span>
+              <span class="error-msg">Mínimo 8 caracteres</span>
             }
           </div>
 
@@ -128,7 +139,7 @@ export class RegisterComponent {
     {
       name: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required],
     },
     { validators: passwordMatchValidator }
