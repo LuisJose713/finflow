@@ -522,3 +522,9 @@
 .chart-skeleton { max-width:230px; }
 .legend { padding-bottom:.25rem; }
 @media(max-width:600px){ .overview-card { padding:1.1rem; } .card-header { gap:.7rem; flex-wrap:wrap; } .stats { gap:.6rem; } .stat-card { padding:.8rem; } .stat-value { font-size:1.1rem; } }
+
+/* No-data state: compact, purposeful and consistent with recent transactions */
+.chart-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.55rem; min-height:185px; padding:1.2rem; border:1px dashed var(--border); border-radius:16px; text-align:center; color:var(--text-muted); }
+.chart-empty strong { color:var(--text-primary); font-size:.9rem; }
+.chart-empty span:last-child { font-size:.8rem; line-height:1.5; }
+.empty-symbol { display:grid; place-items:center; width:52px; height:52px; border-radius:16px; background:rgba(99,102,241,.12); color:#a7c4ff; font-size:2rem; }
