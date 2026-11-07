@@ -20,7 +20,15 @@
       <input id="profile-password" [(ngModel)]="profilePassword" name="current" type="password" autocomplete="current-password" required/>
       <button type="submit" class="security-primary" [disabled]="profileBusy() || busy()">Guardar perfil y cerrar sesiones</button>
     </form>
-    <p class="security-note">La verificación de la nueva dirección por correo todavía está pendiente. No se enviará ningún mensaje de confirmación en esta versión.</p>
+    <p class="security-note">Si cambias tu correo, te enviaremos un código de ocho dígitos a la nueva dirección. No actualizaremos el correo hasta verificarlo. La verificación requiere configurar primero el servicio de correo seguro.</p>
+    <div *ngIf="emailPending()" class="email-check">
+      <h3>Confirmar nuevo correo</h3>
+      <p>Introduce el código recibido en tu nuevo correo. Caduca a los 15 minutos.</p>
+      <label for="email-verification-code">Código de ocho dígitos</label>
+      <input id="email-verification-code" type="text" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" [(ngModel)]="verificationCode" name="verificationCode" autocomplete="one-time-code"/>
+      <button type="button" class="security-primary" [disabled]="profileBusy() || verificationCode.length!==8" (click)="confirmEmail()">Confirmar correo</button>
+      <button type="button" class="security-secondary" (click)="emailPending.set(false);verificationCode=''">Cancelar</button>
+    </div>
    </section>
    <section class="security-panel" aria-labelledby="change-password-title">
     <span class="security-kicker">ACCESO PERSONAL</span><h2 id="change-password-title">Cambiar contraseña</h2>
