@@ -1,37 +1,32 @@
-import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const router  = inject(Router);
-  const token   = localStorage.getItem('token');
-  const userRaw = localStorage.getItem('user');
+  const router = inject(Router);
+  const token = localStorage.getItem('token');
 
-  if (token && userRaw) {
-    try {
-      const user = JSON.parse(userRaw);
+  // Never send credentials to third-party endpoints or similarly named hosts.
+  const api = new URL(environment.apiUrl, window.location.origin);
+  const target = new URL(req.url, window.location.origin);
+  const apiPath = api.pathname.replace(/\\/$/, '');
+  const isApiRequest = target.origin === api.origin &&
+    (target.pathname === apiPath || target.pathname.startsWith(apiPath + '/'));
 
-      const cloned = req.clone({
-        headers: req.headers
-          .set('Authorization', `Bearer ${token}`)
-          .set('X-User-Id', String(user.id)),
-      });
+  const request = isApiRequest && token
+    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+    : req;
 
-      return next(cloned).pipe(
-        catchError((error: HttpErrorResponse) => {
-          if (error.status === 401) {
-            localStorage.clear();
-            router.navigate(['/login']);
-          }
-          return throwError(() => error);
-        })
-      );
-    } catch {
-      localStorage.clear();
-      return next(req);
-    }
-  }
-
-  return next(req);
+  return next(request).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (isApiRequest && token && error.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        void router.navigate(['/login']);
+      }
+      return throwError(() => error);
+    }),
+  );
 };
