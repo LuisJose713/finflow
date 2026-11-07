@@ -120,7 +120,10 @@ export class GoalFormComponent {
     }
 
     const request$ = goal
-      ? this.goalService.update(goal.id, data)
+      ? this.goalService.update(goal.id, {
+          title: data.title, targetAmount: data.targetAmount,
+          deadline: data.deadline, description: data.description,
+        }) // No enviar currentAmount=0 al editar: conservar aportes existentes.
       : this.goalService.create(data);
 
     request$.subscribe({
