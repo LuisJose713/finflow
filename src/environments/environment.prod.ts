@@ -1,4 +1,5 @@
 export const environment = {
-  production: true,
-  apiUrl: 'https://finflow-backend-yqhi.onrender.com',
+  production: false,
+  apiUrl: 'http://localhost:8081', // ruta principal back
+
 };
