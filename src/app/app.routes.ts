@@ -67,6 +67,11 @@ export const routes: Routes = [
 
   },
   {
+    path: "budgets",
+    loadComponent: () => import("./features/budgets/budgets.component").then(m => m.BudgetsComponent),
+    canActivate: [authGuard],
+  },
+  {
     path: "categories",
     loadComponent: () => import("./features/categories/categories.component").then(m => m.CategoriesComponent),
     canActivate: [authGuard],
