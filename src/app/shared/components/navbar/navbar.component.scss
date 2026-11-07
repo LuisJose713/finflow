@@ -222,6 +222,15 @@
     left: max(1rem, env(safe-area-inset-left, 0px));
     box-shadow: 0 8px 24px rgba(20, 36, 68, .2);
   }
+  .mobile-menu-btn.menu-open {
+    left: calc(min(320px, 100vw - 16px) - 56px);
+    background: #1b2b43;
+    border-color: #7a8ca8;
+    font-size: 1.75rem;
+  }
+  .sidebar.open .sidebar-header {
+    padding-right: 3.25rem;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   :host, .sidebar { transition: none; }
