@@ -64,3 +64,54 @@
 
 .auth-creator-credit { margin:1.4rem 0 0; text-align:center; color:#9cabb9; font-size:.7rem; }
 .auth-creator-credit strong { letter-spacing:.13em; color:#a6804b; }
+
+/* Login + registration are shared: keep keyboard-safe scrolling and
+   usable password controls at 320px wide without horizontal overflow. */
+.auth-wrapper {
+  min-width: 0;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.auth-card,
+.auth-card form,
+.auth-card .form-group,
+.auth-card .password-input-wrap {
+  min-width: 0;
+  max-width: 100%;
+}
+.auth-card :is(input, button) {
+  min-width: 0;
+  max-width: 100%;
+}
+@media (max-width: 640px) {
+  .auth-wrapper {
+    align-items: start;
+    padding: max(.75rem, env(safe-area-inset-top, 0px))
+             max(.75rem, env(safe-area-inset-right, 0px))
+             max(1rem, env(safe-area-inset-bottom, 0px))
+             max(.75rem, env(safe-area-inset-left, 0px));
+  }
+  .auth-card {
+    width: 100%;
+    padding: clamp(1.05rem, 4vw, 1.65rem);
+    border-radius: 18px;
+  }
+  .auth-card :is(input, select) {
+    font-size: 1rem;
+  }
+  .auth-header h1 {
+    font-size: clamp(1.55rem, 7vw, 2.1rem);
+    overflow-wrap: anywhere;
+  }
+  .password-input-wrap input {
+    padding-right: 6.5rem;
+  }
+  .password-visibility-toggle {
+    min-height: 40px;
+    right: .35rem;
+  }
+  .auth-card .btn-primary {
+    min-height: 48px;
+  }
+}

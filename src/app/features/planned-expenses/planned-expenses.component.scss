@@ -1,3 +1,4 @@
+@use '../../shared/styles/responsive-dialog' as responsiveDialog;
 .app-shell {
   display: flex;
   min-height: 100vh;
@@ -525,3 +526,7 @@
   .expense-right { flex: 1 1 100%; justify-content: space-between; min-width: 0; }
   .modal-body { gap: 1rem; }
 }
+
+
+/* Same responsive bottom-sheet behavior as goals and transactions. */
+@include responsiveDialog.apply(540px);
