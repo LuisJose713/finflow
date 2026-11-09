@@ -21,6 +21,10 @@ export const routes: Routes = [
     canActivate: [guestGuard],
   },
   {
+    path: "privacy",
+    loadComponent: () => import("./features/privacy/privacy-info.component").then(m => m.PrivacyInfoComponent),
+  },
+  {
     path: "pricing",
     loadComponent: () => import("./features/pricing/pricing.component").then(m => m.PricingComponent),
   },

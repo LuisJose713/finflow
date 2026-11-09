@@ -130,6 +130,8 @@ function passwordMatchValidator(
           ¿Ya tienes cuenta?
           <a routerLink="/login">Inicia sesión</a>
         </p>
+        <p class="auth-footer"><a routerLink="/privacy">Conoce cómo protegemos tus datos personales</a></p>
+        <p class="auth-privacy-note">La política formal y el consentimiento versionado están en preparación. Consulta la información disponible antes de registrarte.</p>
         <p class="auth-creator-credit">Creado por <strong>AEVQOR</strong></p>
       </div>
     </div>
