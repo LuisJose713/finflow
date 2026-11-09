@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { environment } from '@environments/environment';
 
 export interface PrivacyPolicy {
@@ -39,6 +39,25 @@ export interface PrivacyRightsRequest {
 export class PrivacyService {
   private readonly http = inject(HttpClient);
   private readonly api = environment.apiUrl + '/privacy';
+
+  // Keep a per-tab, per-user onboarding notice until the new account owner
+  // sees and dismisses it. This is informational and is NOT consent.
+  private readonly noticeStorageKey = 'finflow.signupPrivacyNoticeUserId';
+  private readonly _signupNoticeUserId = signal<string | null>(
+    sessionStorage.getItem(this.noticeStorageKey)
+  );
+  readonly signupNoticeUserId = this._signupNoticeUserId.asReadonly();
+
+  queueSignupNotice(userId: string | number) {
+    const id = String(userId);
+    sessionStorage.setItem(this.noticeStorageKey, id);
+    this._signupNoticeUserId.set(id);
+  }
+
+  dismissSignupNotice() {
+    sessionStorage.removeItem(this.noticeStorageKey);
+    this._signupNoticeUserId.set(null);
+  }
 
   policy() {
     return this.http.get<PrivacyPolicy>(this.api + '/policy');
