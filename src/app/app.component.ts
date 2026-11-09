@@ -1,6 +1,6 @@
 import { Component, ElementRef, HostListener, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet, RouterLink } from '@angular/router';
-import { filter, forkJoin } from 'rxjs';
+import { catchError, filter, forkJoin, of } from 'rxjs';
 import { AuthService } from './core/services/auth.service';
 import { PrivacyPolicy, PrivacyService } from './core/services/privacy.service';
 import { PrivacyPolicyComponent } from './shared/components/privacy-policy.component';
@@ -113,6 +113,8 @@ export class AppComponent {
   private readonly router = inject(Router);
   readonly currentRoute = signal(this.router.url);
   readonly privacyStatusLoaded = signal(false);
+  // This describes the education notice revision, not a legal policy version.
+  readonly noticeRevision = 'notice-v2';
 
   readonly needsConsent = signal(false);
   readonly policy = signal<PrivacyPolicy | null>(null);
@@ -126,30 +128,47 @@ export class AppComponent {
   readonly showSignupNotice = computed(() => {
     const requestedId = this.privacy.signupNoticeUserId();
     const currentUser = this.auth.currentUser();
-    const policy = this.policy();
     const route = this.currentRoute();
+    const policy = this.policy();
     this.privacy.noticeRevision();
 
-    if (!this.auth.isAuthenticated() || !currentUser || !this.privacyStatusLoaded()
-        || !policy || this.needsConsent() || !route.startsWith('/dashboard')) {
+    if (!this.auth.isAuthenticated() || !route.startsWith('/dashboard')
+        || this.needsConsent()) {
       return false;
     }
 
-    const userId = String(currentUser.id);
-    // A queued signup notice and a first-login notice are the same dialog.
-    // Reading the queued ID also rechecks the notice when signup finishes.
+    // The informational notice must not depend on /privacy/status succeeding.
+    // For a published policy, wait for the actual consent status first.
+    if (policy?.ready && !this.privacyStatusLoaded()) return false;
+
+    const userIdentity = currentUser?.id || currentUser?.email;
+    if (!userIdentity) return false;
+    const version = (policy?.version || '2026-11-09-v1') + ':' + this.noticeRevision;
+    const preview = /(?:[?&])privacy=1(?:&|$)/.test(route);
+
+    // An explicit preview URL is useful if a browser retained old assets.
+    // It never submits consent.
     void requestedId;
-    return !this.privacy.isNoticeAcknowledged(userId, policy.version);
+    return preview || !this.privacy.isNoticeAcknowledged(userIdentity, version);
   });
   @ViewChild('signupDialog') private signupDialog?: ElementRef<HTMLElement>;
 
   dismissSignupNotice() {
     const user = this.auth.currentUser();
-    const policy = this.policy();
-    if (user && policy) {
-      this.privacy.acknowledgeNotice(user.id, policy.version);
+    const userIdentity = user?.id || user?.email;
+    const version = (this.policy()?.version || '2026-11-09-v1') + ':' + this.noticeRevision;
+    if (userIdentity) {
+      this.privacy.acknowledgeNotice(userIdentity, version);
     } else {
       this.privacy.dismissSignupNotice();
+    }
+    // Remove preview query so the modal actually stays dismissed.
+    if (/(?:[?&])privacy=1(?:&|$)/.test(this.currentRoute())) {
+      void this.router.navigate([], {
+        queryParams: { privacy: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true
+      });
     }
   }
 
@@ -200,15 +219,20 @@ export class AppComponent {
       this.privacyError.set('');
       if (!token) return;
       const sub = forkJoin({
-        status: this.privacy.status(),
-        policy: this.privacy.policy()
+        status: this.privacy.status().pipe(catchError(() => of(null))),
+        policy: this.privacy.policy().pipe(catchError(() => of(null)))
       }).subscribe({
         next: ({ status, policy }) => {
           this.policy.set(policy);
-          this.needsConsent.set(policy.ready && status.policyReady && !status.accepted);
+          // Only a successful check with a published policy can open the
+          // authorization dialog. The backend still enforces consent.
+          this.needsConsent.set(Boolean(policy?.ready && status?.policyReady && !status.accepted));
           this.privacyStatusLoaded.set(true);
         },
-        error: () => { /* The backend remains authoritative on protected APIs. */ }
+        error: () => {
+          // Do not suppress the informational notice when an API is down.
+          this.privacyStatusLoaded.set(true);
+        }
       });
       onCleanup(() => sub.unsubscribe());
     });
@@ -222,7 +246,7 @@ export class AppComponent {
     this.privacy.consent(true, policy.version, this.marketing()).subscribe({
       next: () => {
         const user = this.auth.currentUser();
-        if (user) this.privacy.acknowledgeNotice(user.id, policy.version);
+        if (user) this.privacy.acknowledgeNotice(user.id || user.email, policy.version + ':' + this.noticeRevision);
         this.needsConsent.set(false);
         this.saving.set(false);
       },
