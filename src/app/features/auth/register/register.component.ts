@@ -7,6 +7,8 @@ import {
   ValidationErrors,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { PrivacyPolicy, PrivacyService } from '../../../core/services/privacy.service';
+import { PrivacyPolicyComponent } from '../../../shared/components/privacy-policy.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 
@@ -21,7 +23,7 @@ function passwordMatchValidator(
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, PrivacyPolicyComponent],
   template: `
     <div class="auth-wrapper">
       <section class="auth-showcase" aria-label="Conoce FinFlow">
@@ -121,6 +123,29 @@ function passwordMatchValidator(
           @if (form.get('password')?.value && form.get('confirmPassword')?.value && !form.errors?.['passwordMismatch']) {
             <p class="password-match-indicator" role="status">Las contraseñas coinciden.</p>
           }
+          <section class="registration-privacy" aria-labelledby="registration-privacy-heading">
+            <h2 id="registration-privacy-heading">Protección de tus datos personales</h2>
+            @if (policy()?.ready) {
+              <details>
+                <summary>Leer la política de tratamiento vigente</summary>
+                <app-privacy-policy [policy]="policy()"/>
+              </details>
+              <label class="privacy-check">
+                <input type="checkbox" formControlName="privacyAccepted" />
+                <span>He leído la política y autorizo expresamente el tratamiento necesario para utilizar FinFlow.</span>
+              </label>
+              @if (privacyError()) {
+                <span class="error-msg" role="alert">{{ privacyError() }}</span>
+              }
+              <label class="privacy-check">
+                <input type="checkbox" formControlName="marketingConsent" />
+                <span>Opcional: deseo recibir promociones y novedades por correo. Puedo cambiar esta decisión.</span>
+              </label>
+            } @else {
+              <p class="privacy-pending" role="status">La política formal está en revisión. El registro de consentimiento versionado se activará cuando esté aprobada y publicada; no se registra tu aceptación de un documento pendiente.</p>
+            }
+            <a routerLink="/privacy">Ver información de privacidad y tus derechos</a>
+          </section>
           <button type="submit" class="btn-primary" [disabled]="loading()">
             {{ loading() ? 'Creando cuenta...' : 'Crear cuenta' }}
           </button>
@@ -131,7 +156,7 @@ function passwordMatchValidator(
           <a routerLink="/login">Inicia sesión</a>
         </p>
         <p class="auth-footer"><a routerLink="/privacy">Conoce cómo protegemos tus datos personales</a></p>
-        <p class="auth-privacy-note">La política formal y el consentimiento versionado están en preparación. Consulta la información disponible antes de registrarte.</p>
+
         <p class="auth-creator-credit">Creado por <strong>AEVQOR</strong></p>
       </div>
     </div>
@@ -143,6 +168,16 @@ export class RegisterComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
   private toast = inject(ToastService);
+  private privacy = inject(PrivacyService);
+  readonly policy = signal<PrivacyPolicy | null>(null);
+  readonly privacyError = signal('');
+
+  constructor() {
+    this.privacy.policy().subscribe({
+      next: value => this.policy.set(value),
+      error: () => this.policy.set(null)
+    });
+  }
 
   loading = signal(false);
   errorMsg = signal('');
@@ -155,6 +190,8 @@ export class RegisterComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required],
+      privacyAccepted: [false],
+      marketingConsent: [false],
     },
     { validators: passwordMatchValidator }
   );
@@ -169,12 +206,24 @@ export class RegisterComponent {
       return;
     }
 
+    if (this.policy()?.ready && !this.form.get('privacyAccepted')?.value) {
+      this.privacyError.set('Debes aceptar la política vigente para crear tu cuenta.');
+      return;
+    }
+
     this.loading.set(true);
     this.errorMsg.set('');
+    this.privacyError.set('');
+    const { name, email, password, confirmPassword, privacyAccepted, marketingConsent } = this.form.getRawValue();
 
-    const { name, email, password, confirmPassword } = this.form.getRawValue();
-
-    this.auth.register({ name: name!, email: email!, password: password!, confirmPassword: confirmPassword! }).subscribe({
+    this.auth.register({
+      name: name!, email: email!, password: password!, confirmPassword: confirmPassword!,
+      ...(this.policy()?.ready ? {
+        privacyAccepted: Boolean(privacyAccepted),
+        privacyVersion: this.policy()!.version,
+        marketingConsent: Boolean(marketingConsent)
+      } : {})
+    }).subscribe({
       next: () => {
         this.toast.success('¡Cuenta creada exitosamente!');
         this.router.navigate(['/dashboard']);
