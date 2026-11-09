@@ -7,6 +7,7 @@ export interface PrivacyPolicy {
   effectiveDate: string;
   ready: boolean;
   controllerName: string;
+  controllerNit: string;
   contactEmail: string;
   contactAddress: string;
   contactPhone: string;
