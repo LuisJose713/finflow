@@ -76,3 +76,7 @@
 .registration-privacy a{font-size:.8rem;color:#254c79;text-decoration:underline;text-underline-offset:3px}
 .registration-privacy .privacy-pending{font-size:.8rem;color:#6a5437;line-height:1.65;background:#fff8e8;padding:.8rem;border-radius:9px}
 @media(max-width:500px){.registration-privacy{padding:.9rem}}
+
+/* Legal controller identity remains visible even before formal policy activation. */
+.registration-privacy .privacy-legal-identity{margin:0;padding:.7rem .85rem;border-left:3px solid #ac8d5a;background:#fff;color:#27354c;border-radius:7px;font-size:.79rem;line-height:1.6}
+.registration-privacy .privacy-legal-identity span{display:block;color:#62718a}
