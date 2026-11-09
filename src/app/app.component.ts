@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { AuthService } from './core/services/auth.service';
@@ -46,6 +46,42 @@ import { PrivacyPolicyComponent } from './shared/components/privacy-policy.compo
         </section>
       </div>
     }
+    @if (showSignupNotice() && !needsConsent()) {
+      <div class="privacy-shield" (click)="dismissSignupNotice()">
+        <section #signupDialog class="privacy-dialog signup-privacy-dialog"
+                 role="dialog" aria-modal="true"
+                 aria-labelledby="signup-privacy-title"
+                 aria-describedby="signup-privacy-desc"
+                 tabindex="-1"
+                 (click)="$event.stopPropagation()">
+          <header>
+            <span>FINFLOW · BIENVENIDO</span>
+            <h2 id="signup-privacy-title">Tu información, bajo tu control</h2>
+            <p id="signup-privacy-desc">¡Tu cuenta ya está creada! Estás en el inicio de FinFlow.
+              Conoce cómo se tratarán tus datos personales.</p>
+          </header>
+          <div class="privacy-scroll" tabindex="0" aria-label="Información de tratamiento de datos">
+            <app-privacy-policy [policy]="policy()"/>
+          </div>
+          <footer>
+            @if (policy()?.ready) {
+              <p class="signup-privacy-status">Puedes consultar el comprobante de tu autorización
+                y cambiar el permiso comercial desde el centro de privacidad.</p>
+            } @else {
+              <p class="signup-privacy-status">La política formal continúa en revisión.
+                Esta ventana es informativa: cerrarla no registra ninguna autorización
+                ni supone que hayas aceptado una política pendiente.</p>
+            }
+            <button data-signup-dismiss type="button" (click)="dismissSignupNotice()">
+              Entendido, continuar a mi inicio
+            </button>
+            <a routerLink="/privacy" (click)="dismissSignupNotice()">
+              Consultar el tratamiento de datos y mis derechos
+            </a>
+          </footer>
+        </section>
+      </div>
+    }
   `,
   styles: [`
     .privacy-shield{position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;background:#061328e8;backdrop-filter:blur(8px);padding:clamp(.5rem,2vw,1.7rem)}
@@ -64,6 +100,11 @@ import { PrivacyPolicyComponent } from './shared/components/privacy-policy.compo
     .privacy-footer-links{display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap}
     .privacy-footer-links a{font-size:.78rem;color:#2563a0}
     .privacy-error{font-size:.8rem;color:#a5243b}
+    .signup-privacy-dialog header p{margin-bottom:0}
+    .signup-privacy-dialog footer{gap:.8rem}
+    .signup-privacy-dialog .signup-privacy-status{font-size:.82rem;line-height:1.55;color:#586b80;margin:0;padding:.65rem .85rem;background:#f4f7fa;border-radius:10px}
+    .signup-privacy-dialog footer a{color:#285683;text-align:center;font-size:.78rem;text-decoration:underline;text-underline-offset:3px}
+    .signup-privacy-dialog :is(a,button,[tabindex="0"]):focus-visible{outline:3px solid #b58c50;outline-offset:3px}
     @media(max-width:600px){.privacy-shield{padding:0;align-items:end}.privacy-dialog{border-radius:18px 18px 0 0;max-height:100dvh}.privacy-dialog header{padding:1rem}.privacy-footer-links{align-items:stretch;flex-direction:column}}
   `]
 })
@@ -78,7 +119,57 @@ export class AppComponent {
   readonly saving = signal(false);
   readonly privacyError = signal('');
 
+  // New accounts see this once, immediately after entering the home screen.
+  // A notice is not an authorization; only /privacy/consent can record one.
+  readonly showSignupNotice = computed(() => {
+    const requestedId = this.privacy.signupNoticeUserId();
+    const currentUser = this.auth.currentUser();
+    return requestedId !== null && this.auth.isAuthenticated()
+      && currentUser !== null && String(currentUser.id) === requestedId;
+  });
+  @ViewChild('signupDialog') private signupDialog?: ElementRef<HTMLElement>;
+
+  dismissSignupNotice() {
+    this.privacy.dismissSignupNotice();
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleSignupNoticeKeyboard(event: KeyboardEvent) {
+    if (!this.showSignupNotice() || this.needsConsent()) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.dismissSignupNotice();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    const dialog = this.signupDialog?.nativeElement;
+    if (!dialog) return;
+    const focusable = Array.from(dialog.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), a[href], [tabindex="0"]'
+    )).filter(element => element.getClientRects().length > 0);
+    if (!focusable.length) return;
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (event.shiftKey && (document.activeElement === first || !dialog.contains(document.activeElement))) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && (document.activeElement === last || !dialog.contains(document.activeElement))) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
   constructor() {
+    effect(() => {
+      if (this.showSignupNotice() && !this.needsConsent()) {
+        setTimeout(() => {
+          if (this.showSignupNotice()) {
+            this.signupDialog?.nativeElement.querySelector<HTMLElement>(
+              '[data-signup-dismiss]'
+            )?.focus();
+          }
+        }, 0);
+      }
+    });
     effect(onCleanup => {
       const token = this.auth.token();
       this.needsConsent.set(false);

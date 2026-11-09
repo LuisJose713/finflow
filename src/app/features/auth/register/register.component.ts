@@ -138,10 +138,7 @@ function passwordMatchValidator(
                   Promociones {{ form.controls.marketingConsent.value ? 'aceptadas' : 'no autorizadas' }}</p>
               }
             } @else {
-              <p class="privacy-pending" role="status">La política formal está pendiente de aprobación. Puedes conocer el tratamiento previsto; todavía no se registran autorizaciones legales.</p>
-              <button #privacyTrigger type="button" class="privacy-open-modal" (click)="openPrivacyModal()">
-                Leer información sobre mis datos
-              </button>
+              <p class="privacy-pending" role="status">Después de crear tu cuenta entrarás al inicio de FinFlow y verás automáticamente una ventana con información sobre el tratamiento de tus datos. La política formal sigue pendiente de aprobación y todavía no se registra una autorización legal.</p>
             }
             @if (privacyError()) {
               <span class="error-msg" role="alert">{{ privacyError() }}</span>
@@ -315,9 +312,21 @@ export class RegisterComponent {
         marketingConsent: Boolean(marketingConsent)
       } : {})
     }).subscribe({
-      next: () => {
+      next: result => {
         this.toast.success('¡Cuenta creada exitosamente!');
-        this.router.navigate(['/dashboard']);
+        // First enter the financial home; only then open the one-time notice.
+        // This must not be confused with a legal authorization receipt.
+        void this.router.navigate(['/dashboard']).then(navigated => {
+          if (navigated) {
+            this.privacy.queueSignupNotice(result.user.id);
+          } else {
+            this.loading.set(false);
+            this.errorMsg.set('La cuenta se creó, pero no pudimos abrir el inicio. Entra desde el panel principal.');
+          }
+        }).catch(() => {
+          this.loading.set(false);
+          this.errorMsg.set('La cuenta se creó, pero hubo un error de navegación. Intenta abrir el inicio.');
+        });
       },
       error: (err: string) => {
         this.errorMsg.set(err);
