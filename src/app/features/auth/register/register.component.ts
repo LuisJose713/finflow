@@ -143,6 +143,14 @@ function passwordMatchValidator(
               </label>
             } @else {
               <p class="privacy-pending" role="status">La política formal está en revisión. El registro de consentimiento versionado se activará cuando esté aprobada y publicada; no se registra tu aceptación de un documento pendiente.</p>
+              <label class="privacy-check">
+                <input type="checkbox" disabled aria-disabled="true" />
+                <span>Autorización del tratamiento necesario (pendiente de habilitación).</span>
+              </label>
+              <label class="privacy-check">
+                <input type="checkbox" disabled aria-disabled="true" />
+                <span>Promociones por correo, opcional (pendiente de habilitación).</span>
+              </label>
             }
             <a routerLink="/privacy">Ver información de privacidad y tus derechos</a>
           </section>
