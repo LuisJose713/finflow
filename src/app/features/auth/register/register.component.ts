@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild, inject, signal } from '@angular/core';
 import {
   FormBuilder,
   Validators,
@@ -123,41 +123,29 @@ function passwordMatchValidator(
           @if (form.get('password')?.value && form.get('confirmPassword')?.value && !form.errors?.['passwordMismatch']) {
             <p class="password-match-indicator" role="status">Las contraseñas coinciden.</p>
           }
-          <section class="registration-privacy" aria-labelledby="registration-privacy-heading">
+          <section class="registration-privacy privacy-entry" aria-labelledby="registration-privacy-heading">
+            <span class="privacy-entry-label">PRIVACIDAD · TU DECISIÓN</span>
             <h2 id="registration-privacy-heading">Tratamiento de datos personales</h2>
-            <p class="privacy-legal-identity"><strong>Responsable:</strong>
-              {{ policy()?.controllerName || 'SoftDevCode S.A.S.' }}
-              · <strong>NIT:</strong> {{ policy()?.controllerNit || '901796447' }}
-              <span>FinFlow es un producto de la marca AEVQOR.</span>
-            </p>
+            <p><strong>Responsable:</strong> {{ policy()?.controllerName || 'SoftDevCode S.A.S.' }} ·
+              NIT {{ policy()?.controllerNit || '901796447' }}</p>
             @if (policy()?.ready) {
-              <details>
-                <summary>Leer la política de tratamiento vigente</summary>
-                <app-privacy-policy [policy]="policy()"/>
-              </details>
-              <label class="privacy-check">
-                <input type="checkbox" formControlName="privacyAccepted" />
-                <span>He leído la política y autorizo expresamente el tratamiento necesario para utilizar FinFlow.</span>
-              </label>
-              @if (privacyError()) {
-                <span class="error-msg" role="alert">{{ privacyError() }}</span>
+              <p>Para crear tu cuenta, revisa la política vigente y elige si deseas recibir novedades comerciales.</p>
+              <button #privacyTrigger type="button" class="privacy-open-modal" (click)="openPrivacyModal()">
+                {{ privacyReviewed() ? 'Revisar mi autorización' : 'Leer política y autorizar' }}
+              </button>
+              @if (privacyReviewed()) {
+                <p class="privacy-reviewed" role="status">Autorización revisada ·
+                  Promociones {{ form.controls.marketingConsent.value ? 'aceptadas' : 'no autorizadas' }}</p>
               }
-              <label class="privacy-check">
-                <input type="checkbox" formControlName="marketingConsent" />
-                <span>Opcional: deseo recibir promociones y novedades por correo. Puedo cambiar esta decisión.</span>
-              </label>
             } @else {
-              <p class="privacy-pending" role="status">La información del responsable ya está identificada. El consentimiento obligatorio estará disponible después de validar los datos legales de contacto y publicar la política definitiva. Por ahora estas casillas son informativas y no registran aceptaciones.</p>
-              <label class="privacy-check">
-                <input type="checkbox" disabled aria-disabled="true" />
-                <span>Autorización del tratamiento necesario (pendiente de habilitación).</span>
-              </label>
-              <label class="privacy-check">
-                <input type="checkbox" disabled aria-disabled="true" />
-                <span>Promociones por correo, opcional (pendiente de habilitación).</span>
-              </label>
+              <p class="privacy-pending" role="status">La política formal está pendiente de aprobación. Puedes conocer el tratamiento previsto; todavía no se registran autorizaciones legales.</p>
+              <button #privacyTrigger type="button" class="privacy-open-modal" (click)="openPrivacyModal()">
+                Leer información sobre mis datos
+              </button>
             }
-            <a routerLink="/privacy">Consultar el tratamiento de datos y tus derechos</a>
+            @if (privacyError()) {
+              <span class="error-msg" role="alert">{{ privacyError() }}</span>
+            }
           </section>
           <button type="submit" class="btn-primary" [disabled]="loading()">
             {{ loading() ? 'Creando cuenta...' : 'Crear cuenta' }}
@@ -168,10 +156,53 @@ function passwordMatchValidator(
           ¿Ya tienes cuenta?
           <a routerLink="/login">Inicia sesión</a>
         </p>
-        <p class="auth-footer"><a routerLink="/privacy">Conoce cómo protegemos tus datos personales</a></p>
+        <p class="auth-footer"><button type="button" class="privacy-footer-button" (click)="openPrivacyModal()">Tratamiento de datos personales</button></p>
 
         <p class="auth-creator-credit">Creado por <strong>AEVQOR</strong></p>
       </div>
+      @if (privacyModalOpen()) {
+        <div class="ff-consent-backdrop" role="presentation" (click)="closePrivacyModal()">
+          <section #privacyDialog class="ff-consent-modal" role="dialog" aria-modal="true"
+                   aria-labelledby="ff-consent-title" aria-describedby="ff-consent-explainer"
+                   (click)="$event.stopPropagation()" tabindex="-1">
+            <header class="ff-consent-header">
+              <div>
+                <span>FINFLOW · PRIVACIDAD</span>
+                <h2 id="ff-consent-title">Tratamiento de datos personales</h2>
+                <p id="ff-consent-explainer">SoftDevCode S.A.S. · NIT 901796447 · FinFlow / AEVQOR</p>
+              </div>
+              <button data-modal-close type="button" class="ff-consent-close"
+                      aria-label="Cerrar información de privacidad" (click)="closePrivacyModal()">×</button>
+            </header>
+            <div class="ff-consent-scroll" tabindex="0" aria-label="Información de tratamiento de datos">
+              <app-privacy-policy [policy]="policy()"/>
+            </div>
+            <footer class="ff-consent-footer">
+              @if (policy()?.ready) {
+                <label class="ff-consent-check">
+                  <input type="checkbox" [checked]="form.controls.privacyAccepted.value ?? false"
+                         (change)="form.controls.privacyAccepted.setValue($any($event.target).checked)" />
+                  <span>He leído la política y autorizo expresamente el tratamiento necesario para utilizar FinFlow.</span>
+                </label>
+                <label class="ff-consent-check">
+                  <input type="checkbox" [checked]="form.controls.marketingConsent.value ?? false"
+                         (change)="form.controls.marketingConsent.setValue($any($event.target).checked)" />
+                  <span>Opcional: quiero recibir noticias y promociones. Puedo retirar esta autorización.</span>
+                </label>
+                <button type="button" class="ff-consent-confirm"
+                        [disabled]="!form.controls.privacyAccepted.value"
+                        (click)="confirmPrivacyReview()">Confirmar mi decisión</button>
+              } @else {
+                <p class="ff-consent-pending" role="status">Este documento todavía está en revisión. Puedes leerlo, pero no se guarda ningún consentimiento hasta su aprobación y publicación.</p>
+                <button type="button" class="ff-consent-confirm" (click)="closePrivacyModal()">Entendido</button>
+              }
+              <p class="ff-consent-more">Para consultas y solicitudes de derechos,
+                <a routerLink="/privacy" (click)="closePrivacyModal()">consulta el centro de privacidad.</a>
+              </p>
+            </footer>
+          </section>
+        </div>
+      }
     </div>
   `,
   styleUrl: '../login/login.component.scss',
@@ -184,6 +215,52 @@ export class RegisterComponent {
   private privacy = inject(PrivacyService);
   readonly policy = signal<PrivacyPolicy | null>(null);
   readonly privacyError = signal('');
+  readonly privacyModalOpen = signal(false);
+  readonly privacyReviewed = signal(false);
+  @ViewChild('privacyDialog') private privacyDialog?: ElementRef<HTMLElement>;
+
+  openPrivacyModal() {
+    this.privacyModalOpen.set(true);
+    this.privacyReviewed.set(false);
+    this.privacyError.set('');
+    setTimeout(() => this.privacyDialog?.nativeElement.querySelector<HTMLElement>('[data-modal-close]')?.focus(), 0);
+  }
+
+  closePrivacyModal() {
+    this.privacyModalOpen.set(false);
+  }
+
+  confirmPrivacyReview() {
+    if (!this.policy()?.ready || !this.form.controls.privacyAccepted.value) return;
+    this.privacyReviewed.set(true);
+    this.privacyError.set('');
+    this.closePrivacyModal();
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onPrivacyDialogKeydown(event: KeyboardEvent) {
+    if (!this.privacyModalOpen()) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.closePrivacyModal();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    const dialog = this.privacyDialog?.nativeElement;
+    if (!dialog) return;
+    const focusable = Array.from(dialog.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), input:not([disabled]), a[href], [tabindex="0"]'
+    )).filter(element => element.getClientRects().length > 0);
+    if (!focusable.length) return;
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (event.shiftKey && (document.activeElement === first || !dialog.contains(document.activeElement))) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && (document.activeElement === last || !dialog.contains(document.activeElement))) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
 
   constructor() {
     this.privacy.policy().subscribe({
@@ -219,8 +296,9 @@ export class RegisterComponent {
       return;
     }
 
-    if (this.policy()?.ready && !this.form.get('privacyAccepted')?.value) {
-      this.privacyError.set('Debes aceptar la política vigente para crear tu cuenta.');
+    if (this.policy()?.ready && (!this.form.controls.privacyAccepted.value || !this.privacyReviewed())) {
+      this.privacyError.set('Lee y confirma tu autorización para continuar.');
+      this.openPrivacyModal();
       return;
     }
 
