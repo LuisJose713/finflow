@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { AuthService } from '../../core/services/auth.service';
 import { environment } from '@environments/environment';
 
 @Component({
- selector:'app-security',standalone:true,imports:[CommonModule,FormsModule,NavbarComponent],
+ selector:'app-security',standalone:true,imports:[CommonModule,FormsModule,NavbarComponent,RouterLink],
  templateUrl:'./security.component.html',styleUrl:'./security.component.scss'
 })
 export class SecurityComponent {
