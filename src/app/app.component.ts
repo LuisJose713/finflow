@@ -1,6 +1,6 @@
 import { Component, ElementRef, HostListener, ViewChild, computed, effect, inject, signal } from '@angular/core';
-import { RouterOutlet, RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { NavigationEnd, Router, RouterOutlet, RouterLink } from '@angular/router';
+import { filter, forkJoin } from 'rxjs';
 import { AuthService } from './core/services/auth.service';
 import { PrivacyPolicy, PrivacyService } from './core/services/privacy.service';
 import { PrivacyPolicyComponent } from './shared/components/privacy-policy.component';
@@ -55,10 +55,9 @@ import { PrivacyPolicyComponent } from './shared/components/privacy-policy.compo
                  tabindex="-1"
                  (click)="$event.stopPropagation()">
           <header>
-            <span>FINFLOW · BIENVENIDO</span>
+            <span>FINFLOW · TU PRIVACIDAD</span>
             <h2 id="signup-privacy-title">Tu información, bajo tu control</h2>
-            <p id="signup-privacy-desc">¡Tu cuenta ya está creada! Estás en el inicio de FinFlow.
-              Conoce cómo se tratarán tus datos personales.</p>
+            <p id="signup-privacy-desc">Queremos que conozcas cómo FinFlow trata tus datos personales, tanto si acabas de registrarte como si ya utilizabas la aplicación.</p>
           </header>
           <div class="privacy-scroll" tabindex="0" aria-label="Información de tratamiento de datos">
             <app-privacy-policy [policy]="policy()"/>
@@ -111,6 +110,9 @@ import { PrivacyPolicyComponent } from './shared/components/privacy-policy.compo
 export class AppComponent {
   readonly auth = inject(AuthService);
   private readonly privacy = inject(PrivacyService);
+  private readonly router = inject(Router);
+  readonly currentRoute = signal(this.router.url);
+  readonly privacyStatusLoaded = signal(false);
 
   readonly needsConsent = signal(false);
   readonly policy = signal<PrivacyPolicy | null>(null);
@@ -119,18 +121,36 @@ export class AppComponent {
   readonly saving = signal(false);
   readonly privacyError = signal('');
 
-  // New accounts see this once, immediately after entering the home screen.
-  // A notice is not an authorization; only /privacy/consent can record one.
+  // Existing and newly registered accounts see this education notice once
+  // for each policy version in this browser. It is NOT consent.
   readonly showSignupNotice = computed(() => {
     const requestedId = this.privacy.signupNoticeUserId();
     const currentUser = this.auth.currentUser();
-    return requestedId !== null && this.auth.isAuthenticated()
-      && currentUser !== null && String(currentUser.id) === requestedId;
+    const policy = this.policy();
+    const route = this.currentRoute();
+    this.privacy.noticeRevision();
+
+    if (!this.auth.isAuthenticated() || !currentUser || !this.privacyStatusLoaded()
+        || !policy || this.needsConsent() || !route.startsWith('/dashboard')) {
+      return false;
+    }
+
+    const userId = String(currentUser.id);
+    // A queued signup notice and a first-login notice are the same dialog.
+    // Reading the queued ID also rechecks the notice when signup finishes.
+    void requestedId;
+    return !this.privacy.isNoticeAcknowledged(userId, policy.version);
   });
   @ViewChild('signupDialog') private signupDialog?: ElementRef<HTMLElement>;
 
   dismissSignupNotice() {
-    this.privacy.dismissSignupNotice();
+    const user = this.auth.currentUser();
+    const policy = this.policy();
+    if (user && policy) {
+      this.privacy.acknowledgeNotice(user.id, policy.version);
+    } else {
+      this.privacy.dismissSignupNotice();
+    }
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -159,6 +179,8 @@ export class AppComponent {
   }
 
   constructor() {
+    this.router.events.pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe(event => this.currentRoute.set(event.urlAfterRedirects));
     effect(() => {
       if (this.showSignupNotice() && !this.needsConsent()) {
         setTimeout(() => {
@@ -173,6 +195,7 @@ export class AppComponent {
     effect(onCleanup => {
       const token = this.auth.token();
       this.needsConsent.set(false);
+      this.privacyStatusLoaded.set(false);
       this.accepted.set(false);
       this.privacyError.set('');
       if (!token) return;
@@ -182,9 +205,8 @@ export class AppComponent {
       }).subscribe({
         next: ({ status, policy }) => {
           this.policy.set(policy);
-          if (policy.ready && status.policyReady && !status.accepted) {
-            this.needsConsent.set(true);
-          }
+          this.needsConsent.set(policy.ready && status.policyReady && !status.accepted);
+          this.privacyStatusLoaded.set(true);
         },
         error: () => { /* The backend remains authoritative on protected APIs. */ }
       });
@@ -198,7 +220,12 @@ export class AppComponent {
     this.privacyError.set('');
     this.saving.set(true);
     this.privacy.consent(true, policy.version, this.marketing()).subscribe({
-      next: () => { this.needsConsent.set(false); this.saving.set(false); },
+      next: () => {
+        const user = this.auth.currentUser();
+        if (user) this.privacy.acknowledgeNotice(user.id, policy.version);
+        this.needsConsent.set(false);
+        this.saving.set(false);
+      },
       error: () => {
         this.privacyError.set('No se pudo guardar la autorización. Inténtalo nuevamente.');
         this.saving.set(false);
