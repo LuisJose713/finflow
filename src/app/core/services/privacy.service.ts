@@ -48,6 +48,25 @@ export class PrivacyService {
   );
   readonly signupNoticeUserId = this._signupNoticeUserId.asReadonly();
 
+  // A notice is informational, not legal consent. Persist only that it was
+  // displayed and dismissed in this browser, separately per account/version.
+  private readonly _noticeRevision = signal(0);
+  readonly noticeRevision = this._noticeRevision.asReadonly();
+  private noticeSeenKey(userId: string | number, version: string): string {
+    return 'finflow.privacyNoticeSeen.' + encodeURIComponent(version)
+      + '.' + encodeURIComponent(String(userId));
+  }
+
+  isNoticeAcknowledged(userId: string | number, version: string): boolean {
+    return localStorage.getItem(this.noticeSeenKey(userId, version)) === 'yes';
+  }
+
+  acknowledgeNotice(userId: string | number, version: string) {
+    localStorage.setItem(this.noticeSeenKey(userId, version), 'yes');
+    this.dismissSignupNotice();
+    this._noticeRevision.update(value => value + 1);
+  }
+
   queueSignupNotice(userId: string | number) {
     const id = String(userId);
     sessionStorage.setItem(this.noticeStorageKey, id);
