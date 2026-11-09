@@ -65,3 +65,14 @@
 .auth-privacy-note { text-align:center; color:#738099; font-size:.75rem; line-height:1.6; margin:.6rem 0 0; }
 .auth-creator-credit { margin:1.4rem 0 0; text-align:center; color:#9cabb9; font-size:.7rem; }
 .auth-creator-credit strong { letter-spacing:.13em; color:#a6804b; }
+
+/* Privacy choices — shared signup card, one field per row on small screens */
+.registration-privacy{display:flex;flex-direction:column;gap:.75rem;background:#f8fafc;border:1px solid #e0e6ed;border-radius:13px;padding:1.1rem;margin:0 0 1.25rem;color:#263750}
+.registration-privacy h2{font-size:1.04rem;letter-spacing:-.03em;margin:0}
+.registration-privacy details{border:1px solid #d6dfeb;border-radius:10px;background:#fff;padding:.85rem;max-height:310px;overflow:auto}
+.registration-privacy summary{font-size:.84rem;font-weight:700;cursor:pointer}
+.registration-privacy .privacy-check{display:flex;align-items:flex-start;gap:.6rem;font-size:.81rem;line-height:1.55;cursor:pointer}
+.registration-privacy .privacy-check input{width:20px;height:20px;flex:0 0 20px;accent-color:#173b63;margin-top:.1rem}
+.registration-privacy a{font-size:.8rem;color:#254c79;text-decoration:underline;text-underline-offset:3px}
+.registration-privacy .privacy-pending{font-size:.8rem;color:#6a5437;line-height:1.65;background:#fff8e8;padding:.8rem;border-radius:9px}
+@media(max-width:500px){.registration-privacy{padding:.9rem}}

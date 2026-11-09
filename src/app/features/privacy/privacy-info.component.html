@@ -13,12 +13,20 @@
       <span class="privacy-overline">FINFLOW · TRANSPARENCIA Y CONTROL</span>
       <h1 id="privacy-heading">Protección de datos personales</h1>
       <p>Tu información financiera merece claridad. Aquí puedes consultar qué información utiliza FinFlow, para qué se necesita y qué funciones de protección están disponibles.</p>
-      <span class="privacy-status">Información sobre privacidad · Política formal en preparación</span>
+      <span class="privacy-status">{{ policy()?.ready ? 'Política vigente · Versión ' + policy()?.version : 'Información sobre privacidad · Política formal en preparación' }}</span>
     </section>
 
     <section class="privacy-notice" aria-labelledby="privacy-notice-heading">
       <h2 id="privacy-notice-heading">Estado de la política de tratamiento</h2>
-      <p>La política formal de tratamiento de datos, los datos completos del responsable y el registro de consentimientos por versión aún están pendientes de validación y publicación. Esta página es informativa: <strong>no sustituye una política legal aprobada ni registra autorizaciones.</strong></p>
+      @if (policy()?.ready) {
+        <p>La política vigente está publicada. Revisa su versión y tus autorizaciones antes de cambiar tus preferencias.</p>
+      } @else {
+        <p>La política formal y los datos del responsable aún están pendientes de revisión y publicación. <strong>No registramos autorizaciones de una política que todavía no está aprobada.</strong></p>
+      }
+      <details class="policy-details">
+        <summary>Consultar el documento y los datos del responsable</summary>
+        <app-privacy-policy [policy]="policy()"/>
+      </details>
     </section>
 
     <div class="privacy-grid">
@@ -47,9 +55,71 @@
       </section>
     </div>
 
+    @if (isAuthenticated()) {
+      <section class="privacy-account" aria-labelledby="privacy-account-title">
+        <h2 id="privacy-account-title">Mis decisiones y solicitudes</h2>
+        @if (message()) { <p class="privacy-success" role="status">{{ message() }}</p> }
+        @if (error()) { <p class="privacy-error" role="alert">{{ error() }}</p> }
+
+        <div class="privacy-grid">
+          <article class="privacy-panel">
+            <span class="privacy-kicker">AUTORIZACIONES REGISTRADAS</span>
+            <h3>Mi historial</h3>
+            @if (status()?.accepted) {
+              <p>Autorización registrada para la versión {{ status()?.version }}.</p>
+              @if (receipts().length) {
+                <ul class="privacy-history">
+                  @for (receipt of receipts(); track receipt.accepted_at) {
+                    <li>Versión {{ receipt.policy_version }} · {{ receipt.accepted_at }} · {{ receipt.source }}</li>
+                  }
+                </ul>
+              }
+              <label class="privacy-choice">
+                <input type="checkbox" [(ngModel)]="marketingConsent" name="marketing" />
+                <span>Quiero recibir comunicaciones comerciales opcionales.</span>
+              </label>
+              <button type="button" class="privacy-action" (click)="saveMarketing()" [disabled]="loading()">
+                Guardar preferencia comercial
+              </button>
+            } @else {
+              <p>No existe una autorización versionada registrada para tu cuenta. Se te solicitará expresamente cuando la política esté publicada.</p>
+            }
+          </article>
+
+          <article class="privacy-panel">
+            <span class="privacy-kicker">CONSULTAS Y RECLAMOS</span>
+            <h3>Ejercer mis derechos</h3>
+            <p>Tu solicitud se registra para revisión. La supresión o revocatoria no implica borrar datos automáticamente.</p>
+            <form class="privacy-rights-form" (ngSubmit)="submitRightsRequest()">
+              <label for="privacy-request-type">Tipo de solicitud</label>
+              <select id="privacy-request-type" name="requestType" [(ngModel)]="requestType">
+                <option value="ACCESS">Acceso a mis datos</option>
+                <option value="RECTIFY">Corrección de mis datos</option>
+                <option value="DELETE">Solicitud de supresión</option>
+                <option value="REVOKE">Solicitud de revocatoria</option>
+              </select>
+              <label for="privacy-request-description">Descripción (máximo 500 caracteres)</label>
+              <textarea id="privacy-request-description" name="requestDescription"
+                        [(ngModel)]="requestDescription" maxlength="500" rows="3"
+                        placeholder="Explica tu solicitud. No escribas contraseñas ni información financiera sensible."></textarea>
+              <button class="privacy-action" type="submit" [disabled]="loading()">Registrar solicitud</button>
+            </form>
+            @if (requests().length) {
+              <h4>Solicitudes anteriores</h4>
+              <ul class="privacy-history">
+                @for (item of requests(); track item.id) {
+                  <li>#{{ item.id }} · {{ item.request_type }} · {{ item.status }}</li>
+                }
+              </ul>
+            }
+          </article>
+        </div>
+      </section>
+    }
+
     <section class="privacy-next" aria-labelledby="privacy-next-title">
       <h2 id="privacy-next-title">Qué estamos completando</h2>
-      <p>Publicaremos una política versionada con identificación y contacto del responsable, consentimiento informado para el registro, autorización comercial opcional por separado y mecanismos verificables para ejercer derechos sobre los datos.</p>
+      <p>El sistema ya contempla autorización versionada, decisiones comerciales independientes y solicitudes de derechos. Su activación formal depende de que se valide y publique la información legal del responsable.</p>
       <p class="privacy-small">Esta sección no cambia tus datos, tus permisos ni la sesión existente.</p>
     </section>
 
