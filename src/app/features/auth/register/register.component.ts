@@ -124,7 +124,12 @@ function passwordMatchValidator(
             <p class="password-match-indicator" role="status">Las contraseñas coinciden.</p>
           }
           <section class="registration-privacy" aria-labelledby="registration-privacy-heading">
-            <h2 id="registration-privacy-heading">Protección de tus datos personales</h2>
+            <h2 id="registration-privacy-heading">Tratamiento de datos personales</h2>
+            <p class="privacy-legal-identity"><strong>Responsable:</strong>
+              {{ policy()?.controllerName || 'SoftDevCode S.A.S.' }}
+              · <strong>NIT:</strong> {{ policy()?.controllerNit || '901796447' }}
+              <span>FinFlow es un producto de la marca AEVQOR.</span>
+            </p>
             @if (policy()?.ready) {
               <details>
                 <summary>Leer la política de tratamiento vigente</summary>
@@ -142,7 +147,7 @@ function passwordMatchValidator(
                 <span>Opcional: deseo recibir promociones y novedades por correo. Puedo cambiar esta decisión.</span>
               </label>
             } @else {
-              <p class="privacy-pending" role="status">La política formal está en revisión. El registro de consentimiento versionado se activará cuando esté aprobada y publicada; no se registra tu aceptación de un documento pendiente.</p>
+              <p class="privacy-pending" role="status">La información del responsable ya está identificada. El consentimiento obligatorio estará disponible después de validar los datos legales de contacto y publicar la política definitiva. Por ahora estas casillas son informativas y no registran aceptaciones.</p>
               <label class="privacy-check">
                 <input type="checkbox" disabled aria-disabled="true" />
                 <span>Autorización del tratamiento necesario (pendiente de habilitación).</span>
@@ -152,7 +157,7 @@ function passwordMatchValidator(
                 <span>Promociones por correo, opcional (pendiente de habilitación).</span>
               </label>
             }
-            <a routerLink="/privacy">Ver información de privacidad y tus derechos</a>
+            <a routerLink="/privacy">Consultar el tratamiento de datos y tus derechos</a>
           </section>
           <button type="submit" class="btn-primary" [disabled]="loading()">
             {{ loading() ? 'Creando cuenta...' : 'Crear cuenta' }}
