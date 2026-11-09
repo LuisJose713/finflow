@@ -17,7 +17,10 @@
     </section>
 
     <section class="privacy-notice" aria-labelledby="privacy-notice-heading">
-      <h2 id="privacy-notice-heading">Estado de la política de tratamiento</h2>
+      <h2 id="privacy-notice-heading">Responsable del tratamiento de datos</h2>
+      <p class="privacy-company"><strong>{{ policy()?.controllerName || 'SoftDevCode S.A.S.' }}</strong>
+        · NIT {{ policy()?.controllerNit || '901796447' }}</p>
+      <p>FinFlow es un producto de AEVQOR. Razón social y NIT declarados por el responsable, pendientes de cotejo registral.</p>
       @if (policy()?.ready) {
         <p>La política vigente está publicada. Revisa su versión y tus autorizaciones antes de cambiar tus preferencias.</p>
       } @else {
@@ -51,7 +54,7 @@
       <section class="privacy-panel" aria-labelledby="privacy-rights-title">
         <span class="privacy-kicker">04 · TUS DERECHOS</span>
         <h2 id="privacy-rights-title">Consulta y control de tus datos</h2>
-        <p>Puedes solicitar información, corrección y, cuando corresponda, eliminación de tus datos personales. El canal formal del responsable y el flujo de solicitudes dentro de la aplicación están pendientes de publicación y verificación.</p>
+        <p>Puedes solicitar información, corrección y, cuando corresponda, eliminación de tus datos personales. Las solicitudes se pueden registrar dentro de la cuenta para seguimiento. El canal de contacto oficial y la atención humana de los casos están pendientes de formalización.</p>
       </section>
     </div>
 
