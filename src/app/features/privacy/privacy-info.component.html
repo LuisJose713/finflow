@@ -1,0 +1,65 @@
+<main class="privacy-page">
+  <header class="privacy-topbar">
+    <a class="privacy-brand" routerLink="/login" aria-label="FinFlow, volver al inicio"><span>F·</span> FinFlow</a>
+    @if (isAuthenticated()) {
+      <a class="privacy-back" routerLink="/dashboard">Volver a mi espacio</a>
+    } @else {
+      <a class="privacy-back" routerLink="/login">Iniciar sesión</a>
+    }
+  </header>
+
+  <div class="privacy-content">
+    <section class="privacy-hero" aria-labelledby="privacy-heading">
+      <span class="privacy-overline">FINFLOW · TRANSPARENCIA Y CONTROL</span>
+      <h1 id="privacy-heading">Protección de datos personales</h1>
+      <p>Tu información financiera merece claridad. Aquí puedes consultar qué información utiliza FinFlow, para qué se necesita y qué funciones de protección están disponibles.</p>
+      <span class="privacy-status">Información sobre privacidad · Política formal en preparación</span>
+    </section>
+
+    <section class="privacy-notice" aria-labelledby="privacy-notice-heading">
+      <h2 id="privacy-notice-heading">Estado de la política de tratamiento</h2>
+      <p>La política formal de tratamiento de datos, los datos completos del responsable y el registro de consentimientos por versión aún están pendientes de validación y publicación. Esta página es informativa: <strong>no sustituye una política legal aprobada ni registra autorizaciones.</strong></p>
+    </section>
+
+    <div class="privacy-grid">
+      <section class="privacy-panel" aria-labelledby="privacy-data-title">
+        <span class="privacy-kicker">01 · INFORMACIÓN</span>
+        <h2 id="privacy-data-title">Qué información utiliza FinFlow</h2>
+        <p>Datos de cuenta, como nombre y correo electrónico, y los registros financieros que tú ingresas: ingresos, gastos, categorías, presupuestos, cuentas y metas. También se utilizan datos técnicos de autenticación y seguridad para gestionar el acceso.</p>
+      </section>
+      <section class="privacy-panel" aria-labelledby="privacy-purpose-title">
+        <span class="privacy-kicker">02 · FINALIDAD</span>
+        <h2 id="privacy-purpose-title">Para qué se utiliza</h2>
+        <p>Para que puedas iniciar sesión, consultar y gestionar tus finanzas, visualizar estadísticas y mantener la seguridad de tu cuenta. No deberías tener que aceptar publicidad para usar las funciones financieras.</p>
+      </section>
+      <section class="privacy-panel" aria-labelledby="privacy-security-title">
+        <span class="privacy-kicker">03 · SEGURIDAD</span>
+        <h2 id="privacy-security-title">Controles que ya existen</h2>
+        <p>Las conexiones públicas utilizan HTTPS; el backend autentica solicitudes con JWT y comprueba permisos de acceso. Las contraseñas se verifican mediante hashes BCrypt. Esto <strong>no significa</strong> que todos los datos estén cifrados de extremo a extremo.</p>
+        @if (isAuthenticated()) {
+          <a routerLink="/security" class="privacy-inline-link">Ir a seguridad y sesiones</a>
+        }
+      </section>
+      <section class="privacy-panel" aria-labelledby="privacy-rights-title">
+        <span class="privacy-kicker">04 · TUS DERECHOS</span>
+        <h2 id="privacy-rights-title">Consulta y control de tus datos</h2>
+        <p>Puedes solicitar información, corrección y, cuando corresponda, eliminación de tus datos personales. El canal formal del responsable y el flujo de solicitudes dentro de la aplicación están pendientes de publicación y verificación.</p>
+      </section>
+    </div>
+
+    <section class="privacy-next" aria-labelledby="privacy-next-title">
+      <h2 id="privacy-next-title">Qué estamos completando</h2>
+      <p>Publicaremos una política versionada con identificación y contacto del responsable, consentimiento informado para el registro, autorización comercial opcional por separado y mecanismos verificables para ejercer derechos sobre los datos.</p>
+      <p class="privacy-small">Esta sección no cambia tus datos, tus permisos ni la sesión existente.</p>
+    </section>
+
+    <footer class="privacy-footer">
+      <span>FinFlow · Creado por <strong>AEVQOR</strong></span>
+      @if (isAuthenticated()) {
+        <a routerLink="/security">Seguridad de la cuenta</a>
+      } @else {
+        <a routerLink="/register">Crear cuenta</a>
+      }
+    </footer>
+  </div>
+</main>
