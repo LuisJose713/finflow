@@ -6,7 +6,7 @@ import { PrivacyPolicy } from '../../core/services/privacy.service';
   standalone: true,
   template: `
     <article class="policy-document">
-      <h3>Política de tratamiento de datos personales</h3>
+      <h3>Tratamiento de datos personales de FinFlow</h3>
       <p><strong>Versión:</strong> {{ policy()?.version || 'Pendiente' }} ·
         <strong>Fecha:</strong> {{ policy()?.effectiveDate || 'Por definir' }}</p>
       @if (!policy()?.ready) {
@@ -14,11 +14,14 @@ import { PrivacyPolicy } from '../../core/services/privacy.service';
       }
       <section>
         <h4>Identificación del responsable</h4>
+        <p><strong>{{ policy()?.controllerName || 'SoftDevCode S.A.S.' }}</strong>
+          · NIT {{ policy()?.controllerNit || '901796447' }}</p>
+        <p>Producto FinFlow · Marca AEVQOR.</p>
         @if (policy()?.ready) {
-          <p>{{ policy()?.controllerName }}</p>
-          <p>Contacto: {{ policy()?.contactEmail }} · {{ policy()?.contactPhone }} · {{ policy()?.contactAddress }}</p>
+          <p>Correo: {{ policy()?.contactEmail }} · Teléfono: {{ policy()?.contactPhone }}</p>
+          <p>Dirección: {{ policy()?.contactAddress }}</p>
         } @else {
-          <p>Identificación, dirección y canales oficiales pendientes de validación.</p>
+          <p>Razón social/NIT aportados por el responsable, pendientes de cotejo registral. Dirección física, teléfono y canal de atención de derechos aún pendientes de validación.</p>
         }
       </section>
       <section>
