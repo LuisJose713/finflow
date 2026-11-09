@@ -80,3 +80,29 @@
 /* Legal controller identity remains visible even before formal policy activation. */
 .registration-privacy .privacy-legal-identity{margin:0;padding:.7rem .85rem;border-left:3px solid #ac8d5a;background:#fff;color:#27354c;border-radius:7px;font-size:.79rem;line-height:1.6}
 .registration-privacy .privacy-legal-identity span{display:block;color:#62718a}
+
+/* Responsive privacy dialogue: registration asks within a modal, not the sidebar. */
+.registration-privacy.privacy-entry{margin:0 0 1.25rem;gap:.55rem}
+.privacy-entry-label{color:#a78753;font-size:.68rem;font-weight:800;letter-spacing:.14em}
+.privacy-entry .privacy-reviewed{font-size:.78rem;color:#1d6f50;margin:.25rem 0 0}
+.privacy-open-modal{width:100%;min-height:45px;border:1px solid #c2a36c;border-radius:10px;background:#fff;color:#1b3654;font-weight:750;font-size:.85rem;cursor:pointer;padding:.75rem}
+.privacy-open-modal:hover{background:#fff8eb}
+.privacy-footer-button{border:0;background:none;color:#c3a36b;text-decoration:underline;text-underline-offset:3px;cursor:pointer;font:inherit;font-size:.81rem;padding:.25rem}
+.ff-consent-backdrop{position:fixed;inset:0;z-index:6000;display:flex;align-items:center;justify-content:center;background:rgba(5,13,28,.88);padding:clamp(.5rem,3vw,1.5rem);backdrop-filter:blur(8px)}
+.ff-consent-modal{width:min(100%,720px);max-height:calc(100dvh - 1rem);display:flex;flex-direction:column;min-height:0;overflow:hidden;border-radius:18px;border:1px solid #dbe2ea;background:#fff;color:#1a304d;box-shadow:0 28px 85px rgba(0,0,0,.45)}
+.ff-consent-header{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;padding:clamp(1rem,3vw,1.7rem);border-bottom:1px solid #e0e6ed}
+.ff-consent-header span{font-size:.65rem;letter-spacing:.18em;font-weight:800;color:#a48249}
+.ff-consent-header h2{font-size:clamp(1.25rem,4vw,1.8rem);line-height:1.2;letter-spacing:-.035em;margin:.5rem 0;color:#142840}
+.ff-consent-header p{font-size:.76rem;line-height:1.5;margin:0;color:#69778a}
+.ff-consent-close{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border:1px solid #e1e5ea;border-radius:10px;font-size:1.65rem;background:#f8fafc;color:#1b3654;cursor:pointer}
+.ff-consent-scroll{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;min-height:0;padding:1rem clamp(1rem,3vw,1.7rem)}
+.ff-consent-footer{display:flex;flex-direction:column;gap:.75rem;padding:1rem clamp(1rem,3vw,1.7rem) calc(1rem + env(safe-area-inset-bottom));border-top:1px solid #dbe2ea;background:#fcfdff}
+.ff-consent-check{display:flex;align-items:flex-start;gap:.75rem;color:#33465e;font-size:.81rem;line-height:1.55;cursor:pointer}
+.ff-consent-check input{flex:0 0 21px;width:21px;height:21px;margin:.15rem 0 0;accent-color:#20466e}
+.ff-consent-confirm{width:100%;min-height:48px;border-radius:11px;border:0;background:#17365a;color:#fff;cursor:pointer;font-size:.86rem;font-weight:800}
+.ff-consent-confirm:disabled{opacity:.5;cursor:not-allowed}
+.ff-consent-pending{color:#71512c;font-size:.8rem;line-height:1.5;padding:.8rem;background:#fff5e7;border-radius:9px;margin:0}
+.ff-consent-more{font-size:.75rem;line-height:1.6;color:#728199;text-align:center;margin:0}
+.ff-consent-more a{color:#24517c;text-decoration:underline}
+.ff-consent-modal :is(a,button,input):focus-visible{outline:3px solid #b08b4d;outline-offset:2px}
+@media(max-width:600px){.ff-consent-backdrop{padding:0;align-items:flex-end}.ff-consent-modal{max-height:100dvh;border-radius:17px 17px 0 0;border-bottom:0}.ff-consent-header{padding:1rem}.ff-consent-scroll{padding:1rem}.ff-consent-footer{padding:1rem 1rem calc(1rem + env(safe-area-inset-bottom))}}
