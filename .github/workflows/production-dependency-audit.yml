@@ -1,0 +1,57 @@
+name: FinFlow dependency security audit
+
+on:
+  push:
+    branches: [security/audit-prod-deps-20261109, main]
+  pull_request:
+    branches: [main, chore/angular-22-migration-20261109]
+  schedule:
+    - cron: '25 9 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.3'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Audit production dependency graph and save evidence
+        shell: bash
+        run: |
+          # npm audit reports non-zero when advisories are found, even when
+          # we intentionally collect the report before applying a severity gate.
+          npm audit --omit=dev --json > audit-production.json || true
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const report = JSON.parse(fs.readFileSync('audit-production.json', 'utf8'));
+          if (report.error) {
+            console.error('npm audit could not complete:', report.error.code || 'unknown error');
+            process.exit(1);
+          }
+          const counts = report.metadata?.vulnerabilities;
+          if (!counts) {
+            console.error('npm audit returned no vulnerability metadata');
+            process.exit(1);
+          }
+          console.log('Production dependency audit:', JSON.stringify(counts));
+          if ((counts.critical || 0) + (counts.high || 0) > 0) {
+            console.error('Blocking: unresolved HIGH or CRITICAL production dependency advisories');
+            process.exit(1);
+          }
+          NODE
+      - name: Preserve dependency security evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: finflow-production-npm-audit
+          path: audit-production.json
+          retention-days: 14
+          if-no-files-found: warn
