@@ -17,7 +17,8 @@ export const authGuard: CanActivateFn = () => {
     const isExpired  = Date.now() >= expiredAt;
 
     if (isExpired) {
-      localStorage.clear();
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
       router.navigate(['/login']);
       return false;
     }
@@ -25,7 +26,8 @@ export const authGuard: CanActivateFn = () => {
     return true;
   } catch {
     // Token malformado
-    localStorage.clear();
+    localStorage.removeItem('token');
+      localStorage.removeItem('user');
     router.navigate(['/login']);
     return false;
   }
