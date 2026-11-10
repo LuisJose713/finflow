@@ -1,0 +1,74 @@
+name: FinFlow Responsive Browser QA
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/app/**/*.scss'
+      - 'src/app/**/*.html'
+      - 'src/app/**/*.ts'
+      - 'src/styles/**'
+      - 'src/styles.scss'
+      - 'scripts/responsive-smoke.mjs'
+      - '.github/workflows/responsive-ui.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: responsive-qa-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  viewport-smoke:
+    name: Chromium viewport & dialog check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install application and temporary browser QA dependencies
+        run: |
+          npm ci
+          npm install --no-save --ignore-scripts playwright@1.56.1
+          npx playwright install --with-deps chromium
+
+      - name: Test genuine Angular components across mobile/tablet/desktop widths
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx ng serve --configuration=production --host=127.0.0.1 --port=4200 \
+            > "$RUNNER_TEMP/angular-serve.log" 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for i in $(seq 1 120); do
+            if curl --silent --fail http://127.0.0.1:4200/ > /dev/null; then
+              echo "Angular server ready"
+              node scripts/responsive-smoke.mjs
+              exit $?
+            fi
+            if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+              echo "::error::Angular server exited unexpectedly"
+              tail -n 100 "$RUNNER_TEMP/angular-serve.log"
+              exit 1
+            fi
+            sleep 3
+          done
+          echo "::error::Angular server did not become ready"
+          tail -n 100 "$RUNNER_TEMP/angular-serve.log"
+          exit 1
+
+      - name: Upload synthetic responsive screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: finflow-responsive-browser-qa
+          path: artifacts/responsive/
+          if-no-files-found: ignore
+          retention-days: 7
