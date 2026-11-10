@@ -21,6 +21,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: "design-preview/:section",
+    loadComponent: () =>
+      import("./features/design-preview/design-preview.component").then(
+        (m) => m.DesignPreviewComponent,
+      ),
+  },
+  {
     path: "login",
     loadComponent: () =>
       import("./features/auth/login/login.component").then(
