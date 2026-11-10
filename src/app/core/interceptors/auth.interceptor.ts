@@ -11,26 +11,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const isPublicAuthRequest = isApiRequest &&
     (req.url === `${apiBase}/auth/login` || req.url === `${apiBase}/auth/register`);
 
-  // V4 DESIGN PREVIEW ONLY. When browsing a Vercel preview deployment, never
-  // send mutating operations to the production API. Login is allowed so the
-  // designer can inspect authenticated layouts, but all data writes (including
-  // registration, category changes, deletes, and advisor posts) are disabled.
-  // Local browser QA and the official production domain are not affected.
-  const isPreviewDeployment = environment.designPreviewReadOnly &&
-    typeof location !== 'undefined' &&
-    location.hostname.endsWith('.vercel.app') &&
-    location.hostname !== 'finflow-opal-five.vercel.app';
-  if (isPreviewDeployment && isApiRequest &&
-      !['GET', 'HEAD', 'OPTIONS'].includes(req.method.toUpperCase()) &&
-      !(req.method === 'POST' && req.url === `${apiBase}/auth/login`)) {
-    return throwError(() => new HttpErrorResponse({
-      status: 403,
-      statusText: 'Design preview is read-only',
-      url: req.url,
-      error: { message: 'La vista previa no modifica datos reales.' },
-    }));
-  }
-
   // Public authentication requests must never carry a stale JWT.
   // Do not attach credentials to unrelated or third-party URLs.
   if (!isApiRequest || isPublicAuthRequest) {
