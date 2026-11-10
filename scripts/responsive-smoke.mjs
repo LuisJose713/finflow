@@ -187,7 +187,10 @@ for (const width of widths) {
       await page.waitForTimeout(200);
       await measureViewport(page, route, width);
       if (route === '/advisor') {
-        await page.getByRole('heading', { name: /Tu asesor financiero/i }).waitFor({ state: 'visible' });
+        await page.getByRole('heading', { name: /Una visión clara/i }).waitFor({ state: 'visible' });
+        // Use the real FinFlow brand assets, not a hand-drawn F or stock chatbot icon.
+        await page.locator('.chat-topbar img.brand-avatar[src="/finflow-icon-classic.svg"]').waitFor({ state: 'visible' });
+        await page.locator('.welcome-panel img.welcome-mark[src="/finflow-icon-classic.svg"]').waitFor({ state: 'visible' });
         await page.getByRole('button', { name: /Consejos de ahorro/i }).waitFor({ state: 'visible' });
         if ([320, 768, 1440].includes(width)) {
           await page.getByRole('button', { name: /Consejos de ahorro/i }).click();
