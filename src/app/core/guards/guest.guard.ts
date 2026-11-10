@@ -12,8 +12,7 @@ export const guestGuard: CanActivateFn = () => {
     const isExpired = Date.now() >= payload.exp * 1000;
 
     if (isExpired) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      localStorage.clear();
       return true; // token expirado → puede ir al login
     }
 
@@ -21,8 +20,7 @@ export const guestGuard: CanActivateFn = () => {
     router.navigate(['/dashboard']);
     return false;
   } catch {
-    localStorage.removeItem('token');
-      localStorage.removeItem('user');
+    localStorage.clear();
     return true;
   }
 };

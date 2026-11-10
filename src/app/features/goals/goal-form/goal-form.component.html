@@ -1,69 +1,73 @@
-@if (isOpen()) {
-  <div class="modal-backdrop" (click)="close()">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="goal-form-title" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2 id="goal-form-title">{{ editGoal() ? "Editar meta" : "Nueva meta" }}</h2>
-        <button type="button" class="btn-close" (click)="close()" aria-label="Cerrar formulario">✕</button>
+<div *ngIf="isOpen()" class="modal-backdrop" (click)="close()">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="goal-form-title" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 id="goal-form-title">{{ editGoal() ? "Editar meta" : "Nueva meta" }}</h2>
+      <button type="button" class="btn-close" (click)="close()" aria-label="Cerrar formulario">✕</button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <p *ngIf="error()" class="goal-form-error" role="alert">{{ error() }}</p>
+
+      <div class="form-group">
+        <label>Título de la meta</label>
+        <input
+          type="text"
+          formControlName="title"
+          maxlength="150"
+          placeholder="Ej: Fondo de emergencia"
+          [class.error]="f['title'].invalid && f['title'].touched"
+        />
       </div>
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        @if (error()) {
-          <p class="goal-form-error" role="alert">{{ error() }}</p>
-        }
+
+      <div class="form-grid">
+
         <div class="form-group">
-          <label>Título de la meta</label>
+          <label>Monto objetivo</label>
           <input
             type="text"
-            formControlName="title"
-            maxlength="150"
-            placeholder="Ej: Fondo de emergencia"
-            [class.error]="f['title'].invalid && f['title'].touched"
-            />
+            inputmode="numeric"
+            placeholder="0"
+            [value]="targetDisplay()"
+            (input)="onInput($event, 'targetAmount')"
+            (blur)="f['targetAmount'].markAsTouched()"
+            [class.error]="f['targetAmount'].invalid && f['targetAmount'].touched"
+          />
         </div>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Monto objetivo</label>
-            <input
-              type="text"
-              inputmode="numeric"
-              placeholder="0"
-              [value]="targetDisplay()"
-              (input)="onInput($event, 'targetAmount')"
-              (blur)="f['targetAmount'].markAsTouched()"
-              [class.error]="f['targetAmount'].invalid && f['targetAmount'].touched"
-              />
-          </div>
-          @if (!editGoal()) {
-            <div class="form-group">
-              <label>Ya tengo ahorrado</label>
-              <input
-                type="text"
-                inputmode="numeric"
-                placeholder="0"
-                [value]="currentDisplay()"
-                (input)="onInput($event, 'currentAmount')"
-                />
-            </div>
-          }
-          <div class="form-group full-width">
-            <label>Fecha límite</label>
-            <input type="date" formControlName="deadline" />
-          </div>
+
+        <div class="form-group" *ngIf="!editGoal()">
+          <label>Ya tengo ahorrado</label>
+          <input
+            type="text"
+            inputmode="numeric"
+            placeholder="0"
+            [value]="currentDisplay()"
+            (input)="onInput($event, 'currentAmount')"
+          />
         </div>
-        <div class="form-group">
-          <label>Descripción (opcional)</label>
-          <textarea
-            formControlName="description"
-            rows="2"
-            placeholder="¿Para qué es esta meta?"
-          ></textarea>
+
+        <div class="form-group full-width">
+          <label>Fecha límite</label>
+          <input type="date" formControlName="deadline" />
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn-cancel" (click)="close()">Cancelar</button>
-          <button type="submit" class="btn-submit" [disabled]="loading()">
-            {{ loading() ? "Guardando..." : editGoal() ? "Actualizar" : "Crear meta" }}
-          </button>
-        </div>
-      </form>
-    </div>
+
+      </div>
+
+      <div class="form-group">
+        <label>Descripción (opcional)</label>
+        <textarea
+          formControlName="description"
+          rows="2"
+          placeholder="¿Para qué es esta meta?"
+        ></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" (click)="close()">Cancelar</button>
+        <button type="submit" class="btn-submit" [disabled]="loading()">
+          {{ loading() ? "Guardando..." : editGoal() ? "Actualizar" : "Crear meta" }}
+        </button>
+      </div>
+
+    </form>
   </div>
-}
+</div>

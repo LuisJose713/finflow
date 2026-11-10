@@ -79,7 +79,7 @@
 //   }
 // }
 
-import { Component, inject, signal, output, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, output } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { GoalService } from '../../../core/services/goal.service';
@@ -87,11 +87,11 @@ import { ToastService } from '../../../core/services/toast.service';
 import { Goal } from '../../../core/models';
 
 @Component({
-    selector: 'app-goal-abono',
-    imports: [CommonModule, ReactiveFormsModule, DecimalPipe],
-    templateUrl: './goal-abono.component.html',
-    changeDetection: ChangeDetectionStrategy.Eager,
-    styleUrls: ['./goal-abono.component.scss']
+  selector: 'app-goal-abono',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, DecimalPipe],
+  templateUrl: './goal-abono.component.html',
+  styleUrls: ['./goal-abono.component.scss'],
 })
 export class GoalAbonoComponent {
   private fb          = inject(FormBuilder);

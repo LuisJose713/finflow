@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ViewChild, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ExportPdfService } from '../../core/services/export-pdf.service';
@@ -11,19 +11,19 @@ import { OverviewComponent } from './overview/overview.component';
 import { RecentTransactionsComponent } from './recent-transactions/recent-transactions.component';
 
 @Component({
-    selector: 'app-dashboard',
-    imports: [
-        RouterLink,
-        NavbarComponent,
-        AddTransactionComponent,
-        ToastContainerComponent,
-        TransactionStatsComponent,
-        OverviewComponent,
-        RecentTransactionsComponent,
-    ],
-    templateUrl: './dashboard.component.html',
-    changeDetection: ChangeDetectionStrategy.Eager,
-    styleUrls: ['./dashboard.component.scss']
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [
+    RouterLink,
+    NavbarComponent,
+    AddTransactionComponent,
+    ToastContainerComponent,
+    TransactionStatsComponent,
+    OverviewComponent,
+    RecentTransactionsComponent,
+  ],
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent {
   private authService = inject(AuthService);

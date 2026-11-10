@@ -1,5 +1,5 @@
-
-import { Component, computed, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
@@ -10,11 +10,11 @@ import { Category } from '../../core/models';
 type CategoryType = 'Income' | 'Expense';
 
 @Component({
-    selector: 'app-categories',
-    imports: [FormsModule, NavbarComponent],
-    templateUrl: './categories.component.html',
-    changeDetection: ChangeDetectionStrategy.Eager,
-    styleUrl: './categories.component.scss'
+  selector: 'app-categories',
+  standalone: true,
+  imports: [CommonModule, FormsModule, NavbarComponent],
+  templateUrl: './categories.component.html',
+  styleUrl: './categories.component.scss',
 })
 export class CategoriesComponent implements OnInit {
   private readonly categoriesApi = inject(CategoryService);

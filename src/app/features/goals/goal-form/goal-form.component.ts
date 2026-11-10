@@ -1,17 +1,17 @@
-import { Component, inject, signal, output, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, output } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
-
+import { CommonModule } from '@angular/common';
 import { GoalService } from '../../../core/services/goal.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Goal, CreateGoalRequest } from '../../../core/models';
 
 @Component({
-    selector: 'app-goal-form',
-    imports: [ReactiveFormsModule],
-    templateUrl: './goal-form.component.html',
-    changeDetection: ChangeDetectionStrategy.Eager,
-    styleUrls: ['./goal-form.component.scss']
+  selector: 'app-goal-form',
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule],
+  templateUrl: './goal-form.component.html',
+  styleUrls: ['./goal-form.component.scss'],
 })
 export class GoalFormComponent {
   private fb          = inject(FormBuilder);

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
@@ -8,9 +8,8 @@ import { BudgetService, MonthlyBudget } from '../../core/services/budget.service
 import { Category } from '../../core/models';
 
 @Component({
-    selector: 'app-budgets', imports: [CommonModule, FormsModule, NavbarComponent],
-    templateUrl: './budgets.component.html', changeDetection: ChangeDetectionStrategy.Eager,
- styleUrl: './budgets.component.scss'
+ selector:'app-budgets', standalone:true, imports:[CommonModule,FormsModule,NavbarComponent],
+ templateUrl:'./budgets.component.html', styleUrl:'./budgets.component.scss'
 })
 export class BudgetsComponent implements OnInit {
  private readonly api=inject(BudgetService);

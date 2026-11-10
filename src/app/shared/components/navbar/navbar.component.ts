@@ -1,6 +1,6 @@
-import { Component, HostListener, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router'; 
- 
+import { CommonModule } from '@angular/common'; 
 import { AuthService } from '../../../core/services/auth.service';
 import { LogoutButtonComponent } from '../logout-button/logout-button.component';
 import { ThemeSwitcherComponent } from '../theme-switcher/theme-switcher.component';
@@ -13,15 +13,16 @@ interface NavItem {
 }
 
 @Component({
-    selector: 'app-navbar',
-    imports: [
-    RouterModule,
+  selector: 'app-navbar',
+  standalone: true,
+  imports: [
+    CommonModule,          
+    RouterModule,          
     LogoutButtonComponent,
     ThemeSwitcherComponent
-],
-    templateUrl: './navbar.component.html',
-    changeDetection: ChangeDetectionStrategy.Eager,
-    styleUrls: ['./navbar.component.scss']
+  ],
+  templateUrl: './navbar.component.html',
+  styleUrls: ['./navbar.component.scss'],
 })
 export class NavbarComponent {
 

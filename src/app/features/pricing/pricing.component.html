@@ -4,69 +4,43 @@
     <a class="back" [routerLink]="auth.isAuthenticated()?'/dashboard':'/login'">{{auth.isAuthenticated()?'Volver al panel':'Iniciar sesión'}}</a>
   </header>
   <section class="intro"><span class="overline">PRECIOS TRANSPARENTES</span><h1>Tu tranquilidad financiera<br><em>empieza gratis.</em></h1>
-  <p>Prueba las funciones Pro durante tu primer mes, sin tarjeta ni cobros automáticos. Después puedes seguir en Gratis, escoger Pro o donar voluntariamente.</p>
-  <p class="disclaimer">Las compras y donaciones en línea todavía no están habilitadas. No pediremos datos bancarios hasta integrar una pasarela de pagos segura.</p>
-</section>
-@if (loading()) {
-  <p role="status">Cargando planes...</p>
-}
-@if (error()) {
-  <p role="alert">{{error()}}</p>
-}
-@if (catalog(); as data) {
-  <section class="plan-grid" aria-label="Opciones de suscripción">
-    @for (p of data.offers; track p) {
-      <article class="plan" [class.featured]="p.code==='YEARLY'">
-        <span class="overline">{{p.code==='FREE'?'GRATIS':'FINFLOW PRO'}}</span>
-        <h2>{{p.title}}</h2><p>{{p.description}}</p>
-        <div class="price">@if (p.originalCop>p.priceCop) {
-          <del>{{format(p.originalCop)}}</del>
-        }
-        <strong>{{format(p.priceCop)}}</strong><span>{{period(p.code)}}</span></div>
-        @if (p.promoTitle) {
-          <small class="promo-label">{{p.promoTitle}} · {{p.savingsPercent}}% menos</small>
-        }
-        @if (current()===p.code && auth.isAuthenticated()) {
-          <div class="current">Tu plan actual</div>
-        }
-        @if (p.code==='FREE') {
-          <a class="action" [routerLink]="auth.isAuthenticated()?'/dashboard':'/register'">
-            {{auth.isAuthenticated()?'Ir a mis finanzas':'Crear cuenta gratis'}}
-          </a>
-        }
-        @if (p.code!=='FREE') {
-          <span class="unavailable">Disponible cuando habilitemos los pagos</span>
-        }
-      </article>
-    }
+    <p>Prueba las funciones Pro durante tu primer mes, sin tarjeta ni cobros automáticos. Después puedes seguir en Gratis, escoger Pro o donar voluntariamente.</p>
+    <p class="disclaimer">Las compras y donaciones en línea todavía no están habilitadas. No pediremos datos bancarios hasta integrar una pasarela de pagos segura.</p>
   </section>
-}
-@if (catalog()) {
-  <section class="extras">
+  <p *ngIf="loading()" role="status">Cargando planes...</p>
+  <p *ngIf="error()" role="alert">{{error()}}</p>
+  <section *ngIf="catalog() as data" class="plan-grid" aria-label="Opciones de suscripción">
+    <article *ngFor="let p of data.offers" class="plan" [class.featured]="p.code==='YEARLY'">
+      <span class="overline">{{p.code==='FREE'?'GRATIS':'FINFLOW PRO'}}</span>
+      <h2>{{p.title}}</h2><p>{{p.description}}</p>
+      <div class="price"><del *ngIf="p.originalCop>p.priceCop">{{format(p.originalCop)}}</del>
+        <strong>{{format(p.priceCop)}}</strong><span>{{period(p.code)}}</span></div>
+      <small *ngIf="p.promoTitle" class="promo-label">{{p.promoTitle}} · {{p.savingsPercent}}% menos</small>
+      <div *ngIf="current()===p.code && auth.isAuthenticated()" class="current">Tu plan actual</div>
+      <a *ngIf="p.code==='FREE'" class="action" [routerLink]="auth.isAuthenticated()?'/dashboard':'/register'">
+        {{auth.isAuthenticated()?'Ir a mis finanzas':'Crear cuenta gratis'}}
+      </a>
+      <span *ngIf="p.code!=='FREE'" class="unavailable">Disponible cuando habilitemos los pagos</span>
+    </article>
+  </section>
+  <section *ngIf="catalog()" class="extras">
     <div class="coupon-card"><span class="overline">PROMOCIONES</span><h2>¿Tienes un código de descuento?</h2>
-    <form (ngSubmit)="checkCoupon()">
-      <label for="price-plan">Plan</label>
-      <select id="price-plan" name="plan" [ngModel]="chosen()" (ngModelChange)="chosen.set($event)">
-        @for (p of catalog()?.offers; track p) {
-          <option [ngValue]="p.code" [disabled]="p.code==='FREE'">{{p.title}}</option>
-        }
-      </select>
-      <label for="price-coupon">Código promocional</label>
-      <input id="price-coupon" name="code" [ngModel]="coupon()" (ngModelChange)="coupon.set($event)" maxlength="32" placeholder="Ej. BIENVENIDO20">
-      <button type="submit">Consultar promoción</button>
-    </form>
-    @if (couponError()) {
-      <p role="alert" class="error">{{couponError()}}</p>
-    }
-    @if (quote(); as q) {
-      <p role="status">Precio promocional: <strong>{{format(q.priceCop)}}</strong>. Compra todavía no disponible.</p>
-    }
-  </div>
-  <div class="donation-card"><span class="overline">APOYA EL PROYECTO</span><h2>¿Quieres aportar sin pasarte a Pro?</h2>
-  <p>FinFlow Gratis siempre podrá seguir siendo Gratis. Cuando habilitemos los pagos, podrás apoyar el proyecto con una donación voluntaria por el importe que elijas, sin cambiar tu plan.</p>
-  <span class="unavailable">Donaciones online próximamente</span>
-</div>
-</section>
-}
-<footer>FinFlow · Creado por <strong>AEVQOR</strong> · Valores en pesos colombianos.</footer>
+      <form (ngSubmit)="checkCoupon()">
+        <label for="price-plan">Plan</label>
+        <select id="price-plan" name="plan" [ngModel]="chosen()" (ngModelChange)="chosen.set($event)">
+          <option *ngFor="let p of catalog()?.offers" [ngValue]="p.code" [disabled]="p.code==='FREE'">{{p.title}}</option>
+        </select>
+        <label for="price-coupon">Código promocional</label>
+        <input id="price-coupon" name="code" [ngModel]="coupon()" (ngModelChange)="coupon.set($event)" maxlength="32" placeholder="Ej. BIENVENIDO20">
+        <button type="submit">Consultar promoción</button>
+      </form>
+      <p *ngIf="couponError()" role="alert" class="error">{{couponError()}}</p>
+      <p *ngIf="quote() as q" role="status">Precio promocional: <strong>{{format(q.priceCop)}}</strong>. Compra todavía no disponible.</p>
+    </div>
+    <div class="donation-card"><span class="overline">APOYA EL PROYECTO</span><h2>¿Quieres aportar sin pasarte a Pro?</h2>
+      <p>FinFlow Gratis siempre podrá seguir siendo Gratis. Cuando habilitemos los pagos, podrás apoyar el proyecto con una donación voluntaria por el importe que elijas, sin cambiar tu plan.</p>
+      <span class="unavailable">Donaciones online próximamente</span>
+    </div>
+  </section>
+  <footer>FinFlow · Creado por <strong>AEVQOR</strong> · Valores en pesos colombianos.</footer>
 </main>

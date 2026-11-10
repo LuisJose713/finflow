@@ -1,5 +1,5 @@
-
-import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
@@ -8,9 +8,8 @@ import { AuthService } from '../../core/services/auth.service';
 import { environment } from '@environments/environment';
 
 @Component({
-    selector: 'app-security', imports: [FormsModule, NavbarComponent, RouterLink],
-    templateUrl: './security.component.html', changeDetection: ChangeDetectionStrategy.Eager,
- styleUrl: './security.component.scss'
+ selector:'app-security',standalone:true,imports:[CommonModule,FormsModule,NavbarComponent,RouterLink],
+ templateUrl:'./security.component.html',styleUrl:'./security.component.scss'
 })
 export class SecurityComponent {
  private readonly http=inject(HttpClient);

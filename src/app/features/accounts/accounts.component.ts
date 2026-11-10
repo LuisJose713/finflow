@@ -1,14 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { AccountService, AccountType, FinancialAccount, AccountTransfer } from '../../core/services/account.service';
 
 @Component({
-    selector: 'app-accounts', imports: [CommonModule, FormsModule, NavbarComponent],
-    templateUrl: './accounts.component.html', changeDetection: ChangeDetectionStrategy.Eager,
- styleUrl: './accounts.component.scss'
+  selector:'app-accounts',standalone:true,imports:[CommonModule,FormsModule,NavbarComponent],
+  templateUrl:'./accounts.component.html',styleUrl:'./accounts.component.scss'
 })
 export class AccountsComponent implements OnInit {
   private readonly api=inject(AccountService);

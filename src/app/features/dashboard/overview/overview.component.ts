@@ -1,11 +1,8 @@
 import {
   Component, inject, signal, computed, effect,
   ElementRef, viewChild, afterNextRender,
-  ChangeDetectionStrategy, DestroyRef
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subscription } from 'rxjs';
-
+import { CommonModule } from '@angular/common';
 import { AppCurrencyPipe } from '../../../shared/pipes/currency.pipe';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { DashboardRefreshService } from '../../../core/services/dashboard-refresh.service';
@@ -13,17 +10,15 @@ import { DashboardRefreshService } from '../../../core/services/dashboard-refres
 interface MonthlyData { month: string; monthKey: string; income: number; expenses: number; }
 
 @Component({
-    selector: 'app-overview',
-    imports: [AppCurrencyPipe],
-    templateUrl: './overview.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    styleUrl: './overview.component.scss'
+  selector: 'app-overview',
+  standalone: true,
+  imports: [CommonModule, AppCurrencyPipe],
+  templateUrl: './overview.component.html',
+  styleUrl: './overview.component.scss',
 })
 export class OverviewComponent {
   private txService = inject(TransactionService);
   private refresh   = inject(DashboardRefreshService);
-  private destroyRef = inject(DestroyRef);
-  private pending?: Subscription;
 
   chartCanvas = viewChild<ElementRef<HTMLCanvasElement>>('chartCanvas');
 
@@ -53,7 +48,6 @@ export class OverviewComponent {
   private readonly C_EXP_TRACK = 'rgba(239, 68, 68, 0.15)';
 
   constructor() {
-    this.destroyRef.onDestroy(() => this.cancelAnimation());
     effect(() => {
       this.refresh.version();
       this.load();
@@ -74,9 +68,9 @@ export class OverviewComponent {
   }
 
   load() {
-    this.pending?.unsubscribe();
     this.loading.set(true);
-    this.pending = this.txService.getMonthlyStats().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.chartReady.set(false);
+    this.txService.getMonthlyStats().subscribe({
       next: data => {
         this.monthlyData.set(data.map((s: any) => ({
           monthKey: s.month,
@@ -85,6 +79,7 @@ export class OverviewComponent {
           expenses: s.expenses,
         })));
         this.loading.set(false);
+        setTimeout(() => this.chartReady.set(true), 50);
       },
       error: () => this.loading.set(false),
     });
@@ -92,10 +87,12 @@ export class OverviewComponent {
 
   setScope(s: 'month' | 'all') {
     this.scope.set(s);
+    this.renderChart();
   }
 
   setFilter(f: 'all' | 'income' | 'expense') {
     this.filter.set(f);
+    this.renderChart();
   }
 
   renderChart() {
@@ -127,14 +124,6 @@ export class OverviewComponent {
       ctx.beginPath(); ctx.arc(cx, cy, r, START, START + TAU * frac);
       ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.stroke();
     };
-
-    // Respect reduced motion and save frames on battery-constrained devices.
-    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      ctx.clearRect(0, 0, W, H);
-      if (showIncome) drawRing(W * .44, W * .12, 1, this.C_INC, this.C_INC_TRACK);
-      if (showExpense) drawRing(W * .30, W * .12, expFrac, this.C_EXP, this.C_EXP_TRACK);
-      return;
-    }
 
     const tick = (now: number) => {
       const p = easeOut(Math.min((now - startTime) / 900, 1));
