@@ -19,23 +19,29 @@ import { DatePipe } from '@angular/common';
       <app-navbar />
 
       <main class="main-content advisor-main">
+        <div class="advisor-topline">
+          <span class="live-dot" aria-hidden="true"></span> FINFLOW
+          <span class="topline-version">ASESOR IA</span>
+        </div>
         <header class="page-header advisor-header">
           <div class="heading-copy">
-            <div class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> FINFLOW INTELLIGENCE</div>
-            <h1>Tu asesor <span class="heading-accent">financiero.</span></h1>
-            <p class="subtitle">Un espacio para explorar ideas y tomar mejores decisiones con tu dinero.</p>
+            <span class="eyebrow">TU ESPACIO FINANCIERO</span>
+            <h1>Una visión clara. <span class="heading-accent">Mejores decisiones.</span></h1>
+            <p class="subtitle">Explora tus finanzas con el asesor de FinFlow.</p>
+            <button class="btn-clear" type="button" (click)="clearChat()"
+                    [disabled]="messages().length === 0 || responding()"
+                    aria-label="Comenzar una conversación nueva">
+              <span aria-hidden="true">↻</span> Nueva conversación
+            </button>
           </div>
-          <button class="btn-clear" type="button" (click)="clearChat()"
-                  [disabled]="messages().length === 0 || responding()"
-                  aria-label="Comenzar una conversación nueva">
-            <span aria-hidden="true">↻</span> Nueva conversación
-          </button>
+          <img class="hero-symbol" src="/finflow-icon-classic.svg" width="96" height="96"
+               alt="" aria-hidden="true" />
         </header>
 
         <section class="chat-layout" aria-label="Conversación con el asesor financiero">
           <div class="chat-topbar">
             <span class="assistant-identity">
-              <span class="brand-avatar" aria-hidden="true">F<span class="brand-dot">·</span></span>
+              <img class="brand-avatar" src="/finflow-icon-classic.svg" width="44" height="44" alt="" aria-hidden="true" />
               <span class="identity-copy"><strong>FinFlow AI</strong><small>Asistente de finanzas personales</small></span>
             </span>
             <span class="conversation-status" aria-label="Conversación actual">
@@ -46,7 +52,7 @@ import { DatePipe } from '@angular/common';
           <div class="messages-wrapper" #messagesContainer role="log" aria-label="Mensajes de la conversación" aria-live="polite" aria-relevant="additions">
             @if (messages().length === 0) {
               <div class="welcome-panel">
-                <span class="welcome-mark" aria-hidden="true">✦</span>
+                <img class="welcome-mark" src="/finflow-icon-classic.svg" width="58" height="58" alt="" aria-hidden="true" />
                 <span class="welcome-eyebrow">TU PRÓXIMA BUENA DECISIÓN EMPIEZA AQUÍ</span>
                 <h2>¿Qué te gustaría <em>explorar hoy?</em></h2>
                 <p>Desde organizar tus gastos hasta planear una meta: empieza con una pregunta o elige una idea.</p>
@@ -63,7 +69,14 @@ import { DatePipe } from '@angular/common';
                   @for (card of cards(); track card.id) {
                     <button class="advisor-card" type="button"
                             (click)="sendPrompt(card.prompt)" [disabled]="responding()">
-                      <span class="card-icon" aria-hidden="true">{{ card.icon }}</span>
+                      <span class="card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M4 17l6-6 4 4 6-8"/>
+                          <path d="M16 7h4v4"/>
+                          <path d="M4 21h16"/>
+                        </svg>
+                      </span>
                       <span class="card-copy"><strong>{{ card.title }}</strong><small>{{ card.description }}</small></span>
                       <span class="card-arrow" aria-hidden="true">↗</span>
                     </button>
@@ -76,7 +89,7 @@ import { DatePipe } from '@angular/common';
                 <div class="message" [class.user]="msg.role === 'user'"
                      [class.assistant]="msg.role === 'assistant'">
                   @if (msg.role === 'assistant') {
-                    <span class="message-avatar" aria-hidden="true">F<span>·</span></span>
+                    <img class="message-avatar" src="/finflow-icon-classic.svg" width="33" height="33" alt="" aria-hidden="true" />
                   }
                   <div class="message-body">
                     <div class="message-author">{{ msg.role === 'assistant' ? 'FinFlow AI' : 'Tú' }}</div>
@@ -103,7 +116,7 @@ import { DatePipe } from '@angular/common';
 
               @if (responding()) {
                 <div class="message assistant" role="status" aria-label="FinFlow está preparando una respuesta">
-                  <span class="message-avatar" aria-hidden="true">F<span>·</span></span>
+                  <img class="message-avatar" src="/finflow-icon-classic.svg" width="33" height="33" alt="" aria-hidden="true" />
                   <div class="message-body">
                     <div class="message-author">FinFlow AI</div>
                     <div class="message-bubble typing"><span></span><span></span><span></span></div>
