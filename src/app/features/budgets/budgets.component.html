@@ -34,8 +34,7 @@
               <option *ngIf="editing()!==null" [ngValue]="selectedCategory">{{ selectedCategoryName() }}</option>
             </select>
             <label for="budget-amount">Límite mensual (COP)</label>
-            <input id="budget-amount" name="amount" [(ngModel)]="amount" type="number" min="0.01"
-              step="0.01" inputmode="decimal" placeholder="Ej. 350000" required>
+            <input id="budget-amount" appCurrencyInput name="amount" [(ngModel)]="amount" type="text" inputmode="decimal" placeholder="Ej. 350000" required>
             <button class="budget-primary" type="submit" [disabled]="busy()">{{busy()?'Guardando…':(editing()===null?'Crear presupuesto':'Guardar cambios')}}</button>
             <button *ngIf="editing()!==null" class="budget-secondary" type="button" (click)="reset()">Cancelar edición</button>
           </form>
