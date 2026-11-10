@@ -33,3 +33,5 @@ jobs:
         run: npx tsc --noEmit --project tsconfig.app.json
       - name: Production build
         run: npm run build:prod
+      - name: Authentication session regression tests
+        run: npm test -- --watch=false --browsers=ChromeHeadless --include=src/app/core/interceptors/auth.interceptor.spec.ts
