@@ -18,77 +18,132 @@ import { DatePipe } from '@angular/common';
     <div class="app-shell">
       <app-navbar />
 
-      <main class="main-content">
-        <header class="page-header">
-          <div>
-            <h1>🤖 Asesor Financiero IA</h1>
-            <p class="subtitle">Consulta sobre tus finanzas personales</p>
+      <main class="main-content advisor-main">
+        <header class="page-header advisor-header">
+          <div class="heading-copy">
+            <div class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> FINFLOW INTELLIGENCE</div>
+            <h1>Tu asesor <span class="heading-accent">financiero.</span></h1>
+            <p class="subtitle">Un espacio para explorar ideas y tomar mejores decisiones con tu dinero.</p>
           </div>
-          <button class="btn-clear" (click)="clearChat()" [disabled]="messages().length === 0">
-            🗑 Limpiar chat
+          <button class="btn-clear" type="button" (click)="clearChat()"
+                  [disabled]="messages().length === 0 || responding()"
+                  aria-label="Comenzar una conversación nueva">
+            <span aria-hidden="true">↻</span> Nueva conversación
           </button>
         </header>
 
-        <div class="chat-layout">
-          <!-- Suggestion cards -->
-          @if (messages().length === 0) {
-            <div class="cards-grid">
-              @if (cardsLoading()) {
-                @for (i of [1, 2, 3, 4]; track i) {
-                  <div class="advisor-card skeleton"></div>
+        <section class="chat-layout" aria-label="Conversación con el asesor financiero">
+          <div class="chat-topbar">
+            <span class="assistant-identity">
+              <span class="brand-avatar" aria-hidden="true">F<span class="brand-dot">·</span></span>
+              <span class="identity-copy"><strong>FinFlow AI</strong><small>Asistente de finanzas personales</small></span>
+            </span>
+            <span class="conversation-status" aria-label="Conversación privada de esta sesión">
+              <span class="status-dot" aria-hidden="true"></span> Esta conversación
+            </span>
+          </div>
+
+          <div class="messages-wrapper" #messagesContainer role="log" aria-label="Mensajes de la conversación" aria-live="polite" aria-relevant="additions">
+            @if (messages().length === 0) {
+              <div class="welcome-panel">
+                <span class="welcome-mark" aria-hidden="true">✦</span>
+                <span class="welcome-eyebrow">TU PRÓXIMA BUENA DECISIÓN EMPIEZA AQUÍ</span>
+                <h2>¿Qué te gustaría <em>explorar hoy?</em></h2>
+                <p>Desde organizar tus gastos hasta planear una meta: empieza con una pregunta o elige una idea.</p>
+              </div>
+              <div class="suggestions-heading">
+                <span>PRUEBA CON UNA DE ESTAS IDEAS</span>
+              </div>
+              <div class="cards-grid">
+                @if (cardsLoading()) {
+                  @for (i of [1, 2, 3, 4]; track i) {
+                    <div class="advisor-card skeleton" aria-hidden="true"></div>
+                  }
+                } @else {
+                  @for (card of cards(); track card.id) {
+                    <button class="advisor-card" type="button"
+                            (click)="sendPrompt(card.prompt)" [disabled]="responding()">
+                      <span class="card-icon" aria-hidden="true">{{ card.icon }}</span>
+                      <span class="card-copy"><strong>{{ card.title }}</strong><small>{{ card.description }}</small></span>
+                      <span class="card-arrow" aria-hidden="true">↗</span>
+                    </button>
+                  }
                 }
-              } @else {
-                @for (card of cards(); track card.id) {
-                  <button class="advisor-card" (click)="sendPrompt(card.prompt)">
-                    <span class="card-icon">{{ card.icon }}</span>
-                    <div>
-                      <strong>{{ card.title }}</strong>
-                      <p>{{ card.description }}</p>
+              </div>
+            } @else {
+              <div class="conversation-label">CONVERSACIÓN ACTUAL</div>
+              @for (msg of messages(); track $index) {
+                <div class="message" [class.user]="msg.role === 'user'"
+                     [class.assistant]="msg.role === 'assistant'">
+                  @if (msg.role === 'assistant') {
+                    <span class="message-avatar" aria-hidden="true">F<span>·</span></span>
+                  }
+                  <div class="message-body">
+                    <div class="message-author">{{ msg.role === 'assistant' ? 'FinFlow AI' : 'Tú' }}</div>
+                    <div class="message-bubble">
+                      <p>{{ msg.content }}</p>
                     </div>
-                  </button>
-                }
+                    <div class="message-meta">
+                      <time>{{ msg.timestamp | date: 'HH:mm' }}</time>
+                      @if (msg.role === 'assistant') {
+                        <button type="button" class="copy-btn" (click)="copyMessage(msg.content)"
+                                aria-label="Copiar respuesta del asesor" title="Copiar respuesta">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                               aria-hidden="true">
+                            <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+                            <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path>
+                          </svg> Copiar
+                        </button>
+                      }
+                    </div>
+                  </div>
+                </div>
               }
+
+              @if (responding()) {
+                <div class="message assistant" role="status" aria-label="FinFlow está preparando una respuesta">
+                  <span class="message-avatar" aria-hidden="true">F<span>·</span></span>
+                  <div class="message-body">
+                    <div class="message-author">FinFlow AI</div>
+                    <div class="message-bubble typing"><span></span><span></span><span></span></div>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+
+          <div class="composer-shell">
+            <label for="finflow-advisor-input" class="composer-label">ESCRIBE TU PREGUNTA</label>
+            <div class="input-area">
+              <textarea
+                id="finflow-advisor-input"
+                [(ngModel)]="userInput"
+                placeholder="¿Cómo puedo organizar mejor mi presupuesto?"
+                rows="2"
+                maxlength="2000"
+                (keydown.enter)="onEnter($event)"
+                [disabled]="responding()"
+                aria-label="Pregunta para el asesor financiero"
+              ></textarea>
+              <button class="btn-send" type="button"
+                      (click)="send()"
+                      [disabled]="!userInput.trim() || responding()"
+                      [attr.aria-label]="responding() ? 'Preparando respuesta' : 'Enviar pregunta'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="m5 12 14-7-4 14-3.4-6.6L5 12Z"></path>
+                  <path d="m11.6 12.4 7.4-7.4"></path>
+                </svg>
+              </button>
             </div>
-          }
-
-          <!-- Messages -->
-          <div class="messages-wrapper" #messagesContainer>
-            @for (msg of messages(); track $index) {
-              <div class="message" [class]="msg.role">
-                <div class="message-bubble">
-                  <p>{{ msg.content }}</p>
-                  <span class="msg-time">{{ msg.timestamp | date: 'HH:mm' }}</span>
-                </div>
-              </div>
-            }
-
-            @if (responding()) {
-              <div class="message assistant">
-                <div class="message-bubble typing">
-                  <span></span><span></span><span></span>
-                </div>
-              </div>
-            }
+            <div class="composer-footer">
+              <span>Enter para enviar · Shift + Enter para nueva línea</span>
+              <span>{{ userInput.length }}/2000</span>
+            </div>
+            <p class="ai-disclaimer">Las sugerencias de IA son orientativas; verifica la información antes de tomar decisiones financieras.</p>
           </div>
-
-          <!-- Input -->
-          <div class="input-area">
-            <textarea
-              [(ngModel)]="userInput"
-              placeholder="Escribe tu pregunta financiera..."
-              rows="1"
-              (keydown.enter)="onEnter($event)"
-              [disabled]="responding()"
-            ></textarea>
-            <button
-              class="btn-send"
-              (click)="send()"
-              [disabled]="!userInput.trim() || responding()"
-            >
-              {{ responding() ? '⏳' : '➤' }}
-            </button>
-          </div>
-        </div>
+        </section>
       </main>
 
       <app-toast-container />
@@ -137,7 +192,7 @@ export class AdvisorComponent implements OnInit {
   ngOnInit() {
     this.advisorService.getCards().subscribe({
       next: (data) => {
-        this.cards.set(data);
+        this.cards.set(data.length ? data : this.defaultCards());
         this.cardsLoading.set(false);
       },
       error: () => {
@@ -154,7 +209,7 @@ export class AdvisorComponent implements OnInit {
 
   onEnter(event: Event) {
     const ke = event as KeyboardEvent;
-    if (!ke.shiftKey) {
+    if (!ke.shiftKey && !ke.isComposing) {
       ke.preventDefault();
       this.send();
     }
@@ -195,7 +250,17 @@ export class AdvisorComponent implements OnInit {
   }
 
   clearChat() {
+    if (this.responding()) return;
     this.messages.set([]);
+  }
+
+  async copyMessage(content: string): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(content);
+      this.toast.success('Respuesta copiada');
+    } catch {
+      this.toast.error('No se pudo copiar la respuesta');
+    }
   }
 
   private scrollToBottom() {
