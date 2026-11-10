@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild, signal, computed } from '@angular/core';
+import { Component, inject, ViewChild, signal, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ExportPdfService } from '../../core/services/export-pdf.service';
@@ -26,6 +26,8 @@ import { RecentTransactionsComponent } from './recent-transactions/recent-transa
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent {
+  /** Render the real Dashboard inside the isolated V4 design showroom. */
+  readonly previewMode = input(false);
   private authService = inject(AuthService);
   private exportService = inject(ExportPdfService);
   private toast = inject(ToastService);
