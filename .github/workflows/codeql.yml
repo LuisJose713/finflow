@@ -24,5 +24,14 @@ jobs:
         with:
           languages: javascript-typescript
           queries: security-extended
-      - name: Analyze frontend
+      - name: Analyze frontend to a reviewable SARIF artifact
         uses: github/codeql-action/analyze@v4
+        with:
+          upload: never
+          output: codeql-results
+      - name: Store security findings until GitHub code scanning is enabled
+        uses: actions/upload-artifact@v4
+        with:
+          name: finflow-codeql-sarif
+          path: codeql-results
+          retention-days: 14
