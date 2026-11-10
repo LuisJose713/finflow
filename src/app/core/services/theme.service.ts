@@ -31,8 +31,8 @@ export class ThemeService {
   toggleTheme() { this._theme.set(this.isDark() ? 'light' : 'dark'); }
 
   private readSavedTheme(): Theme {
-    if (typeof localStorage === 'undefined') return 'system';
+    if (typeof localStorage === 'undefined') return 'dark';
     const saved = localStorage.getItem('theme');
-    return saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'system';
+    return saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'dark';
   }
 }

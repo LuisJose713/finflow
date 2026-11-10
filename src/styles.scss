@@ -663,3 +663,87 @@ body { background:var(--ff-canvas); }
   .app-shell > .main-content :is(.goal-card,.expense-card,.tx-item,
     .account-panel,.budget-panel,.recurring-panel,.categories-panel) { transition: none; }
 }
+
+
+/* FinFlow V4.1 — shared, theme-aware UI foundation for every feature page.
+   No hardcoded dark backgrounds: existing theme selection remains authoritative. */
+:root {
+  --ff41-canvas: #f6f8fc;
+  --ff41-panel: #ffffff;
+  --ff41-panel-alt: #f0f4fa;
+  --ff41-border: #e2e8f0;
+  --ff41-ink: #142036;
+  --ff41-muted: #64748b;
+  --ff41-blue: #2563eb;
+  --ff41-radius: 14px;
+}
+.dark {
+  --ff41-canvas: #0c1423;
+  --ff41-panel: #141f31;
+  --ff41-panel-alt: #19273c;
+  --ff41-border: #293a52;
+  --ff41-ink: #f0f5fc;
+  --ff41-muted: #a4b3c9;
+  --ff41-blue: #80aaff;
+  --ff-shadow: 0 8px 24px rgba(0,0,0,.12);
+}
+.app-shell, .app-shell > .main-content {
+  background: var(--ff41-canvas) !important;
+  color: var(--ff41-ink);
+}
+.app-shell > .main-content {
+  width: 100%;
+  min-width: 0;
+}
+.app-shell :where(.page-header h1, .section-heading h2) {
+  letter-spacing: -.035em;
+  line-height: 1.18;
+}
+.app-shell :where(.goal-card, .summary-card, .filters-card, .advisor-card,
+  .expense-card, .tx-item, .overview-card, .transactions-card,
+  .account-card, .budget-card, .stat-card, .settings-card) {
+  border: 1px solid var(--ff41-border);
+  border-radius: var(--ff41-radius);
+  box-shadow: 0 2px 12px rgba(4, 13, 28, .045);
+}
+.app-shell :where(.goal-card, .summary-card, .filters-card, .advisor-card,
+  .expense-card, .tx-item, .overview-card, .transactions-card,
+  .account-card, .budget-card, .stat-card, .settings-card) {
+  background: var(--ff41-panel);
+  color: var(--ff41-ink);
+}
+.app-shell :where(.btn-primary, .btn-new, .btn-send) {
+  background: #346be7;
+  border-radius: 10px;
+  box-shadow: none;
+  color: #fff;
+}
+.app-shell :where(.btn-primary, .btn-new, .btn-send):hover:not(:disabled) {
+  background: #285acc;
+}
+.app-shell :where(.search-input, .filter-select, input:not([type="checkbox"]):not([type="radio"]),
+  select, textarea) {
+  background: var(--ff41-panel);
+  color: var(--ff41-ink);
+  border-color: var(--ff41-border);
+  border-radius: 10px;
+}
+.app-shell :where(.tab, .filter-tabs, .tabs) { border-radius: 10px; }
+.app-shell :where(.tab.active) {
+  background: color-mix(in srgb, var(--ff41-blue) 15%, var(--ff41-panel));
+  color: var(--ff41-ink);
+}
+.app-shell :where(.tx-item, .expense-card, .goal-card) {
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.app-shell :where(.tx-item, .expense-card, .goal-card):hover {
+  border-color: color-mix(in srgb, var(--ff41-blue) 45%, var(--ff41-border));
+}
+@media (max-width: 768px) {
+  .app-shell > .main-content { padding-inline: 1rem; }
+  .app-shell :where(.page-header) { gap: .85rem; }
+  .app-shell :where(.page-header h1) { font-size: clamp(1.55rem, 5vw, 2rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell :where(.tx-item, .expense-card, .goal-card) { transition: none; }
+}
