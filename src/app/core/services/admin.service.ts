@@ -24,10 +24,31 @@ export interface AdminOverview {
   monthlyActivity: AdminMonthlyActivity[];
 }
 
+export type ServiceHealthStatus = 'UP' | 'DOWN' | 'DEGRADED' | 'NOT_CONFIGURED';
+
+export interface AdminServiceHealthCheck {
+  key: string;
+  name: string;
+  status: ServiceHealthStatus;
+  latencyMs: number | null;
+  detail: string;
+}
+
+export interface AdminPlatformHealth {
+  overall: ServiceHealthStatus;
+  checkedAt: string;
+  services: AdminServiceHealthCheck[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private readonly http = inject(HttpClient);
   getOverview() {
     return this.http.get<AdminOverview>(environment.apiUrl + '/admin/overview');
+  }
+
+  getPlatformHealth() {
+    // Only the logged-in administrator can access this endpoint.
+    return this.http.get<AdminPlatformHealth>(environment.apiUrl + '/admin/monitor');
   }
 }

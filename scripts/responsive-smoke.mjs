@@ -70,6 +70,15 @@ async function mockApi(route) {
   };
   else if (p === '/transactions/years') response = [2026];
   else if (p === '/admin/overview') response = adminStats;
+  else if (p === '/admin/monitor') response = {
+    overall: 'DEGRADED', checkedAt: '2026-11-09T20:00:00Z',
+    services: [
+      { key: 'api', name: 'API · Railway', status: 'UP', latencyMs: 0, detail: 'Servicio respondiendo' },
+      { key: 'database', name: 'Base de datos · PostgreSQL', status: 'UP', latencyMs: 12, detail: 'Consulta de verificación correcta' },
+      { key: 'web', name: 'Web · Vercel', status: 'UP', latencyMs: 94, detail: 'Responde correctamente' },
+      { key: 'ai', name: 'Asesor IA', status: 'NOT_CONFIGURED', latencyMs: null, detail: 'Sin proveedor configurado' }
+    ]
+  };
   else if (p === '/auth/verify' || p === '/admin/verify') response = { role: 'ADMIN', status: 'ok' };
   await route.fulfill({ status: 200, headers, body: JSON.stringify(response) });
 }
@@ -175,6 +184,15 @@ for (const width of widths) {
       await page.goto(base + route, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(200);
       await measureViewport(page, route, width);
+      if (route === '/admin') {
+        await page.getByRole('heading', { name: 'Estado de los servicios' }).waitFor({ state: 'visible' });
+        await page.locator('[data-monitor-key]').first().waitFor({ state: 'visible' });
+        const cards = await page.locator('[data-monitor-key]').count();
+        assert(cards === 4, `${width}px /admin: expected 4 monitoring cards, received ${cards}`);
+        assert(await page.locator('[data-monitor-key="ai"]').getByText('Sin configurar').isVisible(),
+          `${width}px /admin: AI status must be honest when no provider is set`);
+        await measureViewport(page, 'monitor de servicios', width);
+      }
     } catch (error) {
       failures.push(`${width}px ${route}: ${error.message.slice(0, 220)}`);
     }
