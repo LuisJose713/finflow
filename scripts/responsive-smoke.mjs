@@ -182,6 +182,12 @@ for (const width of widths) {
 
   if ([320, 375, 768, 1024].includes(width)) {
     await page.goto(base + '/dashboard', { waitUntil: 'domcontentloaded' });
+    // The one-time privacy education dialog legitimately blocks background
+    // interaction. Acknowledge it before testing transaction controls.
+    const noticeDismiss = page.locator('[data-signup-dismiss]');
+    if (await noticeDismiss.isVisible()) {
+      await noticeDismiss.click();
+    }
     await checkDialog(page, width, 'crear-transaccion', async () => {
       await page.locator('.btn-add').click();
     });
