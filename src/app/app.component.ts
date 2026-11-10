@@ -146,10 +146,13 @@ export class AppComponent {
     const version = (policy?.version || '2026-11-09-v1') + ':' + this.noticeRevision;
     const preview = /(?:[?&])privacy=1(?:&|$)/.test(route);
 
-    // An explicit preview URL is useful if a browser retained old assets.
-    // It never submits consent.
-    void requestedId;
-    return preview || !this.privacy.isNoticeAcknowledged(userIdentity, version);
+    // Show the informational onboarding notice only when registration explicitly
+    // queued it for this account. Existing users must not see it at every login.
+    // Preview remains available for QA and never records legal consent.
+    const queuedForCurrentUser = requestedId != null
+      && String(requestedId) === String(userIdentity);
+    return preview || (queuedForCurrentUser
+      && !this.privacy.isNoticeAcknowledged(userIdentity, version));
   });
   @ViewChild('signupDialog') private signupDialog?: ElementRef<HTMLElement>;
 
