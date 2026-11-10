@@ -516,3 +516,192 @@
   .messages-wrapper { scroll-behavior: auto; }
   .typing > span, .advisor-card.skeleton { animation: none; }
 }
+
+
+/* FinFlow brand alignment — use the SAME visual language as Dashboard / Sidebar.
+   FinFlow's actual /finflow-icon-classic.svg is used by the template. */
+:host {
+  --advisor-midnight: #09162a;
+  --advisor-navy: #132940;
+  --advisor-gold: #d7a94d;
+  --advisor-gold-soft: rgba(215,169,77,.15);
+}
+.advisor-topline {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto .9rem;
+  color: var(--text-muted);
+  font-size: .67rem;
+  letter-spacing: .18em;
+  font-weight: 800;
+}
+.advisor-topline .live-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 0 4px rgba(52,211,153,.11);
+}
+.advisor-topline .topline-version {
+  margin-left: auto;
+  padding: .35rem .6rem;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  letter-spacing: .08em;
+}
+.advisor-main .advisor-header {
+  position: relative;
+  isolation: isolate;
+  min-height: 160px;
+  padding: clamp(1.2rem, 2.5vw, 2rem);
+  gap: 1.5rem;
+  border-radius: 22px;
+  border: 1px solid rgba(132,163,255,.27);
+  background: linear-gradient(115deg, #101e35 0%, #172b53 51%, #33295e 100%);
+  box-shadow: 0 18px 42px rgba(11,18,42,.15);
+  overflow: hidden;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+.advisor-main .advisor-header::before {
+  content: '';
+  z-index: -1;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 86% 42%,rgba(132,155,255,.23),transparent 38%);
+}
+.advisor-header .heading-copy { max-width: 780px; }
+.advisor-main .advisor-header .eyebrow {
+  display: block;
+  color: #d7bd93;
+  font-size: .67rem;
+  letter-spacing: .17em;
+  margin: 0 0 .55rem;
+}
+.advisor-main .advisor-header h1 {
+  color: #f8fafc;
+  font-size: clamp(1.45rem, 2.65vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -.05em;
+  margin: 0;
+}
+.advisor-main .advisor-header .heading-accent {
+  background: linear-gradient(110deg,#f5d68c,#d7a94d 70%,#e9d1a4);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+.advisor-main .advisor-header .subtitle {
+  color: #c3d1e0;
+  margin-top: .5rem;
+  max-width: 54ch;
+  font-size: .86rem;
+}
+.advisor-header .hero-symbol {
+  width: clamp(72px, 9vw, 104px);
+  height: auto;
+  aspect-ratio: 1;
+  flex: 0 0 auto;
+  object-fit: contain;
+  border-radius: 22px;
+  transform: rotate(-5deg);
+  box-shadow: 0 18px 50px rgba(1,8,22,.35);
+}
+.advisor-main .advisor-header .btn-clear {
+  margin-top: .85rem;
+  color: #e8edf7;
+  background: rgba(245,249,255,.09);
+  border-color: rgba(240,246,255,.23);
+  box-shadow: none;
+  padding: .48rem .75rem;
+  min-height: 36px;
+}
+.advisor-main .advisor-header .btn-clear:hover:not(:disabled) {
+  color: #fff;
+  background: rgba(245,249,255,.15);
+  border-color: var(--advisor-gold);
+}
+.advisor-main .chat-layout {
+  border-radius: 21px;
+  box-shadow: var(--shadow-card);
+}
+.advisor-main .chat-topbar {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-primary);
+}
+.advisor-main .chat-topbar .brand-avatar,
+.advisor-main .message .message-avatar {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  object-fit: cover;
+  aspect-ratio: 1;
+  border-radius: 11px;
+}
+.advisor-main .chat-topbar .brand-avatar { width: 44px; height: 44px; }
+.advisor-main .message .message-avatar { width: 33px; height: 33px; }
+.advisor-main .welcome-panel .welcome-mark {
+  display: block;
+  background: transparent;
+  padding: 0;
+  border-radius: 18px;
+  width: 58px;
+  height: 58px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  box-shadow: 0 10px 28px rgba(9,22,42,.18);
+}
+.advisor-main .welcome-eyebrow,
+.advisor-main .suggestions-heading { color: #b38a4b; }
+.advisor-main .welcome-panel em { color: #b78d4a; }
+.advisor-main .advisor-card { border-color: var(--border); background: var(--bg-primary); }
+.advisor-main .advisor-card:hover:not(:disabled) {
+  border-color: var(--advisor-gold);
+  background: color-mix(in srgb,var(--advisor-gold-soft) 35%,var(--bg-primary));
+}
+.advisor-main .advisor-card .card-icon {
+  background: var(--advisor-midnight);
+  color: var(--advisor-gold);
+  border-radius: 12px;
+}
+.advisor-main .advisor-card .card-icon svg { width: 23px; height: 23px; }
+.advisor-main .advisor-card .card-arrow { color: #b38a4b; }
+.advisor-main .message.user .message-bubble {
+  background: linear-gradient(130deg,#142a49,#294575);
+  border: 1px solid rgba(215,169,77,.22);
+  color: #fff;
+}
+.advisor-main .btn-send {
+  background: var(--advisor-midnight);
+  color: #f5d68c;
+  border: 1px solid rgba(215,169,77,.32);
+  box-shadow: 0 7px 18px rgba(9,22,42,.14);
+}
+.advisor-main .btn-send:hover:not(:disabled) { background: #1a3456; }
+.advisor-main .input-area:focus-within {
+  border-color: var(--advisor-gold);
+  box-shadow: 0 0 0 3px rgba(215,169,77,.09);
+}
+@media(max-width:768px) {
+  .advisor-topline { margin-bottom: .6rem; }
+  .advisor-main .advisor-header { min-height: 0; padding: 1rem; border-radius: 16px; margin-bottom: .75rem; }
+  .advisor-main .advisor-header h1 { font-size: clamp(1.26rem, 4.5vw, 1.65rem); }
+  .advisor-main .advisor-header .subtitle { margin-top: .32rem; font-size: .78rem; }
+  .advisor-header .hero-symbol { width: 60px; border-radius: 13px; }
+}
+@media(max-width:480px) {
+  .advisor-main .advisor-header { padding: .85rem .9rem; }
+  .advisor-main .advisor-header h1 { font-size: 1.28rem; }
+  .advisor-main .advisor-header .eyebrow { margin-bottom: .4rem; }
+  .advisor-main .advisor-header .btn-clear { margin-top: .6rem; font-size: .71rem; }
+  .advisor-header .hero-symbol { display: none; }
+  .advisor-main .chat-topbar .brand-avatar { width: 39px; height: 39px; }
+}
