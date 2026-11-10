@@ -64,6 +64,8 @@ async function mockApi(route) {
   ];
   else if (p === '/categories') response = categories;
   else if (p === '/accounts') response = accounts;
+  else if (p === '/advisor/cards') response = [];
+  else if (p === '/advisor/chat') response = { response: 'Respuesta de prueba del asesor.' };
   else if (p === '/transactions/stats') response = {
     totalIncome: 0, totalExpenses: 0, balance: 0, savingsRate: 0,
     monthlyData: [], categoryData: []
@@ -179,11 +181,22 @@ for (const width of widths) {
   page.setDefaultTimeout(7000);
   page.setDefaultNavigationTimeout(15000);
 
-  for (const route of ['/accounts', '/recurring', '/categories', '/budgets', '/security', '/admin']) {
+  for (const route of ['/accounts', '/recurring', '/categories', '/budgets', '/security', '/admin', '/advisor']) {
     try {
       await page.goto(base + route, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(200);
       await measureViewport(page, route, width);
+      if (route === '/advisor') {
+        await page.getByRole('heading', { name: /Tu asesor financiero/i }).waitFor({ state: 'visible' });
+        await page.getByRole('button', { name: /Consejos de ahorro/i }).waitFor({ state: 'visible' });
+        if ([320, 768, 1440].includes(width)) {
+          await page.getByRole('button', { name: /Consejos de ahorro/i }).click();
+          await page.getByText('Respuesta de prueba del asesor.').waitFor({ state: 'visible' });
+          await page.getByRole('button', { name: 'Copiar respuesta del asesor' }).waitFor({ state: 'visible' });
+          await measureViewport(page, 'advisor-chat', width);
+          await page.screenshot({ path: path.join(output, `${width}-advisor-chat.png`) });
+        }
+      }
       if (route === '/admin') {
         await page.getByRole('heading', { name: 'Estado de los servicios' }).waitFor({ state: 'visible' });
         await page.locator('[data-monitor-key]').first().waitFor({ state: 'visible' });
@@ -200,14 +213,13 @@ for (const width of widths) {
 
   if ([320, 375, 768, 1024].includes(width)) {
     await page.goto(base + '/dashboard', { waitUntil: 'domcontentloaded' });
-    // The one-time privacy education dialog legitimately blocks background
-    // interaction. Acknowledge it before testing transaction controls.
+    // An existing authenticated user does not necessarily have a queued
+    // educational notice. Acknowledge it only if it is actually displayed.
     const noticeDismiss = page.locator('[data-signup-dismiss]');
-    // Consent status/policy is resolved asynchronously. Wait for the
-    // educational notice instead of checking visibility too early.
-    await noticeDismiss.waitFor({ state: 'visible', timeout: 6000 });
-    await noticeDismiss.click();
-    await page.locator('.privacy-shield').waitFor({ state: 'hidden', timeout: 5000 });
+    if (await noticeDismiss.isVisible()) {
+      await noticeDismiss.click();
+      await page.locator('.privacy-shield').waitFor({ state: 'hidden', timeout: 5000 });
+    }
     await checkDialog(page, width, 'crear-transaccion', async () => {
       await page.locator('.btn-add').click();
     });

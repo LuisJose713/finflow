@@ -1,8 +1,9 @@
 import {
-  Component, inject, signal, computed, effect,
+  Component, DestroyRef, NgZone, inject, signal, computed, effect,
   ElementRef, viewChild, afterNextRender,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppCurrencyPipe } from '../../../shared/pipes/currency.pipe';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { DashboardRefreshService } from '../../../core/services/dashboard-refresh.service';
@@ -19,6 +20,8 @@ interface MonthlyData { month: string; monthKey: string; income: number; expense
 export class OverviewComponent {
   private txService = inject(TransactionService);
   private refresh   = inject(DashboardRefreshService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly zone = inject(NgZone);
 
   chartCanvas = viewChild<ElementRef<HTMLCanvasElement>>('chartCanvas');
 
@@ -42,12 +45,18 @@ export class OverviewComponent {
   netValue      = computed(() => this.totalIncome() - this.totalExpenses());
 
   private animationId: number | null = null;
+  private chartReadyTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly C_INC       = '#22c55e';
   private readonly C_INC_TRACK = 'rgba(34, 197, 94, 0.15)';
   private readonly C_EXP       = '#ef4444';
   private readonly C_EXP_TRACK = 'rgba(239, 68, 68, 0.15)';
 
   constructor() {
+    this.destroyRef.onDestroy(() => {
+      this.cancelAnimation();
+      if (this.chartReadyTimer !== null) clearTimeout(this.chartReadyTimer);
+    });
+
     effect(() => {
       this.refresh.version();
       this.load();
@@ -68,9 +77,14 @@ export class OverviewComponent {
   }
 
   load() {
+    if (this.chartReadyTimer !== null) {
+      clearTimeout(this.chartReadyTimer);
+      this.chartReadyTimer = null;
+    }
+    this.cancelAnimation();
     this.loading.set(true);
     this.chartReady.set(false);
-    this.txService.getMonthlyStats().subscribe({
+    this.txService.getMonthlyStats().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: data => {
         this.monthlyData.set(data.map((s: any) => ({
           monthKey: s.month,
@@ -79,20 +93,21 @@ export class OverviewComponent {
           expenses: s.expenses,
         })));
         this.loading.set(false);
-        setTimeout(() => this.chartReady.set(true), 50);
+        this.chartReadyTimer = setTimeout(() => {
+          this.chartReadyTimer = null;
+          this.chartReady.set(true);
+        }, 50);
       },
       error: () => this.loading.set(false),
     });
   }
 
   setScope(s: 'month' | 'all') {
-    this.scope.set(s);
-    this.renderChart();
+    this.scope.set(s); // The reactive render effect redraws once.
   }
 
   setFilter(f: 'all' | 'income' | 'expense') {
-    this.filter.set(f);
-    this.renderChart();
+    this.filter.set(f); // No duplicate animation scheduling.
   }
 
   renderChart() {
@@ -131,8 +146,13 @@ export class OverviewComponent {
       if (showIncome)  drawRing(W * .44, W * .12, p,           this.C_INC, this.C_INC_TRACK);
       if (showExpense) drawRing(W * .30, W * .12, expFrac * p, this.C_EXP, this.C_EXP_TRACK);
       if (p < 1) this.animationId = requestAnimationFrame(tick);
+      else this.animationId = null;
     };
-    this.animationId = requestAnimationFrame(tick);
+    // A 60fps canvas animation must not trigger an Angular-wide change-detection
+    // pass on every frame while the user navigates to another menu screen.
+    this.zone.runOutsideAngular(() => {
+      this.animationId = requestAnimationFrame(tick);
+    });
   }
 
   private cancelAnimation() {
