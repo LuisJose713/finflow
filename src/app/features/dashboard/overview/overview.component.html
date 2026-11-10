@@ -37,7 +37,9 @@
   } @else {
     <div class="chart-surface">
       <svg viewBox="0 0 680 210" xmlns="http://www.w3.org/2000/svg"
-           class="trend-chart" role="img"
+           class="trend-chart" role="group" tabindex="0"
+           (pointerdown)="selectFromPointer($event)" (pointermove)="$event.buttons === 1 && selectFromPointer($event)"
+           (keydown.arrowleft)="moveSelection(-1); $event.preventDefault()" (keydown.arrowright)="moveSelection(1); $event.preventDefault()"
            [attr.aria-label]="'Evolución mensual de ingresos y gastos, últimos ' + (scope() === 'six' ? '6' : '12') + ' meses disponibles'">
         <defs>
           <linearGradient id="ff-trend-income-fill" x1="0" y1="0" x2="0" y2="1">
@@ -51,22 +53,38 @@
           <line x1="28" y1="126" x2="652" y2="126"/>
           <line x1="28" y1="170" x2="652" y2="170"/>
         </g>
+        @if (activePoint(); as selected) {
+          <line class="selection-guide" [attr.x1]="selected.x" [attr.x2]="selected.x" y1="32" y2="174"/>
+        }
         @if (filter() !== 'expense') {
           <path [attr.d]="incomePath()" class="trend-line income-line"/>
           @for (point of chartPoints(); track point.monthKey) {
-            <circle [attr.cx]="point.x" [attr.cy]="point.incomeY" r="3.8" class="trend-dot income-dot"/>
+            <circle [attr.cx]="point.x" [attr.cy]="point.incomeY" [attr.r]="selectedMonth() === point.monthKey ? 6 : 3.8" class="trend-dot income-dot"/>
           }
         }
         @if (filter() !== 'income') {
           <path [attr.d]="expensePath()" class="trend-line expense-line"/>
           @for (point of chartPoints(); track point.monthKey) {
-            <circle [attr.cx]="point.x" [attr.cy]="point.expenseY" r="3.8" class="trend-dot expense-dot"/>
+            <circle [attr.cx]="point.x" [attr.cy]="point.expenseY" [attr.r]="selectedMonth() === point.monthKey ? 6 : 3.8" class="trend-dot expense-dot"/>
           }
         }
         @for (point of chartPoints(); track point.monthKey) {
           <text [attr.x]="point.x" y="199" text-anchor="middle" class="chart-month">{{ point.month }}</text>
         }
       </svg>
+      <div class="chart-points" role="group" aria-label="Seleccionar mes">
+        @for (point of chartPoints(); track point.monthKey) {
+          <button type="button" class="point-button" [class.selected]="selectedMonth() === point.monthKey"
+                  [attr.aria-pressed]="selectedMonth() === point.monthKey" (click)="selectPoint(point.monthKey)">{{ point.month }}</button>
+        }
+      </div>
+      @if (activePoint(); as selected) {
+        <div class="selected-values" role="status" aria-live="polite">
+          <strong>{{ selected.month }} · {{ selected.monthKey }}</strong>
+          @if (filter() !== 'expense') { <span>Ingresos: {{ selected.income | appCurrency }}</span> }
+          @if (filter() !== 'income') { <span>Gastos: {{ selected.expenses | appCurrency }}</span> }
+        </div>
+      }
     </div>
     <div class="chart-summary" aria-label="Resumen del periodo seleccionado">
       <div class="insight-row">
