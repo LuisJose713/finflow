@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { LogoutButtonComponent } from '../logout-button/logout-button.component';
 import { ThemeSwitcherComponent } from '../theme-switcher/theme-switcher.component';
+import { AddTransactionComponent } from '../add-transaction/add-transaction.component';
 import { environment } from '../../../../environments/environment';
 
 interface NavItem {
@@ -19,7 +20,8 @@ interface NavItem {
     CommonModule,          
     RouterModule,          
     LogoutButtonComponent,
-    ThemeSwitcherComponent
+    ThemeSwitcherComponent,
+    AddTransactionComponent
   ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
