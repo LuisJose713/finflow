@@ -106,3 +106,7 @@
 .ff-consent-more a{color:#24517c;text-decoration:underline}
 .ff-consent-modal :is(a,button,input):focus-visible{outline:3px solid #b08b4d;outline-offset:2px}
 @media(max-width:600px){.ff-consent-backdrop{padding:0;align-items:flex-end}.ff-consent-modal{max-height:100dvh;border-radius:17px 17px 0 0;border-bottom:0}.ff-consent-header{padding:1rem}.ff-consent-scroll{padding:1rem}.ff-consent-footer{padding:1rem 1rem calc(1rem + env(safe-area-inset-bottom))}}
+
+/* Brand across both login and registration */
+.showcase-brand-image { display:block; width:clamp(210px,25vw,285px); max-width:100%; height:auto; }
+.auth-brand-image { display:block; width:160px; max-width:100%; height:auto; }
