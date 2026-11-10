@@ -1,4 +1,6 @@
-import { Component, inject, signal, output, effect, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, output, effect, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subscription } from 'rxjs';
 import { CommonModule, DatePipe } from '@angular/common';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -10,13 +12,15 @@ import { AppCurrencyPipe } from '../../../shared/pipes/currency.pipe';
     selector: 'app-recent-transactions',
     templateUrl: './recent-transactions.component.html',
     styleUrls: ['./recent-transactions.component.scss'],
-    changeDetection: ChangeDetectionStrategy.Eager,
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [DatePipe, AppCurrencyPipe, CommonModule]
 })
 export class RecentTransactionsComponent {
   private txService  = inject(TransactionService);
   private toast      = inject(ToastService);
   private refresh    = inject(DashboardRefreshService);
+  private destroyRef = inject(DestroyRef);
+  private pending?: Subscription;
 
   transactions = signal<Transaction[]>([]);
   loading      = signal(true);
@@ -30,8 +34,9 @@ export class RecentTransactionsComponent {
   }
 
   load() {
+    this.pending?.unsubscribe();
     this.loading.set(true);
-    this.txService.getRecent().subscribe({
+    this.pending = this.txService.getRecent().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next:  data => { this.transactions.set(data); this.loading.set(false); },
       error: ()   => this.loading.set(false),
     });
