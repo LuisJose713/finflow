@@ -3,10 +3,11 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { CurrencyInputDirective } from '../../shared/directives/currency-input.directive';
 import { AccountService, AccountType, FinancialAccount, AccountTransfer } from '../../core/services/account.service';
 
 @Component({
-  selector:'app-accounts',standalone:true,imports:[CommonModule,FormsModule,NavbarComponent],
+  selector:'app-accounts',standalone:true,imports:[CommonModule,FormsModule,NavbarComponent,CurrencyInputDirective],
   templateUrl:'./accounts.component.html',styleUrl:'./accounts.component.scss'
 })
 export class AccountsComponent implements OnInit {
