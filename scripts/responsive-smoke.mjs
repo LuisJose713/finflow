@@ -129,7 +129,26 @@ async function checkDialog(page, width, label, action, selector = '.modal') {
       fullPage: false
     });
   } catch (error) {
-    failures.push(`${width}px ${label}: ${error.message.slice(0, 240)}`);
+    let detail = '';
+    try {
+      detail = await page.locator('.btn-add').first().evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        const x = Math.max(0, Math.min(window.innerWidth - 1, r.x + r.width / 2));
+        const y = Math.max(0, Math.min(window.innerHeight - 1, r.y + r.height / 2));
+        const top = document.elementFromPoint(x, y);
+        return JSON.stringify({
+          rect: { x: r.x, y: r.y, width: r.width, height: r.height },
+          topElement: top?.outerHTML?.slice(0, 350),
+          display: getComputedStyle(el).display,
+          visibility: getComputedStyle(el).visibility
+        });
+      });
+      await page.screenshot({
+        path: path.join(output, `FAILED-${width}-${label.replace(/\\s+/g, '-')}.png`),
+        fullPage: true
+      });
+    } catch {}
+    failures.push(`${width}px ${label}: ${error.message.slice(0, 1500)}; diagnostics=${detail}`);
   }
 }
 
