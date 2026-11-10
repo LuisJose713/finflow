@@ -69,6 +69,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: finflow-production-npm-audit
-          path: |\n            audit-production.json\n            audit-all.json
+          path: |
+            audit-production.json
+            audit-all.json
           retention-days: 14
           if-no-files-found: warn
