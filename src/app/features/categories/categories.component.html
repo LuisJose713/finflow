@@ -23,12 +23,18 @@
             <option value="Expense">Gasto</option>
             <option value="Income">Ingreso</option>
           </select>
-          <div *ngIf="error()" class="category-feedback error" role="alert">{{ error() }}</div>
-          <div *ngIf="notice()" class="category-feedback success" role="status">{{ notice() }}</div>
+          @if (error()) {
+            <div class="category-feedback error" role="alert">{{ error() }}</div>
+          }
+          @if (notice()) {
+            <div class="category-feedback success" role="status">{{ notice() }}</div>
+          }
           <button class="primary-action" type="submit" [disabled]="saving()">
             {{ saving() ? 'Guardando...' : (editId() === null ? 'Crear categoría' : 'Guardar cambios') }}
           </button>
-          <button *ngIf="editId() !== null" type="button" class="secondary-action" (click)="reset()">Cancelar edición</button>
+          @if (editId() !== null) {
+            <button type="button" class="secondary-action" (click)="reset()">Cancelar edición</button>
+          }
         </form>
       </section>
       <section class="categories-panel category-list-panel" aria-labelledby="my-categories-heading">
@@ -39,40 +45,50 @@
           </div>
           <span class="panel-count">{{ mine().length }}</span>
         </div>
-        <p *ngIf="loading()" class="categories-placeholder">Cargando categorías…</p>
-        <div *ngIf="!loading() && mine().length === 0" class="categories-empty">
-          <span class="categories-empty-mark">+</span>
-          <h3>Hazlo a tu manera</h3>
-          <p>Crea una categoría y utilízala al registrar movimientos o planificar gastos.</p>
-        </div>
-        <ul *ngIf="!loading() && mine().length" class="category-items">
-          <li *ngFor="let category of mine()" class="category-item">
-            <div class="category-item-description">
-              <span class="category-symbol" [class.income]="category.type === 'Income'">
-                {{ category.type === 'Income' ? '↗' : '↘' }}
-              </span>
-              <div><strong>{{ category.name }}</strong>
-                <span>{{ category.type === 'Income' ? 'Ingreso' : 'Gasto' }}</span>
+        @if (loading()) {
+          <p class="categories-placeholder">Cargando categorías…</p>
+        }
+        @if (!loading() && mine().length === 0) {
+          <div class="categories-empty">
+            <span class="categories-empty-mark">+</span>
+            <h3>Hazlo a tu manera</h3>
+            <p>Crea una categoría y utilízala al registrar movimientos o planificar gastos.</p>
+          </div>
+        }
+        @if (!loading() && mine().length) {
+          <ul class="category-items">
+            @for (category of mine(); track category) {
+              <li class="category-item">
+                <div class="category-item-description">
+                  <span class="category-symbol" [class.income]="category.type === 'Income'">
+                    {{ category.type === 'Income' ? '↗' : '↘' }}
+                  </span>
+                  <div><strong>{{ category.name }}</strong>
+                  <span>{{ category.type === 'Income' ? 'Ingreso' : 'Gasto' }}</span>
+                </div>
               </div>
-            </div>
-            <div class="category-actions">
-              <button type="button" (click)="startEdit(category)" [attr.aria-label]="'Editar ' + category.name">Editar</button>
-              <button type="button" class="delete-action" (click)="remove(category)" [attr.aria-label]="'Eliminar ' + category.name">Eliminar</button>
-            </div>
-          </li>
+              <div class="category-actions">
+                <button type="button" (click)="startEdit(category)" [attr.aria-label]="'Editar ' + category.name">Editar</button>
+                <button type="button" class="delete-action" (click)="remove(category)" [attr.aria-label]="'Eliminar ' + category.name">Eliminar</button>
+              </div>
+            </li>
+          }
         </ul>
-      </section>
-    </div>
-    <section class="categories-panel category-global" aria-labelledby="system-categories-title">
-      <span class="section-overline">DISPONIBLES PARA TODOS</span>
-      <h2 id="system-categories-title">Categorías de FinFlow</h2>
-      <p>Estas categorías vienen incluidas con tu cuenta y no pueden editarse ni eliminarse.</p>
-      <div class="system-category-list">
-        <span *ngFor="let category of global()" class="category-chip">
+      }
+    </section>
+  </div>
+  <section class="categories-panel category-global" aria-labelledby="system-categories-title">
+    <span class="section-overline">DISPONIBLES PARA TODOS</span>
+    <h2 id="system-categories-title">Categorías de FinFlow</h2>
+    <p>Estas categorías vienen incluidas con tu cuenta y no pueden editarse ni eliminarse.</p>
+    <div class="system-category-list">
+      @for (category of global(); track category) {
+        <span class="category-chip">
           {{ category.name }} <small>{{ category.type === 'Income' ? 'Ingreso' : 'Gasto' }}</small>
         </span>
-      </div>
-    </section>
-    <footer class="ae-vqor-credit">FinFlow · Creado por <strong>AEVQOR</strong></footer>
-  </main>
+      }
+    </div>
+  </section>
+  <footer class="ae-vqor-credit">FinFlow · Creado por <strong>AEVQOR</strong></footer>
+</main>
 </div>

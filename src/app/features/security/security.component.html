@@ -1,45 +1,49 @@
 <div class="app-shell">
- <app-navbar></app-navbar>
- <main class="main-content security-page">
-  <header class="security-hero"><div><span>FINFLOW · PROTECCIÓN DE CUENTA</span><h1>Seguridad y sesiones</h1>
+  <app-navbar></app-navbar>
+  <main class="main-content security-page">
+    <header class="security-hero"><div><span>FINFLOW · PROTECCIÓN DE CUENTA</span><h1>Seguridad y sesiones</h1>
     <p>Cuida tu información financiera y controla cuándo deben cerrarse tus sesiones.</p></div>
     <div class="security-emblem" aria-hidden="true">F·</div>
   </header>
-  <p *ngIf="error()" class="security-message error" role="alert">{{error()}}</p>
-  <p *ngIf="message()" class="security-message success" role="status">{{message()}}</p>
+  @if (error()) {
+    <p class="security-message error" role="alert">{{error()}}</p>
+  }
+  @if (message()) {
+    <p class="security-message success" role="status">{{message()}}</p>
+  }
   <div class="security-grid">
-   <section class="security-panel" aria-labelledby="change-password-title">
-    <span class="security-kicker">ACCESO PERSONAL</span><h2 id="change-password-title">Cambiar contraseña</h2>
-    <p>Utiliza una contraseña nueva de al menos 12 caracteres. Al cambiarla, se invalidarán los tokens anteriores.</p>
-    <form (ngSubmit)="changePassword()" novalidate>
-     <label for="password-current">Contraseña actual</label>
-     <div class="field-password"><input id="password-current" name="oldPassword" [(ngModel)]="oldPassword" [type]="showOld()?'text':'password'" autocomplete="current-password" required/>
-       <button type="button" (click)="showOld.set(!showOld())" [attr.aria-label]="showOld()?'Ocultar contraseña':'Mostrar contraseña'">{{showOld()?'Ocultar':'Mostrar'}}</button></div>
-     <label for="password-new">Nueva contraseña</label>
-     <div class="field-password"><input id="password-new" name="newPassword" [(ngModel)]="newPassword" [type]="showNew()?'text':'password'" autocomplete="new-password" minlength="12" maxlength="128" required/>
-       <button type="button" (click)="showNew.set(!showNew())" [attr.aria-label]="showNew()?'Ocultar nueva contraseña':'Mostrar nueva contraseña'">{{showNew()?'Ocultar':'Mostrar'}}</button></div>
-     <label for="password-confirm">Confirmar nueva contraseña</label>
-     <div class="field-password"><input id="password-confirm" name="confirmPassword" [(ngModel)]="confirmPassword" [type]="showConfirm()?'text':'password'" autocomplete="new-password" minlength="12" maxlength="128" required/>
-       <button type="button" (click)="showConfirm.set(!showConfirm())" [attr.aria-label]="showConfirm()?'Ocultar confirmación':'Mostrar confirmación'">{{showConfirm()?'Ocultar':'Mostrar'}}</button></div>
-     <small>{{newPassword.length}} caracteres · {{newPassword&&confirmPassword?(newPassword===confirmPassword?'Las contraseñas coinciden':'No coinciden'):'Confirma la contraseña'}}</small>
-     <button type="submit" class="security-primary" [disabled]="busy()">{{busy()?'Guardando…':'Actualizar contraseña'}}</button>
-    </form>
-   </section>
-   <section class="security-panel" aria-labelledby="session-control-title">
-    <span class="security-kicker">TUS DISPOSITIVOS</span><h2 id="session-control-title">Cerrar todas las sesiones</h2>
-    <p>¿Perdiste un celular o iniciaste sesión en un equipo compartido? Invalida los tokens anteriores con tu contraseña.</p>
-    <form (ngSubmit)="revokeSessions()">
-     <label for="revoke-password">Confirma tu contraseña</label>
-     <input id="revoke-password" name="revokePassword" type="password" [(ngModel)]="revokePassword" autocomplete="current-password" required/>
-     <button type="submit" class="security-secondary" [disabled]="busy()||!revokePassword">Cerrar todas las sesiones</button>
-    </form>
-    <div class="security-note">
-     <strong>Seguridad por diseño</strong>
-     <p>El backend comprueba tu identidad y tu versión de sesión en cada solicitud. Los accesos repetidos con claves incorrectas tienen límites temporales.</p>
+    <section class="security-panel" aria-labelledby="change-password-title">
+      <span class="security-kicker">ACCESO PERSONAL</span><h2 id="change-password-title">Cambiar contraseña</h2>
+      <p>Utiliza una contraseña nueva de al menos 12 caracteres. Al cambiarla, se invalidarán los tokens anteriores.</p>
+      <form (ngSubmit)="changePassword()" novalidate>
+        <label for="password-current">Contraseña actual</label>
+        <div class="field-password"><input id="password-current" name="oldPassword" [(ngModel)]="oldPassword" [type]="showOld()?'text':'password'" autocomplete="current-password" required/>
+          <button type="button" (click)="showOld.set(!showOld())" [attr.aria-label]="showOld()?'Ocultar contraseña':'Mostrar contraseña'">{{showOld()?'Ocultar':'Mostrar'}}</button></div>
+          <label for="password-new">Nueva contraseña</label>
+          <div class="field-password"><input id="password-new" name="newPassword" [(ngModel)]="newPassword" [type]="showNew()?'text':'password'" autocomplete="new-password" minlength="12" maxlength="128" required/>
+            <button type="button" (click)="showNew.set(!showNew())" [attr.aria-label]="showNew()?'Ocultar nueva contraseña':'Mostrar nueva contraseña'">{{showNew()?'Ocultar':'Mostrar'}}</button></div>
+            <label for="password-confirm">Confirmar nueva contraseña</label>
+            <div class="field-password"><input id="password-confirm" name="confirmPassword" [(ngModel)]="confirmPassword" [type]="showConfirm()?'text':'password'" autocomplete="new-password" minlength="12" maxlength="128" required/>
+              <button type="button" (click)="showConfirm.set(!showConfirm())" [attr.aria-label]="showConfirm()?'Ocultar confirmación':'Mostrar confirmación'">{{showConfirm()?'Ocultar':'Mostrar'}}</button></div>
+              <small>{{newPassword.length}} caracteres · {{newPassword&&confirmPassword?(newPassword===confirmPassword?'Las contraseñas coinciden':'No coinciden'):'Confirma la contraseña'}}</small>
+              <button type="submit" class="security-primary" [disabled]="busy()">{{busy()?'Guardando…':'Actualizar contraseña'}}</button>
+            </form>
+          </section>
+          <section class="security-panel" aria-labelledby="session-control-title">
+            <span class="security-kicker">TUS DISPOSITIVOS</span><h2 id="session-control-title">Cerrar todas las sesiones</h2>
+            <p>¿Perdiste un celular o iniciaste sesión en un equipo compartido? Invalida los tokens anteriores con tu contraseña.</p>
+            <form (ngSubmit)="revokeSessions()">
+              <label for="revoke-password">Confirma tu contraseña</label>
+              <input id="revoke-password" name="revokePassword" type="password" [(ngModel)]="revokePassword" autocomplete="current-password" required/>
+              <button type="submit" class="security-secondary" [disabled]="busy()||!revokePassword">Cerrar todas las sesiones</button>
+            </form>
+            <div class="security-note">
+              <strong>Seguridad por diseño</strong>
+              <p>El backend comprueba tu identidad y tu versión de sesión en cada solicitud. Los accesos repetidos con claves incorrectas tienen límites temporales.</p>
+            </div>
+          </section>
+        </div>
+        <p class="security-disclaimer"><a routerLink="/privacy">Protección de datos personales y privacidad</a> · Recuperación por correo, verificación del email y MFA siguen pendientes de implementación y pruebas con un proveedor de correo.</p>
+        <footer class="security-footer">FinFlow · Creado por <strong>AEVQOR</strong></footer>
+      </main>
     </div>
-   </section>
-  </div>
-  <p class="security-disclaimer"><a routerLink="/privacy">Protección de datos personales y privacidad</a> · Recuperación por correo, verificación del email y MFA siguen pendientes de implementación y pruebas con un proveedor de correo.</p>
-  <footer class="security-footer">FinFlow · Creado por <strong>AEVQOR</strong></footer>
- </main>
-</div>

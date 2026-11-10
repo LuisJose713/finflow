@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
@@ -16,6 +16,7 @@ import { ThemeService } from '../../../core/services/theme.service';
       <span class="theme-label">{{ themeService.isDark() ? 'Modo claro' : 'Modo oscuro' }}</span>
     </button>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     :host { display:block; min-width:0; }
     .theme-btn { width:100%; min-height:44px; display:flex; align-items:center; justify-content:center; gap:.6rem; border:1px solid #3b4b63; border-radius:11px; background:#1a2a40; color:#e5edf9; font:inherit; font-size:.78rem; font-weight:650; padding:.7rem .8rem; cursor:pointer; transition:background .2s,border-color .2s; white-space:nowrap; }

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
   FormBuilder,
   Validators,
@@ -9,11 +9,11 @@ import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
+    selector: 'app-login',
+    imports: [ReactiveFormsModule, RouterLink],
+    templateUrl: './login.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrl: './login.component.scss'
 })
 export class LoginComponent {
   private fb = inject(FormBuilder);

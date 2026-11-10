@@ -2,3 +2,10 @@
 .env
 node_modules
 dist
+.angular/cache/
+.angular/
+coverage/
+out-tsc/
+*.log
+.env.*
+!.env.example

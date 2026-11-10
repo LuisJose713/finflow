@@ -29,7 +29,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authenticatedRequest).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 && token) {
+      // A late 401 from an older request must never erase a newer valid session.
+      if (error.status === 401 && token && localStorage.getItem('token') === token) {
         // Only clear FinFlow's session, not unrelated application storage.
         localStorage.removeItem('token');
         localStorage.removeItem('user');
