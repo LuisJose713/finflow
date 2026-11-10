@@ -330,7 +330,9 @@ for (const width of widths) {
       // Actual mobile sidebar navigation, not just direct route navigation.
       await guestPage.getByRole('button', { name: 'Abrir menú de FinFlow' }).click();
       await guestPage.getByRole('link', { name: 'Metas' }).click();
-      await guestPage.locator('.studio-page-header h1').getByText('Metas').waitFor({ state: 'visible' });
+      await guestPage.locator('.studio-page-header h1').waitFor({ state: 'visible' });
+      assert((await guestPage.locator('.studio-page-header h1').innerText()).includes('Metas'),
+        `${width}px design-preview: sidebar navigation did not reach goals`);
     }
     assert(previewApiCalls.length === 0,
       `${width}px design-preview: unexpected financial API requests after all windows: ${previewApiCalls.join(', ')}`);
