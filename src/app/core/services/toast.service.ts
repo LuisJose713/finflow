@@ -14,13 +14,13 @@ export class ToastService {
   private _toasts = signal<Toast[]>([]);
   readonly toasts = this._toasts.asReadonly();
 
-  show(message: string, type: ToastType = 'info', duration = 4000) {
+  show(message: string, type: ToastType = 'info', duration = type === 'error' ? 0 : 4000) {
     const id = crypto.randomUUID();
     const toast: Toast = { id, message, type, duration };
 
     this._toasts.update((current) => [...current, toast]);
 
-    setTimeout(() => this.dismiss(id), duration);
+    if (duration > 0) setTimeout(() => this.dismiss(id), duration);
   }
 
   success(message: string) {
