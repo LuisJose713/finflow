@@ -33,7 +33,14 @@ export class OverviewComponent {
 
   readonly filteredData = computed(() => {
     const count = this.scope() === 'six' ? 6 : 12;
-    return this.monthlyData().slice(-count);
+    // Always show a continuous calendar timeline, even when the API omits empty months.
+    const today = new Date();
+    const stats = new Map(this.monthlyData().map(row => [row.monthKey, row]));
+    return Array.from({ length: count }, (_, index) => {
+      const date = new Date(today.getFullYear(), today.getMonth() - (count - 1 - index), 1);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      return stats.get(monthKey) ?? { monthKey, month: this.formatMonth(monthKey), income: 0, expenses: 0 };
+    });
   });
   readonly totalIncome = computed(() => this.filteredData().reduce((sum, point) => sum + point.income, 0));
   readonly totalExpenses = computed(() => this.filteredData().reduce((sum, point) => sum + point.expenses, 0));
