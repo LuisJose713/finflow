@@ -185,9 +185,11 @@ for (const width of widths) {
     // The one-time privacy education dialog legitimately blocks background
     // interaction. Acknowledge it before testing transaction controls.
     const noticeDismiss = page.locator('[data-signup-dismiss]');
-    if (await noticeDismiss.isVisible()) {
-      await noticeDismiss.click();
-    }
+    // Consent status/policy is resolved asynchronously. Wait for the
+    // educational notice instead of checking visibility too early.
+    await noticeDismiss.waitFor({ state: 'visible', timeout: 6000 });
+    await noticeDismiss.click();
+    await page.locator('.privacy-shield').waitFor({ state: 'hidden', timeout: 5000 });
     await checkDialog(page, width, 'crear-transaccion', async () => {
       await page.locator('.btn-add').click();
     });
