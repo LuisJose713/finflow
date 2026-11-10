@@ -11,6 +11,59 @@
       <div class="admin-emblem" aria-hidden="true">F·</div>
     </header>
 
+    <section class="admin-section monitor-section" aria-labelledby="platform-monitor-title">
+      <div class="admin-section-heading monitor-heading">
+        <div>
+          <span class="section-overline">INFRAESTRUCTURA · SALUD DEL SISTEMA</span>
+          <h2 id="platform-monitor-title">Estado de los servicios</h2>
+          <p class="monitor-intro">Comprobación real del backend, la base de datos, la web y el asesor IA.</p>
+        </div>
+        <div class="monitor-actions">
+          <span *ngIf="monitor() as health" class="monitor-summary"
+                [class.monitor-summary-up]="health.overall === 'UP'"
+                [attr.aria-label]="'Estado general: ' + statusLabel(health.overall)">
+            <span class="monitor-status-dot" aria-hidden="true"></span>
+            {{ statusLabel(health.overall) }}
+          </span>
+          <button type="button" class="monitor-refresh" (click)="refreshMonitor()"
+                  [disabled]="monitorLoading()" aria-label="Actualizar estado de los servicios">
+            {{ monitorLoading() ? 'Comprobando…' : '↻ Actualizar' }}
+          </button>
+        </div>
+      </div>
+
+      <p *ngIf="monitorLoading() && !monitor()" class="monitor-feedback" role="status">Comprobando servicios…</p>
+      <p *ngIf="monitorError()" class="monitor-feedback monitor-feedback-error" role="alert">{{ monitorError() }}</p>
+
+      <ng-container *ngIf="monitor() as health">
+        <div class="monitor-grid" aria-label="Comprobaciones de infraestructura">
+          <article *ngFor="let service of health.services" class="monitor-card"
+                   [attr.data-monitor-key]="service.key"
+                   [class.monitor-card-up]="service.status === 'UP'"
+                   [class.monitor-card-down]="service.status === 'DOWN'">
+            <div class="monitor-card-top">
+              <span class="monitor-service-icon" aria-hidden="true">
+                {{ service.key === 'database' ? '▦' : service.key === 'web' ? '◈' : service.key === 'ai' ? '✦' : '⌘' }}
+              </span>
+              <span class="monitor-chip"
+                    [class.monitor-chip-up]="service.status === 'UP'"
+                    [class.monitor-chip-down]="service.status === 'DOWN'">
+                <span class="monitor-status-dot" aria-hidden="true"></span>
+                {{ statusLabel(service.status) }}
+              </span>
+            </div>
+            <h3>{{ service.name }}</h3>
+            <p>{{ service.detail }}</p>
+            <span class="monitor-latency">{{ service.latencyMs === null ? '—' : (service.latencyMs | number:'1.0-0') + ' ms' }}</span>
+          </article>
+        </div>
+        <div class="monitor-footnote">
+          <span>Última comprobación: {{ health.checkedAt | date:'dd/MM/yyyy HH:mm:ss' }}</span>
+          <span>Actualización automática cada 60 segundos · No incluye datos personales</span>
+        </div>
+      </ng-container>
+    </section>
+
     <div *ngIf="loading()" class="admin-state" role="status">Cargando información de la plataforma…</div>
     <section *ngIf="error()" class="admin-state admin-error" role="alert">
       <p>{{ error() }}</p>
