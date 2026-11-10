@@ -22,7 +22,7 @@ export class AdminComponent implements OnInit {
   readonly loading = signal(true);
   readonly error = signal('');
   readonly monitor = signal<AdminPlatformHealth | null>(null);
-  readonly monitorLoading = signal(true);
+  readonly monitorLoading = signal(false);
   readonly monitorError = signal('');
   readonly monthMax = computed(() =>
     Math.max(1, ...(this.overview()?.monthlyActivity ?? []).map(m => Number(m.transactions)))
@@ -36,7 +36,7 @@ export class AdminComponent implements OnInit {
   }
 
   refreshMonitor() {
-    if (this.monitorLoading() && this.monitor()) return;
+    if (this.monitorLoading()) return;
     this.monitorLoading.set(true);
     this.monitorError.set('');
     this.api.getPlatformHealth().subscribe({
