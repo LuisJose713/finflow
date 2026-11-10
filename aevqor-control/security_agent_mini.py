@@ -88,7 +88,7 @@ run.onclick=async()=>{
 
 
 @app.get("/", response_class=HTMLResponse)
-async def home():
+async def home(_: bool = Depends(authorize)):
     return HTMLResponse(PAGE, headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
 
 
