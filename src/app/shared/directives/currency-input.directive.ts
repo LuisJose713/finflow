@@ -44,8 +44,12 @@ export class CurrencyInputDirective implements ControlValueAccessor {
     const cursorPos = input.selectionStart ?? 0;
     const prevLen   = input.value.length;
 
-    // Solo dígitos
-    const raw = input.value.replace(/\D/g, '');
+    // Preserve decimal comma while allowing grouped Colombian currency values.
+    const normalized = input.value.replace(/[^\d,.]/g, '');
+    const decimalIndex = normalized.lastIndexOf(',');
+    const integerPart = (decimalIndex >= 0 ? normalized.slice(0, decimalIndex) : normalized).replace(/\D/g, '');
+    const fractionalPart = decimalIndex >= 0 ? normalized.slice(decimalIndex + 1).replace(/\D/g, '').slice(0, 2) : null;
+    const raw = integerPart;
 
     if (raw === '') {
       input.value = '';
@@ -53,8 +57,8 @@ export class CurrencyInputDirective implements ControlValueAccessor {
       return;
     }
 
-    const numeric   = parseInt(raw, 10);
-    const formatted = this.format(numeric);
+    const numeric   = Number(raw + (fractionalPart !== null ? '.' + fractionalPart : ''));
+    const formatted = this.formatInteger(Number(raw)) + (fractionalPart !== null ? ',' + fractionalPart : '');
     input.value     = formatted;
 
     // Restaurar cursor ajustado por los puntos agregados
@@ -66,11 +70,20 @@ export class CurrencyInputDirective implements ControlValueAccessor {
 
   @HostListener('blur')
   onBlur(): void {
+    const value = this.el.nativeElement.value;
+    if (value) {
+      const normalized = value.replace(/\./g, '').replace(',', '.');
+      const numeric = Number(normalized);
+      if (Number.isFinite(numeric)) this.el.nativeElement.value = this.format(numeric);
+    }
     this.onTouched();
   }
 
-  // ── Formato: 1000000 → "1.000.000" ─────────────────────
-  private format(value: number): string {
+  private formatInteger(value: number): string {
     return value.toLocaleString('es-CO', { maximumFractionDigits: 0 });
+  }
+
+  private format(value: number): string {
+    return value.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 }
