@@ -286,7 +286,7 @@ for (const width of widths) {
   guestPage.on('request', observePreviewRequest);
   try {
     await guestPage.goto(base + '/design-preview', { waitUntil: 'domcontentloaded' });
-    await guestPage.getByText('DESIGN PREVIEW · V4').waitFor({ state: 'visible' });
+    await guestPage.getByText('FINFLOW V4 · DESIGN STUDIO').waitFor({ state: 'visible' });
     await guestPage.locator('.stat-card.balance .balance-value').waitFor({ state: 'visible' });
     await guestPage.locator('.trend-chart .income-line').waitFor({ state: 'visible' });
     await guestPage.locator('.trend-chart .expense-line').waitFor({ state: 'visible' });
@@ -302,6 +302,39 @@ for (const width of widths) {
     await guestPage.screenshot({
       path: path.join(output, `${width}-design-preview-v4.png`), fullPage: false
     });
+    // Review ALL V4 navigation windows and assert there are no financial API
+    // requests, no authentication redirect, and no page-width overflows.
+    const reviewSections = [
+      'transactions', 'accounts', 'goals', 'budgets', 'planned-expenses',
+      'recurring', 'categories', 'advisor', 'security', 'admin'
+    ];
+    for (const section of reviewSections) {
+      await guestPage.goto(base + '/design-preview/' + section, { waitUntil: 'domcontentloaded' });
+      await guestPage.locator('.studio-page-header h1').waitFor({ state: 'visible' });
+      assert(guestPage.url().includes('/design-preview/' + section),
+        `${width}px ${section}: redirected outside design preview`);
+      await measureViewport(guestPage, 'design-preview-' + section, width);
+      if (width === 375 || width === 1440) {
+        await guestPage.screenshot({
+          path: path.join(output, `${width}-design-${section}.png`), fullPage: false
+        });
+      }
+    }
+    // The transaction list has a working search, and all data stays in memory.
+    await guestPage.goto(base + '/design-preview/transactions', { waitUntil: 'domcontentloaded' });
+    await guestPage.getByRole('searchbox', { name: 'Buscar movimientos' }).fill('supermercado');
+    await guestPage.getByText('Supermercado', { exact: true }).waitFor({ state: 'visible' });
+    assert(await guestPage.locator('.movement-row').count() === 1,
+      `${width}px design-preview transactions: search should filter to one row`);
+    if (width === 375) {
+      // Actual mobile sidebar navigation, not just direct route navigation.
+      await guestPage.getByRole('button', { name: 'Abrir menú de FinFlow' }).click();
+      await guestPage.getByRole('link', { name: 'Metas' }).click();
+      await guestPage.locator('.studio-page-header h1').getByText('Metas').waitFor({ state: 'visible' });
+    }
+    assert(previewApiCalls.length === 0,
+      `${width}px design-preview: unexpected financial API requests after all windows: ${previewApiCalls.join(', ')}`);
+
   } catch (error) {
     failures.push(`${width}px design-preview: ${error.message.slice(0, 420)}`);
   }
