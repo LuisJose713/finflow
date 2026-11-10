@@ -3,12 +3,13 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { CurrencyInputDirective } from '../../shared/directives/currency-input.directive';
 import { CategoryService } from '../../core/services/category.service';
 import { BudgetService, MonthlyBudget } from '../../core/services/budget.service';
 import { Category } from '../../core/models';
 
 @Component({
- selector:'app-budgets', standalone:true, imports:[CommonModule,FormsModule,NavbarComponent],
+ selector:'app-budgets', standalone:true, imports:[CommonModule,FormsModule,NavbarComponent,CurrencyInputDirective],
  templateUrl:'./budgets.component.html', styleUrl:'./budgets.component.scss'
 })
 export class BudgetsComponent implements OnInit {
