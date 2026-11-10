@@ -5,9 +5,9 @@ import { ToastService } from '../../../core/services/toast.service';
   selector: 'app-toast-container',
   standalone: true,
   template: `
-    <div class="toast-container">
+    <div class="toast-container" aria-label="Notificaciones de FinFlow">
       @for (toast of toastService.toasts(); track toast.id) {
-        <div class="toast" [class]="toast.type">
+        <div class="toast" [class]="toast.type" [attr.role]="toast.type === 'error' ? 'alert' : 'status'">
           <span class="toast-icon">
             @switch (toast.type) {
               @case ('success') { ✓ }
@@ -17,7 +17,7 @@ import { ToastService } from '../../../core/services/toast.service';
             }
           </span>
           <span class="toast-msg">{{ toast.message }}</span>
-          <button class="toast-close" (click)="toastService.dismiss(toast.id)">✕</button>
+          <button type="button" class="toast-close" [attr.aria-label]="'Cerrar notificación: ' + toast.message" (click)="toastService.dismiss(toast.id)">✕</button>
         </div>
       }
     </div>
@@ -31,7 +31,7 @@ import { ToastService } from '../../../core/services/toast.service';
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
-      max-width: 360px;
+      max-width: min(360px, calc(100vw - 2rem));
     }
 
     .toast {
@@ -52,7 +52,7 @@ import { ToastService } from '../../../core/services/toast.service';
       &.info    { background: var(--primary); }
     }
 
-    .toast-msg { flex: 1; }
+    .toast-msg { flex: 1; overflow-wrap: anywhere; }
 
     .toast-close {
       background: none;
@@ -60,10 +60,14 @@ import { ToastService } from '../../../core/services/toast.service';
       color: rgba(255,255,255,0.8);
       cursor: pointer;
       font-size: 0.8rem;
-      padding: 0;
+      padding: 0.5rem;
+      margin: -0.5rem;
+      min-width: 32px;
+      min-height: 32px;
       line-height: 1;
 
       &:hover { color: #fff; }
+      &:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 4px; }
     }
 
     @keyframes slideIn {
