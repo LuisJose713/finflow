@@ -1,5 +1,9 @@
 <!-- Trigger button -->
-<button class="btn-add" (click)="open()">+ Nueva transacción</button>
+<button class="btn-add" [class.floating]="floating" type="button" (click)="open()"
+        aria-label="Nueva transacción" [attr.aria-expanded]="isOpen()">
+  <span class="btn-add-icon" aria-hidden="true">+</span>
+  <span class="btn-add-label">Nueva transacción</span>
+</button>
 
 <!-- Modal backdrop -->
 <div *ngIf="isOpen()" class="modal-backdrop" (click)="close()">

@@ -1,6 +1,7 @@
-import { Component, inject, signal, output, OnInit } from '@angular/core';
+import { Component, inject, signal, output, OnInit, Input, HostListener, DestroyRef } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { AccountService, FinancialAccount } from '../../../core/services/account.service';
@@ -22,6 +23,9 @@ export class AddTransactionComponent implements OnInit {
   private accountService = inject(AccountService);
   private toast          = inject(ToastService);
   private refresh        = inject(DashboardRefreshService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  @Input() floating = false;
 
   isOpen         = signal(false);
   loading        = signal(false);
@@ -46,19 +50,19 @@ export class AddTransactionComponent implements OnInit {
   get f() { return this.form.controls; }
 
   ngOnInit() {
-    this.accountService.list().subscribe({
-      next: accounts => this.accounts.set(accounts.filter(a => !a.archived && a.currency === 'COP')),
-    });
-    this.categoryService.getAll().subscribe({
-      next: cats => {
-        this.allCategories.set(cats);
-        this.filterCategories('expense');
-      }
-    });
-    this.form.get('type')!.valueChanges.subscribe(type => {
-      this.filterCategories(type!);
-      this.form.patchValue({ categoryId: null });
-    });
+    // The floating control lives in the navbar on every authenticated page.
+    // Fetch reference data only when opened, never on every menu navigation.
+    this.form.get('type')!.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(type => {
+        this.filterCategories(type!);
+        this.form.patchValue({ categoryId: null });
+      });
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.isOpen() && !this.loading()) this.close();
   }
 
   filterCategories(type: string) {
@@ -82,12 +86,25 @@ export class AddTransactionComponent implements OnInit {
     this.form.get('amount')?.setValue(numeric, { emitEvent: false });
   }
 
-  open()  {
+  open() {
+    if (this.loading()) return;
     this.amountDisplay.set('');
-    this.accountService.list().subscribe({
-      next: accounts => this.accounts.set(accounts.filter(a => !a.archived && a.currency === 'COP')),
-    });
     this.isOpen.set(true);
+    this.categoryService.getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: cats => {
+          this.allCategories.set(cats);
+          this.filterCategories(this.form.value.type || 'expense');
+        },
+        error: () => this.toast.error('No pudimos cargar las categorías'),
+      });
+    this.accountService.list()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: accounts => this.accounts.set(accounts.filter(a => !a.archived && a.currency === 'COP')),
+        error: () => this.toast.error('No pudimos cargar las cuentas'),
+      });
   }
 
   close() {

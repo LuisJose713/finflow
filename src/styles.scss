@@ -450,3 +450,216 @@ body { background:var(--ff-canvas); }
     font-size: 16px;
   }
 }
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   FINFLOW V4 — unified, production design system
+   Shared across all authenticated functional pages; NO demo selectors.
+   Component data flow, guards, forms and handlers remain unchanged.
+   ══════════════════════════════════════════════════════════════════════ */
+:root {
+  --ff-v4-navy: #09162a;
+  --ff-v4-navy-raised: #172b4a;
+  --ff-v4-gold: #d7a94d;
+  --ff-v4-gold-soft: rgba(215,169,77,.115);
+  --ff-v4-stroke: #e2e8f0;
+  --ff-v4-surface: #fff;
+  --ff-v4-canvas: #f5f7fb;
+  --ff-v4-ink: #13243b;
+  --ff-v4-muted: #57687e;
+  --ff-v4-elev: 0 9px 30px rgba(13,31,55,.045);
+  --ff-v4-radius: 18px;
+}
+.dark {
+  --ff-v4-stroke: #2c405a;
+  --ff-v4-surface: #17253b;
+  --ff-v4-canvas: #101c30;
+  --ff-v4-ink: #f0f4fc;
+  --ff-v4-muted: #b0bed1;
+  --ff-v4-elev: 0 9px 30px rgba(0,0,0,.13);
+}
+.app-shell > .main-content:not(.advisor-main) {
+  background:
+    radial-gradient(ellipse 56% 17% at 93% 0%, rgba(99,127,202,.085), transparent 85%),
+    var(--ff-v4-canvas) !important;
+  padding: clamp(1.2rem,2.6vw,2.8rem);
+  min-height: 100dvh;
+}
+.app-shell > .main-content:not(.advisor-main) .page-header {
+  border: 0;
+  padding-bottom: 0;
+  margin-bottom: clamp(1.1rem,2vw,1.9rem);
+  align-items: center;
+  gap: 1rem;
+}
+.app-shell > .main-content:not(.advisor-main) .page-header h1 {
+  color: var(--ff-v4-ink);
+  font-size: clamp(1.8rem,3vw,2.85rem);
+  font-weight: 820;
+  letter-spacing: -.055em;
+  line-height: 1.13;
+}
+.app-shell > .main-content:not(.advisor-main) .page-header :is(.subtitle,.greeting) {
+  color: var(--ff-v4-muted);
+  font-size: .87rem;
+  line-height: 1.55;
+  margin-top: .5rem;
+}
+.app-shell > .main-content :is(.premium-page-intro,.account-hero,.budget-hero,
+  .recurring-hero,.security-hero,.admin-heading,.billing-hero) {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid rgba(215,169,77,.22);
+  border-radius: 20px;
+  background: linear-gradient(115deg,#0b1b33 0%,#172e50 57%,#273a5b 100%);
+  box-shadow: 0 16px 42px rgba(9,22,42,.12);
+  color: #fff;
+  margin-bottom: clamp(1rem,2vw,1.65rem);
+  padding: clamp(1.25rem,2.5vw,2.2rem);
+}
+.app-shell > .main-content :is(.premium-page-intro,.account-hero,.budget-hero,
+  .recurring-hero,.security-hero,.admin-heading,.billing-hero)::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(circle at 88% 44%,rgba(215,169,77,.095),transparent 37%);
+}
+.app-shell > .main-content .premium-page-intro::after {
+  border-color: rgba(215,169,77,.19);
+  box-shadow: 0 0 0 44px rgba(215,169,77,.03),0 0 0 88px rgba(215,169,77,.015);
+}
+.app-shell > .main-content :is(.premium-page-intro,.account-hero,.budget-hero,
+  .recurring-hero,.security-hero,.admin-heading,.billing-hero)
+  :is(h1,h2,h3) {
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: -.052em;
+  line-height: 1.15;
+}
+.app-shell > .main-content :is(.premium-page-intro,.account-hero,.budget-hero,
+  .recurring-hero,.security-hero,.admin-heading,.billing-hero)
+  :is(p,small) { color: #c3d1e3; line-height: 1.65; }
+.app-shell > .main-content :is(.premium-overline,.account-kicker,.account-overline,
+  .budget-kicker,.budget-overline,.recurring-kicker,.recurring-overline,
+  .security-kicker,.admin-eyebrow,.section-overline) {
+  color: #b18a4f;
+  font-size: .66rem;
+  font-weight: 800;
+  letter-spacing: .15em;
+}
+.app-shell > .main-content :is(.premium-page-intro,.account-hero,.budget-hero,
+  .recurring-hero,.security-hero,.admin-heading,.billing-hero)
+  :is(.premium-overline,.account-kicker,.account-overline,.budget-kicker,
+    .budget-overline,.recurring-kicker,.recurring-overline,.security-kicker,
+    .admin-eyebrow,.section-overline) { color: #e2bd83; }
+.app-shell > .main-content :is(.account-emblem,.budget-symbol,.recurring-mark,
+  .security-emblem,.admin-emblem) {
+  object-fit: cover;
+  overflow: hidden;
+  border-radius: 19px;
+  border-color: rgba(215,169,77,.35);
+}
+.app-shell > .main-content :is(.filters-card,.goal-card,.account-summary,.account-panel,
+  .budget-panel,.budget-kpis>article,.recurring-panel,.categories-panel,
+  .security-panel,.admin-section,.admin-kpi,.summary-card,.expense-card,
+  .tx-item,.transactions-card,.overview-card,.billing-admin .panel,.billing-admin .plan-edit) {
+  border-color: var(--ff-v4-stroke);
+  background: var(--ff-v4-surface);
+  border-radius: var(--ff-v4-radius);
+  box-shadow: var(--ff-v4-elev);
+}
+.app-shell > .main-content :is(.filter-tabs,.tabs,.scope-toggle,.month-selector) {
+  border-color: var(--ff-v4-stroke);
+  border-radius: 12px;
+}
+.app-shell > .main-content :is(.tab.active,.scope-btn.active) {
+  background: var(--ff-v4-gold-soft);
+  color: var(--ff-v4-ink);
+}
+.app-shell > .main-content :is(.btn-primary,.btn-new,.account-primary,
+  .budget-primary,.recurring-primary,.security-primary,.primary-action) {
+  background: #122944;
+  border: 1px solid rgba(215,169,77,.22);
+  color: #fff;
+  border-radius: 11px;
+  box-shadow: 0 6px 17px rgba(9,22,42,.12);
+  font-weight: 750;
+}
+.app-shell > .main-content :is(.btn-primary,.btn-new,.account-primary,
+  .budget-primary,.recurring-primary,.security-primary,.primary-action):hover:not(:disabled) {
+  background: #1a3857;
+  border-color: #d7a94d;
+}
+.app-shell > .main-content :is(.btn-export,.btn-ghost,.btn-clear,
+  .budget-secondary,.security-secondary,.secondary-action) {
+  background: var(--ff-v4-surface);
+  border-color: var(--ff-v4-stroke);
+  border-radius: 11px;
+  color: var(--ff-v4-ink);
+  box-shadow: none;
+}
+.app-shell > .main-content :is(.btn-export,.btn-ghost,.btn-clear,
+  .budget-secondary,.security-secondary,.secondary-action):hover:not(:disabled) {
+  border-color: #b18a4f;
+}
+.app-shell > .main-content :is(.search-input,.filter-select,.field-input,
+  .account-panel input,.account-panel select,.categories-panel input,
+  .categories-panel select,.budget-panel input,.budget-panel select,
+  .recurring-panel input,.recurring-panel select,.security-panel input) {
+  min-height: 44px;
+  border-color: var(--ff-v4-stroke);
+  border-radius: 10px;
+  background: var(--ff-v4-surface);
+  color: var(--ff-v4-ink);
+}
+.app-shell > .main-content :is(.search-input,.filter-select,.field-input,
+  input,select,textarea):focus-visible {
+  outline: 2px solid #c49c60;
+  outline-offset: 2px;
+}
+.app-shell > .main-content :is(.goal-card,.expense-card,.tx-item,.account-panel,
+  .budget-panel,.recurring-panel,.categories-panel) {
+  transition: border-color .17s ease,box-shadow .17s ease;
+}
+.app-shell > .main-content :is(.goal-card,.expense-card,.tx-item):hover {
+  border-color: rgba(215,169,77,.5);
+}
+.app-shell > .main-content :is(.goal-card,.account-panel,.budget-panel,
+  .recurring-panel,.categories-panel,.admin-section) :is(h2,h3) {
+  color: var(--ff-v4-ink);
+}
+.app-shell > .main-content :is(.goal-card,.account-panel,.budget-panel,
+  .recurring-panel,.categories-panel,.admin-section) :is(p,.muted,small) {
+  line-height: 1.6;
+}
+.app-shell > .main-content :is(.goal-card,.budget-panel,.account-panel,
+  .recurring-panel,.categories-panel) :is(.progress-fill,.budget-progress>span) {
+  background: linear-gradient(90deg,#ad8246,#d7a94d);
+}
+.app-shell > .main-content :is(.goal-card,.budget-panel,.account-panel,
+  .recurring-panel,.categories-panel,.admin-section) :is(.status-badge,.account-state,.budget-status) {
+  border-radius: 999px;
+}
+.app-shell > .main-content .admin-month-bar {
+  background: linear-gradient(180deg,#d7a94d,#1b3b60);
+}
+@media(max-width:768px) {
+  .app-shell > .main-content:not(.advisor-main) {
+    padding: 5.25rem clamp(.85rem,3.5vw,1.5rem) 6rem;
+  }
+  .app-shell > .main-content:not(.advisor-main) .page-header h1 {
+    font-size: clamp(1.7rem,5vw,2.15rem);
+  }
+  .app-shell > .main-content :is(.premium-page-intro,.account-hero,.budget-hero,
+    .recurring-hero,.security-hero,.admin-heading,.billing-hero) {
+    border-radius: 18px;
+    padding: 1.25rem;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  .app-shell > .main-content :is(.goal-card,.expense-card,.tx-item,
+    .account-panel,.budget-panel,.recurring-panel,.categories-panel) { transition: none; }
+}

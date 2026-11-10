@@ -200,3 +200,67 @@ form {
 
 /* Shared mobile-first dialog behavior */
 @include responsiveDialog.apply(540px);
+
+
+/* FinFlow V4: persistent floating quick action, not part of the sidebar layout. */
+.btn-add.floating {
+  position: fixed;
+  right: max(1.4rem, env(safe-area-inset-right));
+  bottom: max(1.45rem, env(safe-area-inset-bottom));
+  z-index: 120;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+  min-height: 56px;
+  padding: .7rem 1.3rem .7rem .8rem;
+  background: linear-gradient(130deg, #09162a, #19385f);
+  border: 1px solid rgba(215,169,77,.55);
+  border-radius: 999px;
+  color: #f8fafc;
+  font-weight: 760;
+  font-size: .87rem;
+  letter-spacing: -.01em;
+  box-shadow: 0 14px 35px rgba(5,15,32,.28), 0 4px 12px rgba(5,15,32,.16);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.btn-add.floating:hover {
+  background: linear-gradient(130deg, #132940, #28466e);
+  border-color: #f5d68c;
+  transform: translateY(-3px);
+  box-shadow: 0 18px 42px rgba(5,15,32,.34);
+}
+.btn-add.floating .btn-add-icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #d7a94d;
+  color: #09162a;
+  font-weight: 450;
+  font-size: 1.65rem;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+.btn-add:not(.floating) .btn-add-icon { font-size: 1.25em; line-height: 1; }
+.btn-add.floating:focus-visible { outline: 3px solid #f5d68c; outline-offset: 4px; }
+.modal-backdrop { z-index: 1000; }
+@media(max-width:600px) {
+  .btn-add.floating {
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    width: 62px;
+    height: 62px;
+    min-height: 62px;
+    border-radius: 20px;
+    padding: 0;
+  }
+  .btn-add.floating .btn-add-icon {
+    width: 100%; height: 100%; background: transparent; color: #f5d68c; font-size: 2rem;
+  }
+  .btn-add.floating .btn-add-label { display: none; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .btn-add.floating { transition: none; }
+}

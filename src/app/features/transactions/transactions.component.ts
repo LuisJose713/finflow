@@ -1,9 +1,10 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransactionService } from '@core/services/transaction.service';
 import { CategoryService } from '@core/services/category.service';
 import { ToastService } from '@core/services/toast.service';
+import { DashboardRefreshService } from '@core/services/dashboard-refresh.service';
 import { Transaction, Category } from '../../core/models/index';
 import { AppCurrencyPipe } from '@shared/pipes/currency.pipe';
 import { NavbarComponent } from '@shared/components/navbar/navbar.component';
@@ -24,6 +25,7 @@ export class TransactionsComponent implements OnInit {
   private txService       = inject(TransactionService);
   private categoryService = inject(CategoryService);
   private toast           = inject(ToastService);
+  private refresh         = inject(DashboardRefreshService);
 
   // Datos crudos del backend (sin filtro de descripción)
   allTransactions = signal<Transaction[]>([]);
@@ -60,10 +62,18 @@ export class TransactionsComponent implements OnInit {
 
   readonly Math = Math;
 
+  constructor() {
+    // The shared floating composer can create a transaction from this page.
+    // Keep the history synchronized without requiring a manual reload.
+    effect(() => {
+      this.refresh.version();
+      this.load();
+    }, { allowSignalWrites: true });
+  }
+
   ngOnInit() {
     this.loadCategories();
     this.loadYears();
-    this.load();
   }
 
   loadCategories() {

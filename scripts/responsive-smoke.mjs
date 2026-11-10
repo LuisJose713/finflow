@@ -70,6 +70,14 @@ async function mockApi(route) {
     totalIncome: 0, totalExpenses: 0, balance: 0, savingsRate: 0,
     monthlyData: [], categoryData: []
   };
+  else if (p === '/transactions/monthly-stats') response = [
+    { month: '2026-05', income: 2150000, expenses: 1370000 },
+    { month: '2026-06', income: 2420000, expenses: 1680000 },
+    { month: '2026-07', income: 2280000, expenses: 1520000 },
+    { month: '2026-08', income: 2850000, expenses: 1720000 },
+    { month: '2026-09', income: 2600000, expenses: 1850000 },
+    { month: '2026-10', income: 2900000, expenses: 1600000 }
+  ];
   else if (p === '/transactions/years') response = [2026];
   else if (p === '/admin/overview') response = adminStats;
   else if (p === '/admin/monitor') response = {
@@ -186,6 +194,16 @@ for (const width of widths) {
       await page.goto(base + route, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(200);
       await measureViewport(page, route, width);
+      // Global FAB is a shared authenticated control on all workspace routes.
+      const fab = page.getByRole('button', { name: 'Nueva transacción', exact: true });
+      await fab.waitFor({ state: 'visible', timeout: 6000 });
+      assert(await fab.count() === 1, `${width}px ${route}: duplicate transaction buttons`);
+      if (route === '/accounts' && [320, 768, 1440].includes(width)) {
+        await fab.click();
+        await page.getByRole('dialog', { name: 'Nueva transacción' }).waitFor({ state: 'visible' });
+        await page.getByRole('button', { name: 'Cerrar formulario' }).click();
+        await page.getByRole('dialog', { name: 'Nueva transacción' }).waitFor({ state: 'hidden' });
+      }
       if (route === '/advisor') {
         await page.getByRole('heading', { name: /Una visión clara/i }).waitFor({ state: 'visible' });
         // Use the real FinFlow brand assets, not a hand-drawn F or stock chatbot icon.
@@ -223,8 +241,16 @@ for (const width of widths) {
       await noticeDismiss.click();
       await page.locator('.privacy-shield').waitFor({ state: 'hidden', timeout: 5000 });
     }
+    await page.locator('.stat-card.balance .balance-value').waitFor({ state: 'visible' });
+    await page.locator('.trend-chart .income-line').waitFor({ state: 'visible' });
+    await page.locator('.trend-chart .expense-line').waitFor({ state: 'visible' });
+    await page.getByRole('button', { name: '12 meses' }).click();
+    await page.waitForFunction(() =>
+      document.querySelector('button[aria-pressed="true"]')?.textContent?.includes('12 meses') ?? false
+    );
+    await measureViewport(page, 'dashboard-v4', width);
     await checkDialog(page, width, 'crear-transaccion', async () => {
-      await page.locator('.btn-add').click();
+      await page.getByRole('button', { name: 'Nueva transacción', exact: true }).click();
     });
 
     await page.goto(base + '/goals', { waitUntil: 'domcontentloaded' });

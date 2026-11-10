@@ -1,39 +1,68 @@
-<div class="stats-grid">
+<div class="stats-grid" aria-live="polite">
   @if (loading()) {
-    @for (i of [1, 2, 3, 4]; track i) {
-      <div class="stat-card skeleton"></div>
-    }
+    <div class="stat-card balance skeleton" aria-label="Cargando balance"></div>
+    <div class="stat-card income skeleton" aria-label="Cargando ingresos"></div>
+    <div class="stat-card expense skeleton" aria-label="Cargando gastos"></div>
+    <div class="stat-card savings skeleton" aria-label="Cargando tasa de ahorro"></div>
+  } @else if (loadError()) {
+    <div class="stats-error" role="alert">
+      <strong>No pudimos cargar tu resumen financiero.</strong>
+      <span>Tu información permanece intacta. Comprueba tu conexión y vuelve a intentarlo.</span>
+      <button type="button" (click)="load()">Volver a intentar</button>
+    </div>
   } @else {
-    <div class="stat-card income">
-      <div class="stat-icon">↑</div>
-      <div class="stat-info">
-        <span class="stat-label">Ingresos totales</span>
-        <span class="stat-value">{{ safeStats().totalIncome | appCurrency }}</span>
+    <article class="stat-card balance" [class.negative]="safeStats().balance < 0">
+      <div class="balance-top">
+        <span class="balance-kicker">BALANCE DE MOVIMIENTOS</span>
+        <img src="/finflow-icon-classic.svg" width="42" height="42" alt="" aria-hidden="true"/>
       </div>
-    </div>
+      <div class="balance-content">
+        <span class="balance-subtitle">Ingresos menos gastos registrados</span>
+        <strong class="balance-value">{{ safeStats().balance | appCurrency }}</strong>
+        <p>Conoce tu balance para decidir con claridad. El saldo de cada cuenta se consulta en Mis cuentas.</p>
+      </div>
+      <a routerLink="/accounts" class="balance-cta">
+        Ver mis cuentas <span aria-hidden="true">↗</span>
+      </a>
+      <div class="balance-decoration" aria-hidden="true"></div>
+    </article>
 
-    <div class="stat-card expense">
-      <div class="stat-icon">↓</div>
-      <div class="stat-info">
-        <span class="stat-label">Gastos totales</span>
-        <span class="stat-value">{{ safeStats().totalExpenses | appCurrency }}</span>
+    <article class="stat-card income">
+      <div class="metric-top">
+        <span class="metric-icon income-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </span>
+        <span class="metric-arrow" aria-hidden="true">↗</span>
       </div>
-    </div>
+      <div class="metric-info">
+        <span class="stat-label">Ingresos registrados</span>
+        <strong class="stat-value">{{ safeStats().totalIncome | appCurrency }}</strong>
+      </div>
+    </article>
 
-    <div class="stat-card balance" [class.negative]="safeStats().balance < 0">
-      <div class="stat-icon">⚖</div>
-      <div class="stat-info">
-        <span class="stat-label">Balance</span>
-        <span class="stat-value">{{ safeStats().balance | appCurrency }}</span>
+    <article class="stat-card expense">
+      <div class="metric-top">
+        <span class="metric-icon expense-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14m7-7-7 7-7-7"/></svg>
+        </span>
+        <span class="metric-arrow" aria-hidden="true">↗</span>
       </div>
-    </div>
+      <div class="metric-info">
+        <span class="stat-label">Gastos registrados</span>
+        <strong class="stat-value">{{ safeStats().totalExpenses | appCurrency }}</strong>
+      </div>
+    </article>
 
-    <div class="stat-card savings">
-      <div class="stat-icon">🎯</div>
-      <div class="stat-info">
-        <span class="stat-label">Tasa de ahorro</span>
-        <span class="stat-value">{{ safeStats().savingsRate | number: '1.1-1' }}%</span>
+    <article class="stat-card savings">
+      <div class="savings-details">
+        <span class="stat-label">TASA DE AHORRO</span>
+        <strong class="savings-value">{{ safeStats().savingsRate | number: '1.1-1' }}%</strong>
+        <small>Proporción estimada de tus ingresos que conservas</small>
       </div>
-    </div>
+      <div class="savings-progress" role="progressbar" [attr.aria-valuenow]="savingsProgress()"
+           aria-valuemin="0" aria-valuemax="100" aria-label="Tasa de ahorro acotada a 0–100%">
+        <span [style.width.%]="savingsProgress()"></span>
+      </div>
+    </article>
   }
 </div>

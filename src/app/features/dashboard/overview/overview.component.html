@@ -1,31 +1,87 @@
-<section class="overview-card" aria-label="Resumen de movimientos">
+<section class="overview-card" aria-labelledby="trend-title">
   <div class="card-header">
-    <div><span class="panel-kicker">DISTRIBUCIÓN</span><h2>Resumen de movimientos</h2></div>
-    <div class="scope-toggle" aria-label="Periodo">
-      <button type="button" class="scope-btn" [class.active]="scope() === 'month'" (click)="setScope('month')">Este mes</button>
-      <button type="button" class="scope-btn" [class.active]="scope() === 'all'" (click)="setScope('all')">Todo</button>
+    <div>
+      <span class="panel-kicker">EVOLUCIÓN FINANCIERA</span>
+      <h2 id="trend-title">Actividad de tus movimientos</h2>
+    </div>
+    <div class="scope-toggle" role="group" aria-label="Periodo del gráfico">
+      <button type="button" class="scope-btn" [class.active]="scope() === 'six'"
+              [attr.aria-pressed]="scope() === 'six'" (click)="setScope('six')">6 meses</button>
+      <button type="button" class="scope-btn" [class.active]="scope() === 'year'"
+              [attr.aria-pressed]="scope() === 'year'" (click)="setScope('year')">12 meses</button>
     </div>
   </div>
-  <div class="tabs" aria-label="Tipo de movimiento">
-    <button type="button" class="tab" [class.active]="filter() === 'all'" (click)="setFilter('all')">Todo</button>
-    <button type="button" class="tab" [class.active]="filter() === 'income'" (click)="setFilter('income')">Ingresos</button>
-    <button type="button" class="tab" [class.active]="filter() === 'expense'" (click)="setFilter('expense')">Egresos</button>
+  <div class="tabs" role="group" aria-label="Series que se muestran en el gráfico">
+    <button type="button" class="tab" [class.active]="filter() === 'all'"
+            [attr.aria-pressed]="filter() === 'all'" (click)="setFilter('all')">Ambos</button>
+    <button type="button" class="tab" [class.active]="filter() === 'income'"
+            [attr.aria-pressed]="filter() === 'income'" (click)="setFilter('income')">Ingresos</button>
+    <button type="button" class="tab" [class.active]="filter() === 'expense'"
+            [attr.aria-pressed]="filter() === 'expense'" (click)="setFilter('expense')">Gastos</button>
   </div>
+
   @if (loading()) {
-    <div class="chart-skeleton"></div>
-  } @else if (totalIncome() === 0 && totalExpenses() === 0) {
-    <div class="chart-empty"><span class="empty-symbol" aria-hidden="true">◎</span><strong>Tu actividad aparecerá aquí</strong><span>Registra un ingreso o gasto para visualizar tu balance.</span></div>
+    <div class="chart-skeleton" aria-label="Cargando gráfico de movimientos"></div>
+  } @else if (loadError()) {
+    <div class="chart-empty" role="alert">
+      <strong>No pudimos cargar la actividad.</strong>
+      <span>Vuelve a intentarlo sin perder tus filtros ni tus datos.</span>
+      <button type="button" class="retry-btn" (click)="load()">Reintentar</button>
+    </div>
+  } @else if (chartPoints().length === 0) {
+    <div class="chart-empty">
+      <span class="empty-symbol" aria-hidden="true">↗</span>
+      <strong>Tu actividad aparecerá aquí</strong>
+      <span>Registra ingresos y gastos para conocer cómo evoluciona tu dinero.</span>
+    </div>
   } @else {
-    <div class="insight-layout">
-      <div class="chart-wrap">
-        <canvas #chartCanvas width="320" height="320" role="img" aria-label="Gráfico de ingresos y egresos"></canvas>
-        <div class="chart-center"><span class="net-label">Balance neto</span><span class="net-value" [class.positive]="netValue() >= 0" [class.negative]="netValue() < 0">{{ netValue() | appCurrency }}</span></div>
+    <div class="chart-surface">
+      <svg viewBox="0 0 680 210" xmlns="http://www.w3.org/2000/svg"
+           class="trend-chart" role="img"
+           [attr.aria-label]="'Evolución mensual de ingresos y gastos, últimos ' + (scope() === 'six' ? '6' : '12') + ' meses disponibles'">
+        <defs>
+          <linearGradient id="ff-trend-income-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#477cff" stop-opacity=".14"/>
+            <stop offset="1" stop-color="#477cff" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <g class="grid-lines" aria-hidden="true">
+          <line x1="28" y1="42" x2="652" y2="42"/>
+          <line x1="28" y1="84" x2="652" y2="84"/>
+          <line x1="28" y1="126" x2="652" y2="126"/>
+          <line x1="28" y1="170" x2="652" y2="170"/>
+        </g>
+        @if (filter() !== 'expense') {
+          <path [attr.d]="incomePath()" class="trend-line income-line"/>
+          @for (point of chartPoints(); track point.monthKey) {
+            <circle [attr.cx]="point.x" [attr.cy]="point.incomeY" r="3.8" class="trend-dot income-dot"/>
+          }
+        }
+        @if (filter() !== 'income') {
+          <path [attr.d]="expensePath()" class="trend-line expense-line"/>
+          @for (point of chartPoints(); track point.monthKey) {
+            <circle [attr.cx]="point.x" [attr.cy]="point.expenseY" r="3.8" class="trend-dot expense-dot"/>
+          }
+        }
+        @for (point of chartPoints(); track point.monthKey) {
+          <text [attr.x]="point.x" y="199" text-anchor="middle" class="chart-month">{{ point.month }}</text>
+        }
+      </svg>
+    </div>
+    <div class="chart-summary" aria-label="Resumen del periodo seleccionado">
+      <div class="insight-row">
+        <span class="insight-heading"><span class="legend-dot income"></span> Ingresos</span>
+        <strong>{{ totalIncome() | appCurrency }}</strong>
       </div>
-      <div class="insight-details">
-        <div class="insight-row"><div class="insight-heading"><span class="legend-dot income"></span><span>Ingresos</span></div><strong class="income-value">{{ totalIncome() | appCurrency }}</strong></div>
-        <div class="insight-row"><div class="insight-heading"><span class="legend-dot expense"></span><span>Gastos</span></div><strong class="expense-value">{{ totalExpenses() | appCurrency }}</strong></div>
-        <p class="insight-note">Tu balance refleja la diferencia entre ingresos y gastos del periodo seleccionado.</p>
+      <div class="insight-row">
+        <span class="insight-heading"><span class="legend-dot expense"></span> Gastos</span>
+        <strong>{{ totalExpenses() | appCurrency }}</strong>
+      </div>
+      <div class="insight-row net-row">
+        <span class="insight-heading">Balance del periodo</span>
+        <strong [class.negative]="netValue() < 0">{{ netValue() | appCurrency }}</strong>
       </div>
     </div>
+    <p class="insight-note">Tendencia calculada a partir de los meses disponibles en tu historial, sin estimaciones.</p>
   }
 </section>
