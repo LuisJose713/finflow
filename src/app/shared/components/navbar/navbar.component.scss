@@ -240,3 +240,32 @@
 .brand-symbol { display:block; width:38px; height:38px; border-radius:12px; object-fit:contain; flex-shrink:0; }
 .brand-lockup { display:block; min-width:0; flex:1 1 0; width:100%; max-width:155px; max-height:45px; height:auto; object-fit:contain; object-position:left; }
 @media(max-width:768px) { .sidebar.collapsed .brand-lockup { display:block; } .sidebar.collapsed .brand-symbol { display:none; } }
+
+
+/* FinFlow atelier: unobtrusive, fully scrollable navigation.
+   Keep wheel, touch, trackpad and keyboard scrolling without the
+   browser's bright native scrollbar cutting through the dark rail. */
+.sidebar .nav {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-inline: .15rem;
+  margin-inline: -.15rem;
+  scroll-padding-block: .65rem;
+}
+.sidebar .nav::-webkit-scrollbar {
+  display: none;
+}
+.sidebar .nav-item {
+  flex-shrink: 0;
+  margin-inline: .1rem;
+}
+.sidebar .nav-item:focus-visible {
+  outline-offset: -3px;
+}
+@media (max-width: 768px) {
+  .sidebar .nav {
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+}
