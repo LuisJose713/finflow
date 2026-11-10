@@ -18,14 +18,14 @@
        <span class="recurring-overline">ORGANIZA TUS PAGOS</span><h2 id="recurring-new-title">Programar movimiento</h2>
        <p>Los días 1 al 28 se repiten todos los meses sin errores de calendario.</p>
        <form (ngSubmit)="create()" novalidate>
-         <label for="recurring-title">Descripción</label>
+         <label for="recurring-title">Título</label>
          <input id="recurring-title" [(ngModel)]="title" name="title" maxlength="120" placeholder="Ej. Salario o arriendo" required/>
          <label for="recurring-type">Tipo</label>
          <select id="recurring-type" name="type" [ngModel]="type" (ngModelChange)="changeType($event)">
            <option value="expense">Gasto</option><option value="income">Ingreso</option>
          </select>
          <label for="recurring-amount">Monto mensual (COP)</label>
-         <input id="recurring-amount" type="number" min="0.01" step="0.01" [(ngModel)]="amount" name="amount" required/>
+         <input id="recurring-amount" appCurrencyInput type="text" inputmode="decimal" [(ngModel)]="amount" name="amount" required/>
          <label for="recurring-category">Categoría</label>
          <select id="recurring-category" [(ngModel)]="categoryId" name="categoryId" required><option [ngValue]="null">Selecciona</option>
            <option *ngFor="let c of categoriesForType()" [ngValue]="c.id">{{c.name}}</option></select>
