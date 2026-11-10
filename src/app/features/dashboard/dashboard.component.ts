@@ -1,10 +1,9 @@
-import { Component, inject, ViewChild, signal, computed, input } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ExportPdfService } from '../../core/services/export-pdf.service';
 import { ToastService } from '../../core/services/toast.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
-import { AddTransactionComponent } from '../../shared/components/add-transaction/add-transaction.component';
 import { ToastContainerComponent } from '../../shared/components/toast-container/toast-container.component';
 import { TransactionStatsComponent } from './transaction-stats/transaction-stats.component';
 import { OverviewComponent } from './overview/overview.component';
@@ -16,7 +15,6 @@ import { RecentTransactionsComponent } from './recent-transactions/recent-transa
   imports: [
     RouterLink,
     NavbarComponent,
-    AddTransactionComponent,
     ToastContainerComponent,
     TransactionStatsComponent,
     OverviewComponent,
@@ -26,13 +24,9 @@ import { RecentTransactionsComponent } from './recent-transactions/recent-transa
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent {
-  /** Render the real Dashboard inside the isolated V4 design showroom. */
-  readonly previewMode = input(false);
   private authService = inject(AuthService);
   private exportService = inject(ExportPdfService);
   private toast = inject(ToastService);
-
-  @ViewChild('recentTx') recentTx!: RecentTransactionsComponent;
 
   // Señal para el usuario
   user = signal(this.authService.currentUser());
@@ -45,10 +39,6 @@ export class DashboardComponent {
   // Si quieres actualizar el usuario después de login
   refreshUser() {
     this.user.set(this.authService.currentUser());
-  }
-
-  onTransactionCreated() {
-    this.recentTx?.load();
   }
 
   exportPdf() {
