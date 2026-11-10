@@ -31,5 +31,7 @@ jobs:
         run: npm ci
       - name: TypeScript typecheck
         run: npx tsc --noEmit --project tsconfig.app.json
+      - name: Verify FinFlow brand
+        run: node scripts/verify-brand.mjs
       - name: Production build
         run: npm run build:prod

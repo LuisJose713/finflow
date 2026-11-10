@@ -2,8 +2,8 @@
 <div class="overlay" *ngIf="mobileOpen()" (click)="closeMobile()" aria-hidden="true"></div>
 <aside id="finflow-sidebar" class="sidebar" [class.collapsed]="collapsed() && !mobileOpen()" [class.open]="mobileOpen()" aria-label="Navegación principal">
   <div class="sidebar-header">
-    <span class="logo" aria-hidden="true">F<span class="brand-dot">·</span></span>
-    <span class="brand" *ngIf="!collapsed() || mobileOpen()">FinFlow<small>PERSONAL FINANCE</small></span>
+    <img class="brand-symbol" src="/finflow-icon-classic.svg" alt="" aria-hidden="true" width="38" height="38" *ngIf="collapsed() && !mobileOpen()" />
+    <img class="brand-lockup" src="/finflow-logo.svg" alt="FinFlow" width="390" height="96" *ngIf="!collapsed() || mobileOpen()" />
     <button class="collapse-btn" type="button" (click)="toggleCollapse()" [attr.title]="collapsed() ? 'Expandir menú' : 'Contraer menú'" [attr.aria-label]="collapsed() ? 'Expandir menú' : 'Contraer menú'">{{ collapsed() ? '→' : '←' }}</button>
   </div>
   <div class="nav-group-label" *ngIf="!collapsed() || mobileOpen()">ESPACIO DE TRABAJO</div><nav class="nav" aria-label="Secciones">

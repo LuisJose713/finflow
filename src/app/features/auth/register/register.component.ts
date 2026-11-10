@@ -27,7 +27,7 @@ function passwordMatchValidator(
   template: `
     <div class="auth-wrapper">
       <section class="auth-showcase" aria-label="Conoce FinFlow">
-      <div class="showcase-brand"><span class="showcase-logo">F<span>·</span></span><span>FinFlow <small>PERSONAL FINANCE</small></span></div>
+      <div class="showcase-brand"><img class="showcase-brand-image" src="/finflow-logo.svg" alt="FinFlow" width="390" height="96" /></div>
       <div class="showcase-copy">
         <span class="showcase-eyebrow">TU DINERO, CON OTRO NIVEL DE CLARIDAD</span>
         <h2>La tranquilidad<br>de tener <em>el control.</em></h2>
@@ -38,7 +38,7 @@ function passwordMatchValidator(
     </section>
       <div class="auth-card">
         <div class="auth-header">
-          <div class="auth-brand"><span class="auth-brand-mark">F·</span> FinFlow</div>
+          <div class="auth-brand"><img class="auth-brand-image" src="/finflow-logo-light.svg" alt="FinFlow" width="390" height="96" /></div>
           <h1>Empieza a construir tu futuro</h1>
           <p>Crea tu cuenta y da el primer paso hacia el control de tus finanzas.</p>
         </div>
