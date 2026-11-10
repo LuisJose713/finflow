@@ -47,11 +47,28 @@ jobs:
             process.exit(1);
           }
           NODE
+      - name: Classify remaining development dependency advisories
+        shell: bash
+        run: |
+          npm audit --json > audit-all.json || true
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const report = JSON.parse(fs.readFileSync('audit-all.json', 'utf8'));
+          if (report.error) {
+            console.error('npm audit could not classify development dependencies');
+            process.exit(1);
+          }
+          const issues = Object.entries(report.vulnerabilities || {})
+            .filter(([, value]) => ['high', 'critical'].includes(value.severity))
+            .map(([name, value]) => ({ name, severity: value.severity,
+              isDirect: !!value.isDirect, fixAvailable: value.fixAvailable }));
+          console.log('High/critical development dependency advisories:', JSON.stringify(issues));
+          NODE
       - name: Preserve dependency security evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: finflow-production-npm-audit
-          path: audit-production.json
+          path: |\n            audit-production.json\n            audit-all.json
           retention-days: 14
           if-no-files-found: warn
