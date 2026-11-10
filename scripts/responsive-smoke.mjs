@@ -268,6 +268,44 @@ for (const width of widths) {
       failures.push(`${width}px ${authPath}: ${error.message.slice(0, 220)}`);
     }
   }
+
+  // The public V4 showroom uses the actual Dashboard Angular components,
+  // backed by memory-only, synthetic services. It must load WITHOUT a JWT
+  // and MUST NEVER request financial data from a live backend.
+  const previewApiCalls = [];
+  const observePreviewRequest = request => {
+    try {
+      const url = new URL(request.url());
+      if (url.hostname === 'finflow-backend-production.up.railway.app' ||
+          url.hostname === 'finflow-backend-yqhi.onrender.com' ||
+          (url.hostname === '127.0.0.1' && url.port === '8081')) {
+        previewApiCalls.push(url.pathname);
+      }
+    } catch {}
+  };
+  guestPage.on('request', observePreviewRequest);
+  try {
+    await guestPage.goto(base + '/design-preview', { waitUntil: 'domcontentloaded' });
+    await guestPage.getByText('DESIGN PREVIEW · V4').waitFor({ state: 'visible' });
+    await guestPage.locator('.stat-card.balance .balance-value').waitFor({ state: 'visible' });
+    await guestPage.locator('.trend-chart .income-line').waitFor({ state: 'visible' });
+    await guestPage.locator('.trend-chart .expense-line').waitFor({ state: 'visible' });
+    const value = (await guestPage.locator('.stat-card.balance .balance-value').innerText()).trim();
+    assert(value.includes('4.190.000') || value.includes('4,190,000'),
+      `${width}px design-preview: sample balance is missing, received ${value}`);
+    await guestPage.getByRole('button', { name: '12 meses' }).click();
+    assert(await guestPage.getByRole('button', { name: '12 meses' }).getAttribute('aria-pressed') === 'true',
+      `${width}px design-preview: period toggle did not update`);
+    await measureViewport(guestPage, 'design-preview', width);
+    assert(previewApiCalls.length === 0,
+      `${width}px design-preview: unexpected financial API requests: ${previewApiCalls.join(', ')}`);
+    await guestPage.screenshot({
+      path: path.join(output, `${width}-design-preview-v4.png`), fullPage: false
+    });
+  } catch (error) {
+    failures.push(`${width}px design-preview: ${error.message.slice(0, 420)}`);
+  }
+  guestPage.off('request', observePreviewRequest);
   await guest.close();
   console.log(`Viewport ${width}px checked`);
 }
