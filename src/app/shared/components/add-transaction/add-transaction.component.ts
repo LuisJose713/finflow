@@ -1,6 +1,6 @@
-import { Component, inject, signal, output, OnInit } from '@angular/core';
+import { Component, inject, signal, output, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { TransactionService } from '../../../core/services/transaction.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { AccountService, FinancialAccount } from '../../../core/services/account.service';
@@ -9,11 +9,11 @@ import { DashboardRefreshService } from '../../../core/services/dashboard-refres
 import { CreateTransactionRequest, TransactionType, Category } from '../../../core/models';
 
 @Component({
-  selector: 'app-add-transaction',
-  standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
-  templateUrl: './add-transaction.component.html',
-  styleUrls: ['./add-transaction.component.scss'],
+    selector: 'app-add-transaction',
+    imports: [ReactiveFormsModule],
+    templateUrl: './add-transaction.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./add-transaction.component.scss']
 })
 export class AddTransactionComponent implements OnInit {
   private fb             = inject(FormBuilder);

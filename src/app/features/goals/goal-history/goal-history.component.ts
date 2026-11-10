@@ -1,15 +1,15 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { GoalService } from '../../../core/services/goal.service';
 import { Goal, GoalContribution } from '../../../core/models';
 import { AppCurrencyPipe } from '../../../shared/pipes/currency.pipe';
 
 @Component({
-  selector: 'app-goal-history',
-  standalone: true,
-  imports: [CommonModule, DatePipe, DecimalPipe, AppCurrencyPipe],
-  templateUrl: './goal-history.component.html',
-  styleUrls: ['./goal-history.component.scss'],
+    selector: 'app-goal-history',
+    imports: [CommonModule, DatePipe, DecimalPipe, AppCurrencyPipe],
+    templateUrl: './goal-history.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./goal-history.component.scss']
 })
 export class GoalHistoryComponent {
   private goalService = inject(GoalService);

@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, ViewChild, computed, effect, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild, computed, effect, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet, RouterLink } from '@angular/router';
 import { catchError, filter, forkJoin, of } from 'rxjs';
 import { AuthService } from './core/services/auth.service';
@@ -6,10 +6,9 @@ import { PrivacyPolicy, PrivacyService } from './core/services/privacy.service';
 import { PrivacyPolicyComponent } from './shared/components/privacy-policy.component';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, RouterLink, PrivacyPolicyComponent],
-  template: `
+    selector: 'app-root',
+    imports: [RouterOutlet, RouterLink, PrivacyPolicyComponent],
+    template: `
     <router-outlet/>
     @if (needsConsent()) {
       <div class="privacy-shield">
@@ -82,7 +81,8 @@ import { PrivacyPolicyComponent } from './shared/components/privacy-policy.compo
       </div>
     }
   `,
-  styles: [`
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styles: [`
     .privacy-shield{position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;background:#061328e8;backdrop-filter:blur(8px);padding:clamp(.5rem,2vw,1.7rem)}
     .privacy-dialog{display:flex;flex-direction:column;width:min(100%,720px);max-height:calc(100dvh - 1rem);min-height:0;overflow:hidden;background:var(--bg-primary,#fff);color:var(--text-primary,#13253c);border-radius:18px;box-shadow:0 22px 75px #0007}
     .privacy-dialog header{padding:1.2rem clamp(1rem,3vw,1.8rem);border-bottom:1px solid var(--border,#dce2e9)}

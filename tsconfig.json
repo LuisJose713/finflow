@@ -17,13 +17,19 @@
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
-    "lib": ["ES2022", "dom"],
-    "baseUrl": "./",
     "paths": {
-      "@core/*":        ["src/app/core/*"],
-      "@features/*":   ["src/app/features/*"],
-      "@shared/*":     ["src/app/shared/*"],
-      "@environments/*": ["src/environments/*"]
+      "@core/*": [
+        "./src/app/core/*"
+      ],
+      "@features/*": [
+        "./src/app/features/*"
+      ],
+      "@shared/*": [
+        "./src/app/shared/*"
+      ],
+      "@environments/*": [
+        "./src/environments/*"
+      ]
     }
   },
   "angularCompilerOptions": {

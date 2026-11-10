@@ -11,13 +11,17 @@
       <div class="admin-emblem" aria-hidden="true">F·</div>
     </header>
 
-    <div *ngIf="loading()" class="admin-state" role="status">Cargando información de la plataforma…</div>
-    <section *ngIf="error()" class="admin-state admin-error" role="alert">
-      <p>{{ error() }}</p>
-      <button type="button" (click)="refresh()">Volver a intentar</button>
-    </section>
+    @if (loading()) {
+      <div class="admin-state" role="status">Cargando información de la plataforma…</div>
+    }
+    @if (error()) {
+      <section class="admin-state admin-error" role="alert">
+        <p>{{ error() }}</p>
+        <button type="button" (click)="refresh()">Volver a intentar</button>
+      </section>
+    }
 
-    <ng-container *ngIf="overview() as info">
+    @if (overview(); as info) {
       <section class="admin-section" aria-label="Usuarios de FinFlow">
         <div class="admin-section-heading">
           <div><span class="section-overline">CRECIMIENTO</span><h2>Usuarios de FinFlow</h2></div>
@@ -30,7 +34,6 @@
           <article class="admin-kpi"><span>Categorías personalizadas</span><strong>{{ info.customCategories | number }}</strong><small>Creadas por usuarios</small></article>
         </div>
       </section>
-
       <section class="admin-section" aria-label="Uso de las funcionalidades">
         <div class="admin-section-heading"><div><span class="section-overline">ACTIVIDAD</span><h2>Operaciones en la plataforma</h2></div></div>
         <div class="admin-kpi-grid">
@@ -40,26 +43,26 @@
           <article class="admin-kpi"><span>Gastos planeados</span><strong>{{ info.plannedExpenses | number }}</strong><small>{{ info.pendingExpenses }} pendientes</small></article>
         </div>
       </section>
-
       <section class="admin-section admin-activity-section" aria-labelledby="admin-activity-title">
         <div class="admin-section-heading">
           <div><span class="section-overline">EVOLUCIÓN</span><h2 id="admin-activity-title">Actividad mensual</h2></div>
           <span class="section-tag">Últimos seis meses</span>
         </div>
         <div class="admin-month-bars" role="img" aria-label="Gráfico de cantidad de transacciones por mes durante los últimos seis meses">
-          <div *ngFor="let month of info.monthlyActivity" class="admin-month-column">
-            <div class="admin-bar-track">
-              <div class="admin-month-bar" [style.height.%]="100 * month.transactions / monthMax()" aria-hidden="true"></div>
+          @for (month of info.monthlyActivity; track month) {
+            <div class="admin-month-column">
+              <div class="admin-bar-track">
+                <div class="admin-month-bar" [style.height.%]="100 * month.transactions / monthMax()" aria-hidden="true"></div>
+              </div>
+              <strong>{{ month.transactions }}</strong>
+              <span>{{ month.month }}</span>
+              <small>{{ month.signups }} altas</small>
             </div>
-            <strong>{{ month.transactions }}</strong>
-            <span>{{ month.month }}</span>
-            <small>{{ month.signups }} altas</small>
-          </div>
+          }
         </div>
       </section>
-
       <p class="admin-privacy-note">Privacidad por diseño: este panel muestra conteos agregados y actividad del producto, no montos, contraseñas ni movimientos privados de otros usuarios.</p>
-    </ng-container>
+    }
     <footer class="ae-vqor-credit">FinFlow · Creado por <strong>AEVQOR</strong></footer>
   </main>
 </div>

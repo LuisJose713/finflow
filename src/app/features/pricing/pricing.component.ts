@@ -1,12 +1,13 @@
-import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { BillingCatalog, BillingOffer, BillingPlanCode, BillingService } from '../../core/services/billing.service';
 @Component({
-  selector:'app-pricing',standalone:true,imports:[CommonModule,FormsModule,RouterLink],
-  templateUrl:'./pricing.component.html',styleUrl:'./pricing.component.scss'
+    selector: 'app-pricing', imports: [FormsModule, RouterLink],
+    templateUrl: './pricing.component.html', changeDetection: ChangeDetectionStrategy.Eager,
+ styleUrl: './pricing.component.scss'
 })
 export class PricingComponent implements OnInit {
   private readonly billing=inject(BillingService);
