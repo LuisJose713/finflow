@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, effect, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { PlannedExpenseService } from '@core/services/planned-expense.service';
@@ -11,16 +11,16 @@ import { ToastContainerComponent } from '@shared/components/toast-container/toas
 import { AppCurrencyPipe } from '@shared/pipes/currency.pipe';
 
 @Component({
-    selector: 'app-planned-expenses',
-    imports: [
-        CommonModule, FormsModule, ReactiveFormsModule,
-        ToastContainerComponent,
-        NavbarComponent,
-        AppCurrencyPipe
-    ],
-    templateUrl: './planned-expenses.component.html',
-    changeDetection: ChangeDetectionStrategy.Eager,
-    styleUrls: ['./planned-expenses.component.scss']
+  selector: 'app-planned-expenses',
+  standalone: true,
+  imports: [
+    CommonModule, FormsModule, ReactiveFormsModule,
+    ToastContainerComponent,
+    NavbarComponent,
+    AppCurrencyPipe
+],
+  templateUrl: './planned-expenses.component.html',
+  styleUrls: ['./planned-expenses.component.scss'],
 })
 export class PlannedExpensesComponent {
   private peService      = inject(PlannedExpenseService);

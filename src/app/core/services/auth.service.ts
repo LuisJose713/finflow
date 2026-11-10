@@ -27,12 +27,9 @@ export class AuthService {
   constructor() {
     // Refresh trusted role/identity from the API after deploy; old stored profiles
     // may not yet contain the role field. Never rely on this UI check for authorization.
-    const tokenAtStartup = this._token();
-    if (tokenAtStartup) {
+    if (this._token()) {
       this.http.get<User>(`${this.apiUrl}/me`).subscribe({
         next: user => {
-          // Ignore an outdated profile response after login, logout or account switching.
-          if (localStorage.getItem('token') !== tokenAtStartup) return;
           localStorage.setItem('user', JSON.stringify(user));
           this._currentUser.set(user);
         },

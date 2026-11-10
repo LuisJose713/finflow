@@ -12,16 +12,10 @@
       <strong>{{period()}}</strong>
       <button type="button" (click)="changeMonth(1)" [disabled]="loading()" aria-label="Mes siguiente">›</button>
     </nav>
-    @if (error()) {
-      <p class="budget-message bad" role="alert">{{error()}}</p>
-    }
-    @if (notice()) {
-      <p class="budget-message good" role="status">{{notice()}}</p>
-    }
-    @if (loading()) {
-      <p class="budget-loading" role="status">Consultando tus presupuestos…</p>
-    }
-    @if (!loading()) {
+    <p *ngIf="error()" class="budget-message bad" role="alert">{{error()}}</p>
+    <p *ngIf="notice()" class="budget-message good" role="status">{{notice()}}</p>
+    <p *ngIf="loading()" class="budget-loading" role="status">Consultando tus presupuestos…</p>
+    <ng-container *ngIf="!loading()">
       <section class="budget-kpis" aria-label="Resumen">
         <article><span>Presupuesto del mes</span><strong>{{totalLimit() | currency:'COP':'symbol-narrow':'1.0-2'}}</strong><small>Solo límites asignados</small></article>
         <article><span>Gastos contabilizados</span><strong>{{totalSpent() | currency:'COP':'symbol-narrow':'1.0-2'}}</strong><small>Gastos realizados en COP</small></article>
@@ -36,60 +30,48 @@
             <label for="budget-category">Categoría de gastos</label>
             <select id="budget-category" name="category" [(ngModel)]="selectedCategory" [disabled]="editing()!==null" required>
               <option [ngValue]="null">Elige una categoría</option>
-              @for (c of available(); track c) {
-                <option [ngValue]="c.id">{{c.name}}</option>
-              }
-              @if (editing()!==null) {
-                <option [ngValue]="selectedCategory">{{ selectedCategoryName() }}</option>
-              }
+              <option *ngFor="let c of available()" [ngValue]="c.id">{{c.name}}</option>
+              <option *ngIf="editing()!==null" [ngValue]="selectedCategory">{{ selectedCategoryName() }}</option>
             </select>
             <label for="budget-amount">Límite mensual (COP)</label>
             <input id="budget-amount" name="amount" [(ngModel)]="amount" type="number" min="0.01"
               step="0.01" inputmode="decimal" placeholder="Ej. 350000" required>
             <button class="budget-primary" type="submit" [disabled]="busy()">{{busy()?'Guardando…':(editing()===null?'Crear presupuesto':'Guardar cambios')}}</button>
-            @if (editing()!==null) {
-              <button class="budget-secondary" type="button" (click)="reset()">Cancelar edición</button>
-            }
+            <button *ngIf="editing()!==null" class="budget-secondary" type="button" (click)="reset()">Cancelar edición</button>
           </form>
           <p class="budget-note">Los gastos planeados pendientes no cuentan como pagos realizados. Las cifras mostradas corresponden a COP.</p>
         </section>
         <section class="budget-panel" aria-labelledby="budget-list-heading">
           <div class="budget-list-heading"><div><span class="budget-overline">SEGUIMIENTO</span>
           <h2 id="budget-list-heading">Tus límites</h2></div><span class="budget-count">{{budgets().length}}</span></div>
-          @if (budgets().length===0) {
-            <div class="budget-empty">
-              <span aria-hidden="true">◎</span><h3>Cada peso merece un plan</h3>
-              <p>Crea tu primer presupuesto para empezar a visualizar el avance del mes.</p>
-            </div>
-          }
-          @if (budgets().length>0) {
-            <ul class="budget-list">
-              @for (b of budgets(); track b) {
-                <li>
-                  <div class="budget-line"><strong>{{b.categoryName}}</strong>
-                  <span class="budget-status" [class.warning]="b.status==='near'" [class.danger]="b.status==='over'">
-                    {{b.status==='over'?'Límite superado':(b.status==='near'?'Cerca del límite':'En control')}}
-                  </span>
-                </div>
-                <div class="budget-line amounts"><span>{{b.spent|currency:'COP':'symbol-narrow':'1.0-2'}} gastados</span>
+          <div *ngIf="budgets().length===0" class="budget-empty">
+            <span aria-hidden="true">◎</span><h3>Cada peso merece un plan</h3>
+            <p>Crea tu primer presupuesto para empezar a visualizar el avance del mes.</p>
+          </div>
+          <ul class="budget-list" *ngIf="budgets().length>0">
+            <li *ngFor="let b of budgets()">
+              <div class="budget-line"><strong>{{b.categoryName}}</strong>
+                <span class="budget-status" [class.warning]="b.status==='near'" [class.danger]="b.status==='over'">
+                  {{b.status==='over'?'Límite superado':(b.status==='near'?'Cerca del límite':'En control')}}
+                </span>
+              </div>
+              <div class="budget-line amounts"><span>{{b.spent|currency:'COP':'symbol-narrow':'1.0-2'}} gastados</span>
                 <span>de {{b.limitAmount|currency:'COP':'symbol-narrow':'1.0-2'}}</span></div>
-                <div class="budget-progress" role="progressbar" [attr.aria-label]="'Consumo de '+b.categoryName"
-                  [attr.aria-valuenow]="progress(b)" aria-valuemin="0" aria-valuemax="100">
-                  <div [style.width.%]="progress(b)" [class.warning]="b.status==='near'" [class.danger]="b.status==='over'"></div>
-                </div>
-                <div class="budget-line lower">
-                  <span [class.negative]="b.remaining<0">{{b.remaining<0?'Exceso':'Disponible'}}:
+              <div class="budget-progress" role="progressbar" [attr.aria-label]="'Consumo de '+b.categoryName"
+                [attr.aria-valuenow]="progress(b)" aria-valuemin="0" aria-valuemax="100">
+                <div [style.width.%]="progress(b)" [class.warning]="b.status==='near'" [class.danger]="b.status==='over'"></div>
+              </div>
+              <div class="budget-line lower">
+                <span [class.negative]="b.remaining<0">{{b.remaining<0?'Exceso':'Disponible'}}:
                   {{(b.remaining<0?-b.remaining:b.remaining)|currency:'COP':'symbol-narrow':'1.0-2'}}</span>
-                  <div><button type="button" (click)="edit(b)">Editar</button>
-                  <button type="button" class="delete" (click)="remove(b)">Eliminar</button></div>
-                </div>
-              </li>
-            }
+                <div><button type="button" (click)="edit(b)">Editar</button>
+                     <button type="button" class="delete" (click)="remove(b)">Eliminar</button></div>
+              </div>
+            </li>
           </ul>
-        }
-      </section>
-    </div>
-  }
-  <footer class="budget-brand">FinFlow · Creado por <strong>AEVQOR</strong></footer>
-</main>
+        </section>
+      </div>
+    </ng-container>
+    <footer class="budget-brand">FinFlow · Creado por <strong>AEVQOR</strong></footer>
+  </main>
 </div>

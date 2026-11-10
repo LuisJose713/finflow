@@ -1,15 +1,14 @@
-
-import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { BillingPlan, BillingPromotion, BillingPlanCode, BillingService, DiscountType, PromotionInput } from '../../core/services/billing.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 
 @Component({
-    selector: 'app-admin-billing',
-    imports: [FormsModule, RouterLink, NavbarComponent],
-    templateUrl: './admin-billing.component.html', changeDetection: ChangeDetectionStrategy.Eager,
- styleUrl: './admin-billing.component.scss'
+  selector: 'app-admin-billing', standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink, NavbarComponent],
+  templateUrl: './admin-billing.component.html', styleUrl: './admin-billing.component.scss'
 })
 export class AdminBillingComponent implements OnInit {
   private readonly billing = inject(BillingService);

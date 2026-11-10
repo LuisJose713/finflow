@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
@@ -12,11 +12,11 @@ import {
 import { PrivacyPolicyComponent } from '../../shared/components/privacy-policy.component';
 
 @Component({
-    selector: 'app-privacy-info',
-    imports: [RouterLink, FormsModule, PrivacyPolicyComponent],
-    templateUrl: './privacy-info.component.html',
-    changeDetection: ChangeDetectionStrategy.Eager,
-    styleUrl: './privacy-info.component.scss'
+  selector: 'app-privacy-info',
+  standalone: true,
+  imports: [RouterLink, FormsModule, PrivacyPolicyComponent],
+  templateUrl: './privacy-info.component.html',
+  styleUrl: './privacy-info.component.scss',
 })
 export class PrivacyInfoComponent implements OnInit {
   private readonly auth = inject(AuthService);

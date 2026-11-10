@@ -3,26 +3,20 @@
     <div><span class="panel-kicker">ÚLTIMOS MOVIMIENTOS</span><h2>Transacciones recientes</h2></div>
     <span class="badge">Últimas 5</span>
   </div>
-  @if (loading()) {
-    <div class="list">@for (i of [1, 2, 3, 4, 5]; track i) {
-      <div class="transaction-item skeleton"></div>
-    }</div>
-  }
-  @if (!loading() && transactions().length === 0) {
+  <ng-container *ngIf="loading()">
+    <div class="list"><div *ngFor="let i of [1, 2, 3, 4, 5]" class="transaction-item skeleton"></div></div>
+  </ng-container>
+  <ng-container *ngIf="!loading() && transactions().length === 0">
     <div class="empty-state"><p>No hay transacciones aún</p><small>Agrega tu primera transacción para comenzar</small></div>
-  }
-  @if (!loading() && transactions().length > 0) {
-    <ul class="list">
-      @for (tx of transactions(); track trackById($index, tx)) {
-        <li class="transaction-item">
-          <div class="tx-icon" [class]="tx.type" aria-hidden="true">{{ tx.type === "income" ? "↑" : "↓" }}</div>
-          <div class="tx-info"><span class="tx-title">{{ tx.description }}</span><span class="tx-meta">{{ tx.date | date: "dd MMM yyyy" }}</span></div>
-          <div class="tx-actions">
-            <span class="tx-amount" [class.income]="tx.type === 'income'" [class.expense]="tx.type === 'expense'">{{ tx.type === "income" ? "+" : "-" }}{{ tx.amount | appCurrency }}</span>
-            <button type="button" class="btn-delete" (click)="confirmDelete(tx)" [attr.aria-label]="'Eliminar transacción ' + tx.description" title="Eliminar transacción">✕</button>
-          </div>
-        </li>
-      }
-    </ul>
-  }
+  </ng-container>
+  <ul *ngIf="!loading() && transactions().length > 0" class="list">
+    <li *ngFor="let tx of transactions(); trackBy: trackById" class="transaction-item">
+      <div class="tx-icon" [class]="tx.type" aria-hidden="true">{{ tx.type === "income" ? "↑" : "↓" }}</div>
+      <div class="tx-info"><span class="tx-title">{{ tx.description }}</span><span class="tx-meta">{{ tx.date | date: "dd MMM yyyy" }}</span></div>
+      <div class="tx-actions">
+        <span class="tx-amount" [class.income]="tx.type === 'income'" [class.expense]="tx.type === 'expense'">{{ tx.type === "income" ? "+" : "-" }}{{ tx.amount | appCurrency }}</span>
+        <button type="button" class="btn-delete" (click)="confirmDelete(tx)" [attr.aria-label]="'Eliminar transacción ' + tx.description" title="Eliminar transacción">✕</button>
+      </div>
+    </li>
+  </ul>
 </section>

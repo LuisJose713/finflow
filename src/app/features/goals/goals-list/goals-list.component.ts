@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { GoalService } from '../../../core/services/goal.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -12,20 +12,20 @@ import { GoalHistoryComponent } from '../goal-history/goal-history.component';
 
 
 @Component({
-    selector: 'app-goals-list',
-    imports: [
-        CommonModule,
-        DecimalPipe,
-        NavbarComponent,
-        ToastContainerComponent,
-        AppCurrencyPipe,
-        GoalFormComponent,
-        GoalAbonoComponent,
-        GoalHistoryComponent
-    ],
-    templateUrl: './goals-list.component.html',
-    changeDetection: ChangeDetectionStrategy.Eager,
-    styleUrls: ['./goals-list.component.scss']
+  selector: 'app-goals-list',
+  standalone: true,
+  imports: [
+    CommonModule,
+    DecimalPipe,
+    NavbarComponent,
+    ToastContainerComponent,
+    AppCurrencyPipe,
+    GoalFormComponent,
+    GoalAbonoComponent, 
+    GoalHistoryComponent
+  ],
+  templateUrl: './goals-list.component.html',
+  styleUrls: ['./goals-list.component.scss'],
 })
 export class GoalsListComponent implements OnInit {
   private goalService = inject(GoalService);
