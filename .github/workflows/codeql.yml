@@ -1,0 +1,37 @@
+name: CodeQL — FinFlow frontend
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '37 3 * * 3'
+
+permissions:
+  contents: read
+  actions: read
+  security-events: write
+
+jobs:
+  analyze-typescript:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+      - name: Analyze frontend to a reviewable SARIF artifact
+        uses: github/codeql-action/analyze@v4
+        with:
+          upload: never
+          output: codeql-results
+      - name: Store security findings until GitHub code scanning is enabled
+        uses: actions/upload-artifact@v4
+        with:
+          name: finflow-codeql-sarif
+          path: codeql-results
+          retention-days: 14
