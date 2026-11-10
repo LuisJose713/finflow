@@ -12,6 +12,14 @@ export const routes: Routes = [
     redirectTo: "/login",
     pathMatch: "full",
   },
+  // Preview branch only: public showroom with synthetic in-memory data.
+  {
+    path: "design-preview",
+    loadComponent: () =>
+      import("./features/design-preview/design-preview.component").then(
+        (m) => m.DesignPreviewComponent,
+      ),
+  },
   {
     path: "login",
     loadComponent: () =>
