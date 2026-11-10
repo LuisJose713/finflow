@@ -41,7 +41,7 @@
             <label for="acc-type">Tipo</label>
             <select id="acc-type" [(ngModel)]="type" name="type"><option *ngFor="let t of types" [ngValue]="t.value">{{t.label}}</option></select>
             <label for="acc-initial">Saldo inicial (COP)</label>
-            <input id="acc-initial" [(ngModel)]="opening" name="opening" type="number" min="0" step="0.01" inputmode="decimal" required/>
+            <input id="acc-initial" appCurrencyInput [(ngModel)]="opening" name="opening" type="text" inputmode="decimal" required/>
             <button type="submit" class="account-primary" [disabled]="saving()">{{saving()?'Guardando…':'Crear billetera'}}</button>
           </form>
         </section>
@@ -56,7 +56,7 @@
             <select id="to-account" [(ngModel)]="toId" name="to" required><option [ngValue]="null">Destino</option>
               <option *ngFor="let a of active()" [ngValue]="a.id">{{a.name}}</option></select>
             <label for="transfer-amount">Importe (COP)</label>
-            <input id="transfer-amount" type="number" [(ngModel)]="amount" name="amount" min="0.01" step="0.01" inputmode="decimal" required/>
+            <input id="transfer-amount" appCurrencyInput type="text" [(ngModel)]="amount" name="amount" inputmode="decimal" required/>
             <label for="transfer-note">Nota (opcional)</label>
             <input id="transfer-note" [(ngModel)]="note" name="note" maxlength="255" placeholder="Ej. Ahorro del mes"/>
             <button type="submit" class="account-primary" [disabled]="saving()||active().length<2">Transferir</button>
