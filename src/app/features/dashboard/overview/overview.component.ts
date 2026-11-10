@@ -28,6 +28,8 @@ export class OverviewComponent {
   readonly monthlyData = signal<MonthlyData[]>([]);
   readonly filter = signal<'all' | 'income' | 'expense'>('all');
   readonly scope = signal<'six' | 'year'>('six');
+  readonly selectedMonth = signal<string | null>(null);
+  readonly activePoint = computed(() => this.chartPoints().find(p => p.monthKey === this.selectedMonth()) ?? null);
 
   readonly filteredData = computed(() => {
     const count = this.scope() === 'six' ? 6 : 12;
@@ -87,7 +89,24 @@ export class OverviewComponent {
     });
   }
 
-  setScope(scope: 'six' | 'year'): void { this.scope.set(scope); }
+  setScope(scope: 'six' | 'year'): void { this.scope.set(scope); this.selectedMonth.set(null); }
+  selectPoint(monthKey: string): void { this.selectedMonth.set(monthKey); }
+  selectFromPointer(event: PointerEvent): void {
+    const svg = event.currentTarget as SVGSVGElement;
+    const bounds = svg.getBoundingClientRect();
+    const rows = this.chartPoints();
+    if (!bounds.width || !rows.length) return;
+    const x = ((event.clientX - bounds.left) / bounds.width) * 680;
+    const nearest = rows.reduce((best, point) => Math.abs(point.x - x) < Math.abs(best.x - x) ? point : best);
+    this.selectedMonth.set(nearest.monthKey);
+  }
+  moveSelection(delta: number): void {
+    const rows = this.chartPoints();
+    if (!rows.length) return;
+    const current = rows.findIndex(row => row.monthKey === this.selectedMonth());
+    const index = Math.max(0, Math.min(rows.length - 1, (current < 0 ? rows.length - 1 : current) + delta));
+    this.selectedMonth.set(rows[index].monthKey);
+  }
   setFilter(filter: 'all' | 'income' | 'expense'): void { this.filter.set(filter); }
 
   private amount(value: unknown): number {

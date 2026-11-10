@@ -49,3 +49,13 @@
   .chart-month { font-size: 15px; }
 }
 @media(prefers-reduced-motion:reduce) { .chart-skeleton { animation: none; } }
+
+/* Interactive exploration: touch drag, mouse drag, keyboard and month buttons. */
+.trend-chart { touch-action: pan-y; cursor: crosshair; }
+.trend-chart:focus-visible { outline: 2px solid #d7a94d; outline-offset: 3px; }
+.selection-guide { stroke: #d7a94d; stroke-width: 1.5; stroke-dasharray: 4 4; pointer-events: none; }
+.chart-points { display: flex; gap: .25rem; justify-content: space-between; flex-wrap: wrap; margin-top: .3rem; }
+.point-button { background: transparent; color: var(--text-secondary); border: 1px solid transparent; border-radius: 7px; padding: .4rem .35rem; min-width: 36px; cursor: pointer; font: inherit; font-size: .72rem; }
+.point-button.selected { border-color: #d7a94d; color: var(--text-primary); background: rgba(215,169,77,.12); }
+.point-button:focus-visible { outline: 2px solid #d7a94d; }
+.selected-values { display: flex; flex-wrap: wrap; gap: .45rem 1rem; align-items: center; margin-top: .65rem; padding: .75rem; border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary); font-size: .8rem; font-variant-numeric: tabular-nums; }
