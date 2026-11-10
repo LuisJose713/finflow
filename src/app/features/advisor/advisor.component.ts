@@ -38,7 +38,7 @@ import { DatePipe } from '@angular/common';
               <span class="brand-avatar" aria-hidden="true">F<span class="brand-dot">·</span></span>
               <span class="identity-copy"><strong>FinFlow AI</strong><small>Asistente de finanzas personales</small></span>
             </span>
-            <span class="conversation-status" aria-label="Conversación privada de esta sesión">
+            <span class="conversation-status" aria-label="Conversación actual">
               <span class="status-dot" aria-hidden="true"></span> Esta conversación
             </span>
           </div>
