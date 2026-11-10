@@ -268,6 +268,79 @@ for (const width of widths) {
       failures.push(`${width}px ${authPath}: ${error.message.slice(0, 220)}`);
     }
   }
+
+  // The public V4 showroom uses the actual Dashboard Angular components,
+  // backed by memory-only, synthetic services. It must load WITHOUT a JWT
+  // and MUST NEVER request financial data from a live backend.
+  const previewApiCalls = [];
+  const observePreviewRequest = request => {
+    try {
+      const url = new URL(request.url());
+      if (url.hostname === 'finflow-backend-production.up.railway.app' ||
+          url.hostname === 'finflow-backend-yqhi.onrender.com' ||
+          (url.hostname === '127.0.0.1' && url.port === '8081')) {
+        previewApiCalls.push(url.pathname);
+      }
+    } catch {}
+  };
+  guestPage.on('request', observePreviewRequest);
+  try {
+    await guestPage.goto(base + '/design-preview', { waitUntil: 'domcontentloaded' });
+    await guestPage.getByText('FINFLOW V4 · DESIGN STUDIO').waitFor({ state: 'visible' });
+    await guestPage.locator('.stat-card.balance .balance-value').waitFor({ state: 'visible' });
+    await guestPage.locator('.trend-chart .income-line').waitFor({ state: 'visible' });
+    await guestPage.locator('.trend-chart .expense-line').waitFor({ state: 'visible' });
+    const value = (await guestPage.locator('.stat-card.balance .balance-value').innerText()).trim();
+    assert(value.includes('4.190.000') || value.includes('4,190,000'),
+      `${width}px design-preview: sample balance is missing, received ${value}`);
+    await guestPage.getByRole('button', { name: '12 meses' }).click();
+    assert(await guestPage.getByRole('button', { name: '12 meses' }).getAttribute('aria-pressed') === 'true',
+      `${width}px design-preview: period toggle did not update`);
+    await measureViewport(guestPage, 'design-preview', width);
+    assert(previewApiCalls.length === 0,
+      `${width}px design-preview: unexpected financial API requests: ${previewApiCalls.join(', ')}`);
+    await guestPage.screenshot({
+      path: path.join(output, `${width}-design-preview-v4.png`), fullPage: false
+    });
+    // Review ALL V4 navigation windows and assert there are no financial API
+    // requests, no authentication redirect, and no page-width overflows.
+    const reviewSections = [
+      'transactions', 'accounts', 'goals', 'budgets', 'planned-expenses',
+      'recurring', 'categories', 'advisor', 'security', 'admin'
+    ];
+    for (const section of reviewSections) {
+      await guestPage.goto(base + '/design-preview/' + section, { waitUntil: 'domcontentloaded' });
+      await guestPage.locator('.studio-page-header h1').waitFor({ state: 'visible' });
+      assert(guestPage.url().includes('/design-preview/' + section),
+        `${width}px ${section}: redirected outside design preview`);
+      await measureViewport(guestPage, 'design-preview-' + section, width);
+      if (width === 375 || width === 1440) {
+        await guestPage.screenshot({
+          path: path.join(output, `${width}-design-${section}.png`), fullPage: false
+        });
+      }
+    }
+    // The transaction list has a working search, and all data stays in memory.
+    await guestPage.goto(base + '/design-preview/transactions', { waitUntil: 'domcontentloaded' });
+    await guestPage.getByRole('searchbox', { name: 'Buscar movimientos' }).fill('supermercado');
+    await guestPage.getByText('Supermercado', { exact: true }).waitFor({ state: 'visible' });
+    assert(await guestPage.locator('.movement-row').count() === 1,
+      `${width}px design-preview transactions: search should filter to one row`);
+    if (width === 375) {
+      // Actual mobile sidebar navigation, not just direct route navigation.
+      await guestPage.getByRole('button', { name: 'Abrir menú de FinFlow' }).click();
+      await guestPage.getByRole('link', { name: 'Metas' }).click();
+      await guestPage.locator('.studio-page-header h1').waitFor({ state: 'visible' });
+      assert((await guestPage.locator('.studio-page-header h1').innerText()).includes('Metas'),
+        `${width}px design-preview: sidebar navigation did not reach goals`);
+    }
+    assert(previewApiCalls.length === 0,
+      `${width}px design-preview: unexpected financial API requests after all windows: ${previewApiCalls.join(', ')}`);
+
+  } catch (error) {
+    failures.push(`${width}px design-preview: ${error.message.slice(0, 420)}`);
+  }
+  guestPage.off('request', observePreviewRequest);
   await guest.close();
   console.log(`Viewport ${width}px checked`);
 }

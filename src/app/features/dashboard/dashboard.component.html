@@ -1,30 +1,87 @@
 <div class="app-shell">
-  <app-navbar></app-navbar>
-  <main class="main-content">
-    <div class="dashboard-topline"><span class="live-dot"></span> FINFLOW <span class="topline-version">PANEL PERSONAL</span></div>
+  @if (!previewMode()) { <app-navbar></app-navbar> }
+
+  <main class="main-content" id="main-content">
+    <div class="dashboard-topline">
+      <span class="live-dot" aria-hidden="true"></span>
+      <span>FINFLOW / ESPACIO PERSONAL</span>
+      <span class="topline-version">RESUMEN FINANCIERO</span>
+    </div>
+
     <header class="page-header">
-      <div class="header-left">
-        <span class="eyebrow">TU ESPACIO FINANCIERO</span>
-        <h1>Tu dinero, <span class="gradient-word">bajo control.</span></h1>
-        <p class="greeting">Hola, {{ firstName() || "Usuario" }} 👋 · Tu panorama financiero empieza aquí.</p>
+      <div class="header-copy">
+        <span class="eyebrow">TU PANORAMA FINANCIERO</span>
+        <h1>Tu dinero, <span class="gradient-word">con claridad.</span></h1>
+        <p class="greeting">Hola, {{ firstName() || 'Usuario' }}. Así se mueve tu dinero.</p>
       </div>
       <div class="header-actions">
-        <button class="btn-export" (click)="exportPdf()">↓ Exportar informe</button>
-        <app-add-transaction></app-add-transaction>
+        <button type="button" class="btn-export" (click)="exportPdf()" [disabled]="previewMode()" [attr.title]="previewMode() ? 'Desactivado en la demostración' : 'Descargar informe'" aria-label="Exportar informe de transacciones en PDF">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v3h16v-3"/>
+          </svg>
+          <span>Exportar</span>
+        </button>
+        <app-add-transaction (created)="onTransactionCreated()"></app-add-transaction>
       </div>
     </header>
-    <section class="premium-hero" aria-label="Bienvenida financiera"><div class="premium-hero-copy"><span class="premium-overline">TU CENTRO DE CONTROL</span><h2>Una visión clara.<br><em>Mejores decisiones.</em></h2><p>Tu patrimonio, tus movimientos y tus próximos objetivos en un solo lugar.</p><div class="premium-hero-actions"><a routerLink="/transactions" class="premium-link">Explorar movimientos <span aria-hidden="true">↗</span></a><a routerLink="/goals" class="premium-link secondary">Ver mis metas <span aria-hidden="true">→</span></a></div></div><div class="premium-hero-art" aria-hidden="true"><div class="premium-orbit outer"></div><div class="premium-orbit inner"></div><span class="premium-monogram">F<span>·</span></span></div></section>
-    <section class="section stats-section" aria-label="Indicadores financieros">
-      <div class="section-heading"><div><span class="eyebrow">PANORAMA GENERAL</span><h2>Tus números de un vistazo</h2></div><span class="section-caption">Información actualizada</span></div>
+
+    <section class="section stats-section" aria-labelledby="balances-heading">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">TU DINERO EN PERSPECTIVA</span>
+          <h2 id="balances-heading">Panorama general</h2>
+        </div>
+        <span class="section-caption"><span class="section-dot" aria-hidden="true"></span> Datos de tus movimientos</span>
+      </div>
       <app-transaction-stats></app-transaction-stats>
     </section>
-    <section class="section analytics-section" aria-label="Actividad financiera">
-      <div class="section-heading"><div><span class="eyebrow">ACTIVIDAD</span><h2>Entiende cómo se mueve tu dinero</h2></div></div>
+
+    <nav class="quick-nav" aria-label="Accesos rápidos">
+      <a [routerLink]="previewMode() ? '/design-preview/accounts' : '/accounts'" class="quick-link">
+        <span class="quick-link-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="6" width="18" height="14" rx="3"/><path d="M3 10h18M16 15h2"/>
+          </svg>
+        </span>
+        <span><strong>Mis cuentas</strong><small>Revisa tus saldos</small></span><span class="quick-arrow" aria-hidden="true">↗</span>
+      </a>
+      <a [routerLink]="previewMode() ? '/design-preview/goals' : '/goals'" class="quick-link">
+        <span class="quick-link-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>
+          </svg>
+        </span>
+        <span><strong>Mis metas</strong><small>Avanza a tu ritmo</small></span><span class="quick-arrow" aria-hidden="true">↗</span>
+      </a>
+      <a [routerLink]="previewMode() ? '/design-preview/advisor' : '/advisor'" class="quick-link">
+        <span class="quick-link-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3l2.3 6.7L21 12l-6.7 2.3L12 21l-2.3-6.7L3 12l6.7-2.3L12 3Z"/>
+          </svg>
+        </span>
+        <span><strong>Asesor FinFlow</strong><small>Explora nuevas ideas</small></span><span class="quick-arrow" aria-hidden="true">↗</span>
+      </a>
+    </nav>
+
+    <section class="section analytics-section" aria-labelledby="activity-heading">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">TENDENCIAS Y ACTIVIDAD</span>
+          <h2 id="activity-heading">Entiende cómo se mueve tu dinero</h2>
+        </div>
+        <a [routerLink]="previewMode() ? '/design-preview/transactions' : '/transactions'" class="section-link">Ver movimientos <span aria-hidden="true">↗</span></a>
+      </div>
       <div class="grid-two">
         <app-overview></app-overview>
         <app-recent-transactions #recentTx></app-recent-transactions>
       </div>
     </section>
+
+    <footer class="dashboard-footer">
+      <img src="/finflow-icon-classic.svg" width="24" height="24" alt="" aria-hidden="true"/>
+      <span>FinFlow · Cada decisión cuenta.</span>
+      <span>Una vista clara de tus finanzas.</span>
+    </footer>
   </main>
   <app-toast-container></app-toast-container>
 </div>

@@ -1,0 +1,302 @@
+<div class="studio-root" [class.dark]="dark()">
+  <div class="preview-banner" role="status">
+    <span class="preview-pill">FINFLOW V4 · DESIGN STUDIO</span>
+    <span>Prototipo interactivo con datos simulados. No se conecta a tus finanzas.</span>
+    <span class="preview-badge">SOLO PREVIEW</span>
+  </div>
+
+  <div class="studio-frame">
+    <aside class="studio-sidebar" [class.open]="menuOpen()" aria-label="Navegación del prototipo">
+      <div class="studio-brand">
+        <img src="/finflow-icon-classic.svg" width="44" height="44" alt="Isotipo de FinFlow"/>
+        <div class="brand-words">
+          <strong>FinFlow<span class="brand-dot">.</span></strong>
+          <small>YOUR FINANCIAL CLARITY</small>
+        </div>
+        <button class="close-nav" type="button" (click)="closeMenu()" aria-label="Cerrar menú">✕</button>
+      </div>
+      <div class="nav-group-title">ESPACIO PERSONAL</div>
+      <nav class="studio-nav" aria-label="Pantallas de FinFlow">
+        @for (item of sections; track item.id) {
+          <a [routerLink]="'/design-preview/' + item.id" class="studio-nav-item"
+             [class.active]="selected() === item.id"
+             [attr.aria-current]="selected() === item.id ? 'page' : null"
+             (click)="closeMenu()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path [attr.d]="item.icon"/>
+            </svg>
+            <span>{{ item.name }}</span>
+            @if (selected() === item.id) { <span class="nav-selected" aria-hidden="true"></span> }
+          </a>
+        }
+      </nav>
+      <div class="studio-sidebar-footer">
+        <button class="theme-toggle" type="button" (click)="toggleTheme()"
+                [attr.aria-label]="dark() ? 'Activar modo claro' : 'Activar modo oscuro'">
+          <span aria-hidden="true">{{ dark() ? '☀' : '☾' }}</span>
+          <span>{{ dark() ? 'Modo claro' : 'Modo oscuro' }}</span>
+        </button>
+        <span class="studio-powered">FINFLOW · DESIGN EXPLORATION</span>
+      </div>
+    </aside>
+
+    @if (menuOpen()) {
+      <button type="button" class="mobile-backdrop" (click)="closeMenu()" aria-label="Cerrar menú de navegación"></button>
+    }
+    <div class="studio-mobile-topbar">
+      <button type="button" class="menu-toggle" (click)="toggleMobileMenu()" aria-label="Abrir menú de FinFlow">
+        <span aria-hidden="true">☰</span>
+      </button>
+      <img src="/finflow-icon-classic.svg" width="34" height="34" alt=""/>
+      <strong>FinFlow <span>V4</span></strong>
+      <span class="mobile-preview-tag">PREVIEW</span>
+    </div>
+
+    <main class="studio-content" [class.dashboard-content]="selected() === 'dashboard'" id="studio-main">
+      @if (selected() === 'dashboard') {
+        <app-dashboard [previewMode]="true"/>
+      } @else {
+        <div class="studio-page">
+          <div class="page-topline">
+            <span class="live-dot" aria-hidden="true"></span>
+            FINFLOW / {{ activeSection().name.toUpperCase() }}
+            <span class="topline-tag">DESIGN V4</span>
+          </div>
+          <header class="studio-page-header">
+            <div>
+              <span class="eyebrow">{{ activeSection().subtitle.toUpperCase() }}</span>
+              <h1>{{ activeSection().name }}<span class="header-dot">.</span></h1>
+              <p>La misma claridad, detalle y estilo en cada parte de tu experiencia financiera.</p>
+            </div>
+            <span class="read-only-tag"><span class="tag-dot"></span> Demostración interactiva</span>
+          </header>
+
+          @switch (selected()) {
+            @case ('transactions') {
+              <section class="page-metrics" aria-label="Resumen de movimientos de ejemplo">
+                <article class="metric-tile highlight-tile">
+                  <span class="metric-name">INGRESOS REGISTRADOS</span>
+                  <strong>{{ money(incomesSum()) }}</strong>
+                  <span>Movimientos de ejemplo</span>
+                </article>
+                <article class="metric-tile">
+                  <span class="metric-name">GASTOS REGISTRADOS</span>
+                  <strong>{{ money(expensesSum()) }}</strong>
+                  <span>Movimientos de ejemplo</span>
+                </article>
+                <article class="metric-tile">
+                  <span class="metric-name">BALANCE DE EJEMPLO</span>
+                  <strong>{{ money(incomesSum() - expensesSum()) }}</strong>
+                  <span>Ingresos menos gastos mostrados</span>
+                </article>
+              </section>
+              <section class="studio-panel transaction-panel" aria-labelledby="movements-title">
+                <div class="panel-head">
+                  <div><span class="panel-eyebrow">HISTORIAL</span><h2 id="movements-title">Todos los movimientos</h2></div>
+                  <span class="quiet-chip">{{ visibleTransactions().length }} registros</span>
+                </div>
+                <div class="toolbar">
+                  <label class="search-control">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg>
+                    <span class="sr-only">Buscar movimientos</span>
+                    <input type="search" [ngModel]="search()" (ngModelChange)="setSearch($event)" placeholder="Buscar por nombre, categoría o cuenta" />
+                  </label>
+                  <div class="segmented" role="group" aria-label="Filtrar por tipo">
+                    <button type="button" [class.selected]="transactionFilter() === 'all'" [attr.aria-pressed]="transactionFilter() === 'all'" (click)="setTransactionFilter('all')">Todos</button>
+                    <button type="button" [class.selected]="transactionFilter() === 'income'" [attr.aria-pressed]="transactionFilter() === 'income'" (click)="setTransactionFilter('income')">Ingresos</button>
+                    <button type="button" [class.selected]="transactionFilter() === 'expense'" [attr.aria-pressed]="transactionFilter() === 'expense'" (click)="setTransactionFilter('expense')">Gastos</button>
+                  </div>
+                </div>
+                <div class="transaction-list">
+                  @for (tx of visibleTransactions(); track tx.id) {
+                    <div class="movement-row">
+                      <div class="movement-icon" [class.income]="tx.type === 'income'" aria-hidden="true">{{ tx.type === 'income' ? '↙' : '↗' }}</div>
+                      <div class="movement-copy"><strong>{{ tx.description }}</strong><small>{{ tx.category }} · {{ tx.account }}</small></div>
+                      <span class="movement-date">{{ tx.date }}</span>
+                      <strong class="movement-amount" [class.income-text]="tx.type === 'income'">{{ tx.type === 'income' ? '+' : '−' }}{{ money(tx.amount) }}</strong>
+                    </div>
+                  } @empty {
+                    <div class="empty-studio"><strong>Sin coincidencias</strong><p>Prueba otro término o cambia el filtro.</p></div>
+                  }
+                </div>
+              </section>
+            }
+            @case ('accounts') {
+              <div class="feature-hero mini-hero">
+                <div>
+                  <span class="hero-eyebrow">VISIÓN DE TUS CUENTAS</span>
+                  <h2>Todo tu dinero. <em>En un solo lugar.</em></h2>
+                  <p>Separa tus saldos por cuenta y conserva la tranquilidad de saber dónde está cada peso.</p>
+                </div>
+                <div class="feature-hero-stat"><span>SALDO TOTAL DE EJEMPLO</span><strong>{{ money(5690000) }}</strong><small>3 cuentas ficticias</small></div>
+              </div>
+              <section class="studio-grid cols-3" aria-label="Cuentas simuladas">
+                @for (account of accounts; track account.name) {
+                  <article class="account-card studio-panel">
+                    <div class="account-top"><span class="account-symbol" aria-hidden="true">{{ account.symbol }}</span><span class="subtle-chip">COP</span></div>
+                    <div class="account-bottom"><span>{{ account.type }}</span><h2>{{ account.name }}</h2><strong>{{ money(account.balance) }}</strong><small>{{ account.last }} · Cuenta ficticia</small></div>
+                  </article>
+                }
+              </section>
+              <section class="studio-panel detail-panel"><div class="panel-head"><div><span class="panel-eyebrow">CÓMO FUNCIONARÁ</span><h2>Tu dinero, siempre organizado</h2></div></div><p>Las cuentas muestran su saldo, tipo y actividad. Los traspasos y cambios de saldo reales permanecerán desactivados en esta demostración visual.</p></section>
+            }
+            @case ('goals') {
+              <div class="feature-hero goal-hero">
+                <div><span class="hero-eyebrow">TUS PROYECTOS IMPORTAN</span><h2>Las metas claras <em>se vuelven posibles.</em></h2><p>Convierte un objetivo grande en pequeños pasos que puedas seguir cada mes.</p></div>
+                <div class="hero-symbol" aria-hidden="true">◎</div>
+              </div>
+              <section class="studio-grid cols-3" aria-label="Metas financieras ficticias">
+                @for (goal of goals; track goal.title) {
+                  <article class="studio-panel goal-card">
+                    <div class="goal-top"><span class="goal-icon" aria-hidden="true">{{ goal.icon }}</span><span class="subtle-chip">{{ goal.finish }}</span></div>
+                    <h2>{{ goal.title }}</h2><p>{{ goal.detail }}</p>
+                    <strong>{{ money(goal.saved) }} <small>de {{ money(goal.target) }}</small></strong>
+                    <div class="progress-track" role="progressbar" [attr.aria-valuenow]="pct(goal.saved,goal.target)" aria-valuemin="0" aria-valuemax="100" [attr.aria-label]="'Avance de ' + goal.title"><span [style.width.%]="pct(goal.saved,goal.target)"></span></div>
+                    <div class="progress-meta"><span>{{ pct(goal.saved,goal.target) }}% alcanzado</span><span>{{ money(goal.target-goal.saved) }} restante</span></div>
+                  </article>
+                }
+              </section>
+            }
+            @case ('budgets') {
+              <div class="section-intro">
+                <div><span class="eyebrow">PLANIFICA CON INTENCIÓN</span><h2>Presupuestos por categoría</h2><p>Visualiza cuánto llevas utilizado y cuánto queda disponible.</p></div>
+                <div class="segmented" role="group" aria-label="Periodo de presupuesto de ejemplo">
+                  <button type="button" [class.selected]="budgetPeriod() === 'month'" (click)="setBudgetPeriod('month')" [attr.aria-pressed]="budgetPeriod() === 'month'">Mes</button>
+                  <button type="button" [class.selected]="budgetPeriod() === 'year'" (click)="setBudgetPeriod('year')" [attr.aria-pressed]="budgetPeriod() === 'year'">Año ×12</button>
+                </div>
+              </div>
+              <section class="studio-grid cols-2" aria-label="Presupuestos ficticios">
+                @for (budget of budgets; track budget.name) {
+                  <article class="studio-panel budget-card">
+                    <div class="budget-top"><span class="category-symbol" aria-hidden="true">{{ budget.icon }}</span><span class="budget-meta">{{ pct(budget.spent,budget.limit) }}% utilizado</span></div>
+                    <h2>{{ budget.name }}</h2>
+                    <div class="budget-values"><strong>{{ money(budget.spent * (budgetPeriod() === 'year' ? 12 : 1)) }}</strong><span>de {{ money(budget.limit * (budgetPeriod() === 'year' ? 12 : 1)) }}</span></div>
+                    <div class="progress-track" [class.warning]="pct(budget.spent,budget.limit)>=80" role="progressbar" [attr.aria-label]="'Presupuesto de ' + budget.name" [attr.aria-valuenow]="pct(budget.spent,budget.limit)" aria-valuemin="0" aria-valuemax="100"><span [style.width.%]="pct(budget.spent,budget.limit)"></span></div>
+                    <p>Disponible: <strong>{{ money((budget.limit-budget.spent) * (budgetPeriod() === 'year' ? 12 : 1)) }}</strong></p>
+                  </article>
+                }
+              </section>
+            }
+            @case ('planned-expenses') {
+              <div class="feature-hero planned-hero">
+                <div><span class="hero-eyebrow">ANTICÍPATE A LO IMPORTANTE</span><h2>Un plan para cada <em>próximo pago.</em></h2><p>Organiza lo que viene y evita sorpresas al final del mes.</p></div>
+                <div class="feature-hero-stat"><span>PRÓXIMOS PAGOS DE EJEMPLO</span><strong>{{ money(642000) }}</strong><small>3 pagos ficticios</small></div>
+              </div>
+              <section class="studio-panel" aria-labelledby="planned-title">
+                <div class="panel-head"><div><span class="panel-eyebrow">AGENDA DE PAGOS</span><h2 id="planned-title">Gastos previstos</h2></div><span class="quiet-chip">Noviembre</span></div>
+                <div class="transaction-list">
+                  @for (bill of planned; track bill.title) {
+                    <div class="movement-row">
+                      <span class="movement-icon" aria-hidden="true">◷</span>
+                      <div class="movement-copy"><strong>{{ bill.title }}</strong><small>{{ bill.category }} · {{ bill.date }}</small></div>
+                      <span class="status-chip">{{ bill.status }}</span><strong class="movement-amount">{{ money(bill.amount) }}</strong>
+                    </div>
+                  }
+                </div>
+              </section>
+            }
+            @case ('recurring') {
+              <div class="section-intro"><div><span class="eyebrow">RUTINAS FINANCIERAS</span><h2>Movimientos recurrentes</h2><p>Una vista sencilla de tus pagos e ingresos periódicos.</p></div><span class="quiet-chip">3 reglas de ejemplo</span></div>
+              <section class="studio-grid cols-3" aria-label="Reglas recurrentes simuladas">
+                @for (rule of recurring; track rule.title) {
+                  <article class="studio-panel recurring-card">
+                    <div class="account-top"><span class="account-symbol" aria-hidden="true">↻</span><span class="status-chip positive">● {{ rule.state }}</span></div>
+                    <h2>{{ rule.title }}</h2><p>{{ rule.every }}</p><strong>{{ money(rule.amount) }}</strong><small>Regla ficticia · Sin ejecución</small>
+                  </article>
+                }
+              </section>
+            }
+            @case ('categories') {
+              <div class="section-intro"><div><span class="eyebrow">UNA ESTRUCTURA MÁS CLARA</span><h2>Categoriza cada movimiento</h2><p>Agrupa tus gastos e ingresos con etiquetas reconocibles y consistentes.</p></div></div>
+              <section class="studio-grid cols-3" aria-label="Categorías ficticias">
+                @for (category of categories; track category.name) {
+                  <article class="studio-panel category-card">
+                    <span class="category-symbol" [class]="category.color" aria-hidden="true">{{ category.icon }}</span>
+                    <div><h2>{{ category.name }}</h2><small>{{ category.kind }} · Ejemplo</small></div>
+                    <span class="category-chevron" aria-hidden="true">↗</span>
+                  </article>
+                }
+              </section>
+            }
+            @case ('advisor') {
+              <section class="advisor-preview studio-panel" aria-label="Demostración del asesor FinFlow">
+                <div class="advisor-top">
+                  <div class="assistant-identity"><img src="/finflow-icon-classic.svg" width="47" height="47" alt=""/><div><h2>FinFlow AI</h2><small>Tu copiloto financiero</small></div></div>
+                  <span class="quiet-chip">Modo demostración</span>
+                </div>
+                <div class="advisor-messages" role="log" aria-label="Mensajes de ejemplo">
+                  @if (advisorReplies().length === 0) {
+                    <div class="advisor-welcome">
+                      <img src="/finflow-icon-classic.svg" width="65" height="65" alt="" aria-hidden="true"/>
+                      <span class="panel-eyebrow">DECISIONES MÁS INTELIGENTES</span>
+                      <h2>¿En qué podemos <em>ayudarte hoy?</em></h2>
+                      <p>Pregunta por tus gastos, tus metas o ideas para ahorrar. Aquí verás una respuesta simulada.</p>
+                      <div class="prompt-grid">
+                        @for (prompt of ['¿Cómo organizar mi presupuesto?', '¿Cómo ahorrar para una meta?', '¿Qué gastos debo revisar?']; track prompt) {
+                          <button type="button" (click)="advisorInput.set(prompt); sendDemoMessage()">{{ prompt }} <span aria-hidden="true">↗</span></button>
+                        }
+                      </div>
+                    </div>
+                  } @else {
+                    @for (message of advisorReplies(); track $index) {
+                      <div class="advisor-message" [class.from-user]="message.role==='user'">
+                        @if (message.role==='assistant') { <img src="/finflow-icon-classic.svg" width="34" height="34" alt="" aria-hidden="true"/> }
+                        <div><small>{{ message.role === 'user' ? 'Tú' : 'FinFlow AI · Demostración' }}</small><p>{{ message.text }}</p></div>
+                      </div>
+                    }
+                  }
+                </div>
+                <form class="advisor-compose" (ngSubmit)="sendDemoMessage()">
+                  <label for="studio-question">HAZ UNA PREGUNTA DE PRUEBA</label>
+                  <div><input id="studio-question" type="text" maxlength="260" placeholder="Escribe tu pregunta…" [ngModel]="advisorInput()" (ngModelChange)="advisorInput.set($event)" name="question"/><button type="submit" [disabled]="!advisorInput().trim()" aria-label="Enviar pregunta de demostración">↗</button></div>
+                  <small>Este prototipo no utiliza un modelo de IA ni tus datos reales.</small>
+                </form>
+              </section>
+            }
+            @case ('security') {
+              <div class="feature-hero mini-hero">
+                <div><span class="hero-eyebrow">TRANQUILIDAD DIGITAL</span><h2>Tu privacidad, <em>siempre primero.</em></h2><p>Una estructura clara para revisar las opciones de seguridad y comprender cómo se protegen tus datos.</p></div>
+                <div class="hero-symbol" aria-hidden="true">◇</div>
+              </div>
+              <section class="studio-grid cols-2 security-grid">
+                <article class="studio-panel security-card">
+                  <div class="security-icon" aria-hidden="true">⌑</div><span class="panel-eyebrow">ACCESO</span><h2>Contraseña y sesión</h2>
+                  <p>Administración de contraseña y opciones de autenticación para tu cuenta.</p>
+                  <span class="preview-inactive">Controles desactivados en esta demo</span>
+                </article>
+                <article class="studio-panel security-card">
+                  <div class="security-icon" aria-hidden="true">◇</div><span class="panel-eyebrow">PRIVACIDAD</span><h2>Tu información financiera</h2>
+                  <p>Visualiza las medidas de protección disponibles. El cifrado extremo a extremo sigue en desarrollo y no se declara activo aquí.</p>
+                  <span class="preview-inactive">Estado real: verificar antes de publicar</span>
+                </article>
+              </section>
+            }
+            @case ('admin') {
+              <section class="page-metrics" aria-label="Indicadores ficticios de administración">
+                <article class="metric-tile highlight-tile"><span class="metric-name">USUARIOS DE EJEMPLO</span><strong>248</strong><span>Dato ilustrativo</span></article>
+                <article class="metric-tile"><span class="metric-name">MOVIMIENTOS DE EJEMPLO</span><strong>3.842</strong><span>Dato ilustrativo</span></article>
+                <article class="metric-tile"><span class="metric-name">SESIONES DE EJEMPLO</span><strong>97</strong><span>Dato ilustrativo</span></article>
+              </section>
+              <section class="studio-panel">
+                <div class="panel-head"><div><span class="panel-eyebrow">VISTA OPERATIVA</span><h2>Estado del sistema</h2></div><span class="quiet-chip">Diseño propuesto</span></div>
+                <div class="status-list">
+                  @for (service of ['API de la aplicación', 'Base de datos', 'Plataforma web', 'Asesor IA']; track service) {
+                    <div><span>{{ service }}</span><span class="preview-inactive">Sin consultar · Demo</span></div>
+                  }
+                </div>
+                <p class="panel-disclaimer">Estos indicadores NO representan métricas ni disponibilidad reales de producción.</p>
+              </section>
+            }
+          }
+
+          <footer class="studio-page-footer">
+            <img src="/finflow-icon-classic.svg" width="25" height="25" alt="" aria-hidden="true"/>
+            <span>FinFlow V4 — revisión integral de interfaz.</span>
+            <span>Todos los ejemplos son ficticios.</span>
+          </footer>
+        </div>
+      }
+    </main>
+  </div>
+</div>
