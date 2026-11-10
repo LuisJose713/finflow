@@ -32,6 +32,7 @@ export class TransactionsComponent implements OnInit {
   categories      = signal<Category[]>([]);
   years           = signal<number[]>([]);
   loading         = signal(true);
+  private loadSequence = 0;
 
   // Filtros que van al backend
   filterType       = signal<string>('');
@@ -90,6 +91,7 @@ export class TransactionsComponent implements OnInit {
 
   // Solo llama al backend con filtros de tipo/mes/año/categoría
   load() {
+    const requestId = ++this.loadSequence;
     this.loading.set(true);
     this.txService.getAll(
       this.filterType()       || undefined,
@@ -97,8 +99,17 @@ export class TransactionsComponent implements OnInit {
       this.filterYear()       ?? undefined,
       this.filterCategoryId() ?? undefined,
     ).subscribe({
-      next:  (data) => { this.allTransactions.set(data); this.loading.set(false); },
-      error: ()     => this.loading.set(false),
+      next: (data) => {
+        // Older filter requests must not overwrite the newest results.
+        if (requestId !== this.loadSequence) return;
+        this.allTransactions.set(data);
+        this.loading.set(false);
+      },
+      error: () => {
+        if (requestId !== this.loadSequence) return;
+        this.loading.set(false);
+        this.toast.error('No pudimos cargar las transacciones. Inténtalo nuevamente.');
+      },
     });
   }
 
