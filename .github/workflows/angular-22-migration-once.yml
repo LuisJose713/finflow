@@ -33,9 +33,6 @@ jobs:
             npx ng update "@angular/core@$major" "@angular/cli@$major" --allow-dirty
             echo "::endgroup::"
           done
-      - name: Update CI Node to supported version
-        run: |
-          sed -i "s/node-version: '20'/node-version: '22.22.3'/" .github/workflows/angular-ci.yml
       - name: Remove deprecated TypeScript 6 baseUrl setting
         shell: bash
         run: |
@@ -45,11 +42,10 @@ jobs:
           npm ci
           npx tsc --noEmit --project tsconfig.app.json
           npm run build:prod
-      - name: Commit verified migration and remove one-time automation
+      - name: Commit verified migration (workflow files handled separately)
         shell: bash
         run: |
           set -euo pipefail
-          git rm -- .github/workflows/angular-22-migration-once.yml
           git add -A
           git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'chore(web): migrate Angular 18 to 22 using official update schematics'
           git push origin HEAD:chore/angular-22-migration-20261109
