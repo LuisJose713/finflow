@@ -1,6 +1,6 @@
 import {
-  Component, inject, signal, OnInit,
-  ElementRef, viewChild, AfterViewChecked,
+  Component, DestroyRef, NgZone, effect, inject, signal, OnInit,
+  ElementRef, viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AdvisorService } from '../../core/services/advisor.service';
@@ -96,9 +96,12 @@ import { DatePipe } from '@angular/common';
   `,
   styleUrl: './advisor.component.scss',
 })
-export class AdvisorComponent implements OnInit, AfterViewChecked {
+export class AdvisorComponent implements OnInit {
   private advisorService = inject(AdvisorService);
   private toast = inject(ToastService);
+  private readonly zone = inject(NgZone);
+  private readonly destroyRef = inject(DestroyRef);
+  private scrollFrame: number | null = null;
 
   messages = signal<AdvisorMessage[]>([]);
   cards = signal<AdvisorCard[]>([]);
@@ -107,6 +110,29 @@ export class AdvisorComponent implements OnInit, AfterViewChecked {
   userInput = '';
 
   messagesContainer = viewChild<ElementRef<HTMLDivElement>>('messagesContainer');
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      if (this.scrollFrame !== null) cancelAnimationFrame(this.scrollFrame);
+    });
+    // Scroll only when the chat content changes; scrolling on every Angular
+    // change detection forced needless layout during menu transitions.
+    effect(() => {
+      this.messages();
+      this.responding();
+      this.scheduleScrollToBottom();
+    });
+  }
+
+  private scheduleScrollToBottom() {
+    if (this.scrollFrame !== null) cancelAnimationFrame(this.scrollFrame);
+    this.zone.runOutsideAngular(() => {
+      this.scrollFrame = requestAnimationFrame(() => {
+        this.scrollFrame = null;
+        this.scrollToBottom();
+      });
+    });
+  }
 
   ngOnInit() {
     this.advisorService.getCards().subscribe({
@@ -119,10 +145,6 @@ export class AdvisorComponent implements OnInit, AfterViewChecked {
         this.cardsLoading.set(false);
       },
     });
-  }
-
-  ngAfterViewChecked() {
-    this.scrollToBottom();
   }
 
   sendPrompt(prompt: string) {
