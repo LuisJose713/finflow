@@ -358,3 +358,37 @@
   .header-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
   .btn-export { justify-content: center; }
 }
+
+
+/* FinFlow V4: unify transaction screens with dashboard typography and soft cards. */
+.app-shell { font-family: 'Inter','Segoe UI',system-ui,sans-serif; }
+.main-content { gap: clamp(1rem,2vw,1.4rem); }
+.header-text h1 {
+  font-family: 'Inter','Segoe UI',system-ui,sans-serif;
+  font-size: clamp(1.8rem,3vw,2.85rem);
+  letter-spacing: -.055em;
+  font-weight: 820;
+}
+.header-text .subtitle, .search-input, .filter-select, .btn-export, .btn-clear {
+  font-family: 'Inter','Segoe UI',system-ui,sans-serif;
+}
+.btn-export.csv, .btn-export.pdf {
+  background: var(--ff-v4-surface,var(--bg-primary));
+  color: var(--ff-v4-ink,var(--text-primary));
+  border: 1px solid var(--ff-v4-stroke,var(--border));
+}
+.btn-export.csv:hover, .btn-export.pdf:hover { border-color: #d7a94d; background: var(--bg-secondary); }
+.filters-card {
+  border-radius: 18px;
+  padding: clamp(1rem,2vw,1.35rem);
+  border-color: var(--ff-v4-stroke,var(--border));
+  box-shadow: var(--ff-v4-elev);
+}
+.search-input { font-size: .86rem; min-height: 46px; }
+.filter-select { font-size: .79rem; min-height: 44px; }
+.tx-item { border-radius: 13px; }
+.tx-title { letter-spacing: -.015em; }
+@media(max-width:600px) {
+  .header-actions { width: 100%; display: flex; flex-wrap: wrap; }
+  .btn-export { flex: 1; justify-content: center; min-height: 44px; }
+}
