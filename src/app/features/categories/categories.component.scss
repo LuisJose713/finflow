@@ -101,3 +101,18 @@
   .category-actions { width: 100%; }
   .category-form-panel .primary-action,.category-form-panel .secondary-action { width: 100%; min-height: 46px; }
 }
+
+
+/* FinFlow V4: same premium hero and content rhythm as dashboard. */
+.categories-heading {
+  border: 1px solid rgba(215,169,77,.22);
+  border-radius: 20px;
+  padding: clamp(1.25rem,2.5vw,2.2rem);
+  background: linear-gradient(115deg,#0b1b33,#172e50 57%,#273a5b);
+  box-shadow: 0 16px 42px rgba(9,22,42,.12);
+}
+.categories-heading .premium-overline { color: #e2bd83; }
+.categories-heading .categories-counter { background: rgba(215,169,77,.12); border-color: rgba(215,169,77,.3); color: #f5d68c; }
+.categories-panel { box-shadow: var(--ff-v4-elev); border-color: var(--ff-v4-stroke,var(--border)); }
+.category-item { border-color: var(--ff-v4-stroke,var(--border)); }
+@media(max-width:600px) { .categories-heading { padding: 1.2rem; } }
