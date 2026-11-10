@@ -39,7 +39,7 @@ jobs:
       - name: Remove deprecated TypeScript 6 baseUrl setting
         shell: bash
         run: |
-          node -e 'const fs=require("fs"); const p="tsconfig.json"; const j=JSON.parse(fs.readFileSync(p, "utf8")); delete j.compilerOptions.baseUrl; fs.writeFileSync(p, JSON.stringify(j, null, 2) + "\n");'
+          node -e 'const fs=require("fs"); const p="tsconfig.json"; const j=JSON.parse(fs.readFileSync(p, "utf8")); delete j.compilerOptions.baseUrl; for(const key of Object.keys(j.compilerOptions.paths || {})){ j.compilerOptions.paths[key] = j.compilerOptions.paths[key].map(x=>x.startsWith(".") ? x : "./" + x); } fs.writeFileSync(p, JSON.stringify(j, null, 2) + "\n");'
       - name: Verify reproducibility and compile
         run: |
           npm ci
