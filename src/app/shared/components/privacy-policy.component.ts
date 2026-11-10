@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { PrivacyPolicy } from '../../core/services/privacy.service';
 
 @Component({
@@ -42,6 +42,7 @@ import { PrivacyPolicy } from '../../core/services/privacy.service';
       </section>
     </article>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     .policy-document{display:grid;gap:.8rem;color:var(--text-primary,#152740);min-width:0}
     h3{font-size:1.14rem;line-height:1.3;margin:0}h4{font-size:.93rem;margin:0 0 .3rem}

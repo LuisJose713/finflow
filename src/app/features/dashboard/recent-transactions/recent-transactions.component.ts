@@ -1,4 +1,4 @@
-import { Component, inject, signal, output, effect } from '@angular/core';
+import { Component, inject, signal, output, effect, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -7,11 +7,11 @@ import { Transaction } from '../../../core/models';
 import { AppCurrencyPipe } from '../../../shared/pipes/currency.pipe';
 
 @Component({
-  selector: 'app-recent-transactions',
-  templateUrl: './recent-transactions.component.html',
-  styleUrls: ['./recent-transactions.component.scss'],
-  standalone: true,
-  imports: [DatePipe, AppCurrencyPipe, CommonModule],
+    selector: 'app-recent-transactions',
+    templateUrl: './recent-transactions.component.html',
+    styleUrls: ['./recent-transactions.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [DatePipe, AppCurrencyPipe, CommonModule]
 })
 export class RecentTransactionsComponent {
   private txService  = inject(TransactionService);

@@ -1,8 +1,9 @@
 import {
   Component, inject, signal, computed, effect,
   ElementRef, viewChild, afterNextRender,
+  ChangeDetectionStrategy
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { AppCurrencyPipe } from '../../../shared/pipes/currency.pipe';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { DashboardRefreshService } from '../../../core/services/dashboard-refresh.service';
@@ -10,11 +11,11 @@ import { DashboardRefreshService } from '../../../core/services/dashboard-refres
 interface MonthlyData { month: string; monthKey: string; income: number; expenses: number; }
 
 @Component({
-  selector: 'app-overview',
-  standalone: true,
-  imports: [CommonModule, AppCurrencyPipe],
-  templateUrl: './overview.component.html',
-  styleUrl: './overview.component.scss',
+    selector: 'app-overview',
+    imports: [AppCurrencyPipe],
+    templateUrl: './overview.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrl: './overview.component.scss'
 })
 export class OverviewComponent {
   private txService = inject(TransactionService);

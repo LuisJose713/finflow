@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, ViewChild, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
   FormBuilder,
   Validators,
@@ -21,10 +21,9 @@ function passwordMatchValidator(
 }
 
 @Component({
-  selector: 'app-register',
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, PrivacyPolicyComponent],
-  template: `
+    selector: 'app-register',
+    imports: [ReactiveFormsModule, RouterLink, PrivacyPolicyComponent],
+    template: `
     <div class="auth-wrapper">
       <section class="auth-showcase" aria-label="Conoce FinFlow">
       <div class="showcase-brand"><span class="showcase-logo">F<span>·</span></span><span>FinFlow <small>PERSONAL FINANCE</small></span></div>
@@ -202,7 +201,8 @@ function passwordMatchValidator(
       }
     </div>
   `,
-  styleUrl: '../login/login.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrl: '../login/login.component.scss'
 })
 export class RegisterComponent {
   private fb = inject(FormBuilder);

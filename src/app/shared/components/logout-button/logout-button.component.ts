@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, inject, ChangeDetectionStrategy } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -10,6 +10,7 @@ import { AuthService } from '../../../core/services/auth.service';
       <span class="logout-label">Cerrar sesión</span>
     </button>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     :host { display:block; min-width:0; }
     .btn-logout { display:flex; align-items:center; justify-content:center; gap:.6rem; width:100%; min-height:44px; padding:.7rem .8rem; border:1px solid #3b4b63; border-radius:11px; background:transparent; color:#b9c8dc; font:inherit; font-size:.78rem; font-weight:650; cursor:pointer; white-space:nowrap; transition:background .2s,border-color .2s,color .2s; }

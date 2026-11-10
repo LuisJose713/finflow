@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransactionService } from '@core/services/transaction.service';
@@ -11,14 +11,14 @@ import { ToastContainerComponent } from '@shared/components/toast-container/toas
 import { AddTransactionComponent } from '@shared/components/add-transaction/add-transaction.component';
 
 @Component({
-  selector: 'app-transactions',
-  standalone: true,
-  imports: [
-    CommonModule, DatePipe, FormsModule,
-    AppCurrencyPipe, NavbarComponent, ToastContainerComponent
-],
-  templateUrl: './transactions.component.html',
-  styleUrls: ['./transactions.component.scss'],
+    selector: 'app-transactions',
+    imports: [
+        CommonModule, DatePipe, FormsModule,
+        AppCurrencyPipe, NavbarComponent, ToastContainerComponent
+    ],
+    templateUrl: './transactions.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./transactions.component.scss']
 })
 export class TransactionsComponent implements OnInit {
   private txService       = inject(TransactionService);

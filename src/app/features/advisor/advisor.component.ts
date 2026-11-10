@@ -1,6 +1,7 @@
 import {
   Component, inject, signal, OnInit,
   ElementRef, viewChild, AfterViewChecked,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AdvisorService } from '../../core/services/advisor.service';
@@ -11,10 +12,9 @@ import { ToastContainerComponent } from '../../shared/components/toast-container
 import { DatePipe } from '@angular/common';
 
 @Component({
-  selector: 'app-advisor',
-  standalone: true,
-  imports: [FormsModule, NavbarComponent, ToastContainerComponent, DatePipe],
-  template: `
+    selector: 'app-advisor',
+    imports: [FormsModule, NavbarComponent, ToastContainerComponent, DatePipe],
+    template: `
     <div class="app-shell">
       <app-navbar />
 
@@ -94,7 +94,8 @@ import { DatePipe } from '@angular/common';
       <app-toast-container />
     </div>
   `,
-  styleUrl: './advisor.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrl: './advisor.component.scss'
 })
 export class AdvisorComponent implements OnInit, AfterViewChecked {
   private advisorService = inject(AdvisorService);
