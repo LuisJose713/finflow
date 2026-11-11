@@ -1,34 +1,13 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { hasUnexpiredSession } from './session-token';
 
 export const authGuard: CanActivateFn = () => {
   const router = inject(Router);
   const token  = localStorage.getItem('token');
 
-  if (!token) {
-    router.navigate(['/login']);
-    return false;
-  }
-
-  // Verificar expiración del JWT sin librería externa
-  try {
-    const payload    = JSON.parse(atob(token.split('.')[1]));
-    const expiredAt  = payload.exp * 1000; // exp viene en segundos
-    const isExpired  = Date.now() >= expiredAt;
-
-    if (isExpired) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      router.navigate(['/login']);
-      return false;
-    }
-
-    return true;
-  } catch {
-    // Token malformado
-    localStorage.removeItem('token');
-      localStorage.removeItem('user');
-    router.navigate(['/login']);
-    return false;
-  }
+  if (hasUnexpiredSession(token)) return true;
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  return router.createUrlTree(['/login']);
 };

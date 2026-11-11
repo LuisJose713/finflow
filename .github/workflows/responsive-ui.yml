@@ -39,6 +39,11 @@ jobs:
           npm install --no-save --ignore-scripts playwright@1.56.1
           npx playwright install --with-deps chromium
 
+      - name: Verify enforced security policy against production build
+        run: |
+          npm run build:prod
+          node scripts/security-smoke.mjs
+
       - name: Test genuine Angular components across mobile/tablet/desktop widths
         shell: bash
         run: |
