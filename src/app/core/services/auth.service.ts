@@ -86,6 +86,9 @@ export class AuthService {
   private authErrorMessage(err: HttpErrorResponse, action: 'login' | 'register'): string {
     if (err.status === 0) return 'No pudimos conectar con el servidor. Inténtalo nuevamente.';
     if (err.status === 429) return 'Demasiados intentos. Espera un momento antes de continuar.';
+    if (err.status === 400 && typeof err.error?.error === 'string' && err.error.error.includes('72 bytes')) {
+      return 'La contraseña supera el máximo de 72 bytes UTF-8. Algunos caracteres, como acentos y emojis, ocupan varios bytes.';
+    }
     if (action === 'login') {
       if (err.status === 401 || err.status === 403) return 'Correo electrónico o contraseña incorrectos.';
       return 'No pudimos iniciar sesión. Inténtalo nuevamente.';

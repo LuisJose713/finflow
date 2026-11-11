@@ -29,6 +29,10 @@ export class SecurityComponent {
  changePassword(){
    if(this.busy())return;
    this.error.set('');this.message.set('');
+   if(new TextEncoder().encode(this.newPassword).length>72){
+     this.error.set('La nueva contraseña supera el máximo de 72 bytes UTF-8. Algunos caracteres ocupan varios bytes.');
+     return;
+   }
    if(this.newPassword.length<12||this.newPassword.length>128||
      this.newPassword!==this.confirmPassword||!this.oldPassword){
      this.error.set('La nueva contraseña debe tener al menos 12 caracteres y coincidir con su confirmación.');

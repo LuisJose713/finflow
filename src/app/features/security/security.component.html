@@ -10,7 +10,7 @@
   <div class="security-grid">
    <section class="security-panel" aria-labelledby="change-password-title">
     <span class="security-kicker">ACCESO PERSONAL</span><h2 id="change-password-title">Cambiar contraseña</h2>
-    <p>Utiliza una contraseña nueva de al menos 12 caracteres. Al cambiarla, se invalidarán los tokens anteriores.</p>
+    <p>Utiliza al menos 12 caracteres y un máximo de 72 bytes UTF-8; algunos caracteres ocupan varios bytes. Al cambiarla, se invalidarán los tokens anteriores.</p>
     <form (ngSubmit)="changePassword()" novalidate>
      <label for="password-current">Contraseña actual</label>
      <div class="field-password"><input id="password-current" name="oldPassword" [(ngModel)]="oldPassword" [type]="showOld()?'text':'password'" autocomplete="current-password" required/>
