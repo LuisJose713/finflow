@@ -9,10 +9,10 @@
 .card-header h2 { margin: 0; color: var(--text-primary); font-size: clamp(1.04rem,1.65vw,1.3rem); font-weight: 780; letter-spacing: -.03em; }
 .scope-toggle,.tabs { display: inline-flex; flex-wrap: wrap; gap: 3px; padding: 4px; border-radius: 11px; border: 1px solid var(--border); background: var(--bg-primary); }
 .tabs { margin-bottom: 1.25rem; }
-.scope-btn,.tab { border: 0; border-radius: 8px; background: transparent; color: var(--text-secondary); font: inherit; font-weight: 720; font-size: .75rem; min-height: 36px; padding: .5rem .75rem; cursor: pointer; }
+.scope-btn,.tab { border: 0; border-radius: 8px; background: transparent; color: var(--text-secondary); font: inherit; font-weight: 720; font-size: .75rem; min-height: 44px; padding: .5rem .75rem; cursor: pointer; }
 .scope-btn.active,.tab.active { background: rgba(215,169,77,.14); color: var(--text-primary); box-shadow: inset 0 0 0 1px rgba(215,169,77,.16); }
 .scope-btn:focus-visible,.tab:focus-visible { outline: 2px solid #d7a94d; outline-offset: 2px; }
-.chart-surface { width: 100%; border-radius: 15px; background: var(--bg-primary); border: 1px solid var(--border); padding: clamp(.4rem,1.4vw,1rem); min-width: 0; }
+.chart-surface { box-sizing: border-box; width: 100%; border-radius: 15px; background: var(--bg-primary); border: 1px solid var(--border); padding: clamp(.4rem,1.4vw,1rem); min-width: 0; }
 .trend-chart { display: block; width: 100%; height: auto; min-height: 130px; overflow: visible; }
 .grid-lines line { stroke: var(--border); stroke-width: 1; stroke-dasharray: 4 6; }
 .trend-line { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
@@ -36,14 +36,16 @@
 .chart-empty strong { color: var(--text-primary); font-size: .9rem; }
 .chart-empty span:last-child { font-size: .8rem; line-height: 1.5; }
 .empty-symbol { display: grid; place-items: center; background: rgba(215,169,77,.13); border-radius: 14px; width: 51px; height: 51px; font-size: 1.55rem; color: #b38a4b; }
-.retry-btn { border: 1px solid var(--border); border-radius: 9px; background: var(--bg-primary); color: var(--text-primary); padding: .6rem .95rem; font-weight: 750; }
+.retry-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; box-sizing: border-box; border: 1px solid var(--border); border-radius: 9px; background: var(--bg-primary); color: var(--text-primary); padding: .6rem .95rem; font: inherit; font-size: .8rem; font-weight: 750; text-decoration: none; cursor: pointer; }
+.retry-btn:focus-visible { outline: 2px solid #d7a94d; outline-offset: 3px; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .chart-skeleton { min-height: 300px; width: 100%; border-radius: 15px; background: var(--skeleton-bg); animation: pulse 1.5s ease-in-out infinite; }
 @keyframes pulse { 50% { opacity: .45; } }
 @media(max-width:1100px) { .chart-summary { grid-template-columns: repeat(3,minmax(0,1fr)); } }
 @media(max-width:560px) {
   .overview-card { padding: .9rem; }
   .card-header { align-items: flex-start; }
-  .scope-btn,.tab { min-height: 34px; padding: .43rem .6rem; }
+  .scope-btn,.tab { padding: .43rem .6rem; }
   .chart-summary { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .net-row { grid-column: 1/-1; }
   .chart-month { font-size: 15px; }
@@ -55,7 +57,7 @@
 .trend-chart:focus-visible { outline: 2px solid #d7a94d; outline-offset: 3px; }
 .selection-guide { stroke: #d7a94d; stroke-width: 1.5; stroke-dasharray: 4 4; pointer-events: none; }
 .chart-points { display: flex; gap: .25rem; justify-content: space-between; flex-wrap: wrap; margin-top: .3rem; }
-.point-button { background: transparent; color: var(--text-secondary); border: 1px solid transparent; border-radius: 7px; padding: .4rem .35rem; min-width: 36px; cursor: pointer; font: inherit; font-size: .72rem; }
+.point-button { background: transparent; color: var(--text-secondary); border: 1px solid transparent; border-radius: 7px; padding: .4rem .35rem; min-width: 44px; min-height: 44px; cursor: pointer; font: inherit; font-size: .72rem; }
 .point-button.selected { border-color: #d7a94d; color: var(--text-primary); background: rgba(215,169,77,.12); }
 .point-button:focus-visible { outline: 2px solid #d7a94d; }
 .selected-values { display: flex; flex-wrap: wrap; gap: .45rem 1rem; align-items: center; margin-top: .65rem; padding: .75rem; border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary); font-size: .8rem; font-variant-numeric: tabular-nums; }

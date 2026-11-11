@@ -7,7 +7,11 @@ import { chromium } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
+const browser = await chromium.launch({
+  headless: true,
+  ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}),
+  args: ['--no-sandbox'],
+});
 const base = 'http://127.0.0.1:4200';
 const widths = [320, 375, 430, 768, 1024, 1440];
 const failures = [];
@@ -71,13 +75,14 @@ async function mockApi(route) {
     monthlyData: [], categoryData: []
   };
   else if (p === '/transactions/monthly-stats') response = [
-    { month: '2026-05', income: 2150000, expenses: 1370000 },
-    { month: '2026-06', income: 2420000, expenses: 1680000 },
-    { month: '2026-07', income: 2280000, expenses: 1520000 },
-    { month: '2026-08', income: 2850000, expenses: 1720000 },
-    { month: '2026-09', income: 2600000, expenses: 1850000 },
-    { month: '2026-10', income: 2900000, expenses: 1600000 }
-  ];
+    [2150000, 1370000], [2420000, 1680000], [2280000, 1520000],
+    [2850000, 1720000], [2600000, 1850000], [2900000, 1600000]
+  ].map(([income, expenses], index) => {
+    // Keep fixtures in the selected calendar period as the CI date advances.
+    const now = new Date();
+    const date = new Date(now.getFullYear(), now.getMonth() - 5 + index, 1);
+    return { month: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`, income, expenses };
+  });
   else if (p === '/transactions/years') response = [2026];
   else if (p === '/admin/overview') response = adminStats;
   else if (p === '/admin/monitor') response = {

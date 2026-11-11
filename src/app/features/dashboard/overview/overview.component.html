@@ -1,4 +1,4 @@
-<section class="overview-card" aria-labelledby="trend-title">
+<section class="overview-card" aria-labelledby="trend-title" [attr.aria-busy]="loading()">
   <div class="card-header">
     <div>
       <span class="panel-kicker">EVOLUCIÓN FINANCIERA</span>
@@ -21,7 +21,7 @@
   </div>
 
   @if (loading()) {
-    <div class="chart-skeleton" aria-label="Cargando gráfico de movimientos"></div>
+    <div class="chart-skeleton" role="status"><span class="visually-hidden">Cargando gráfico de movimientos…</span></div>
   } @else if (loadError()) {
     <div class="chart-empty" role="alert">
       <strong>No pudimos cargar la actividad.</strong>
@@ -31,16 +31,21 @@
   } @else if (chartPoints().length === 0) {
     <div class="chart-empty">
       <span class="empty-symbol" aria-hidden="true">↗</span>
-      <strong>Tu actividad aparecerá aquí</strong>
-      <span>Registra ingresos y gastos para conocer cómo evoluciona tu dinero.</span>
+      <strong>{{ hasHistory() ? 'No hay actividad en este periodo' : 'Tu actividad aparecerá aquí' }}</strong>
+      <span>{{ hasHistory() ? 'Prueba un periodo más amplio o consulta tu historial de movimientos.' : 'Registra ingresos y gastos para conocer cómo evoluciona tu dinero.' }}</span>
+      @if (hasHistory() && scope() === 'six') {
+        <button type="button" class="retry-btn" (click)="setScope('year')">Ver últimos 12 meses</button>
+      }
+      <a routerLink="/transactions" class="retry-btn">Ir a movimientos</a>
     </div>
   } @else {
     <div class="chart-surface">
       <svg viewBox="0 0 680 210" xmlns="http://www.w3.org/2000/svg"
            class="trend-chart" role="group" tabindex="0"
+           aria-describedby="trend-instructions"
            (pointerdown)="selectFromPointer($event)" (pointermove)="$event.buttons === 1 && selectFromPointer($event)"
            (keydown.arrowleft)="moveSelection(-1); $event.preventDefault()" (keydown.arrowright)="moveSelection(1); $event.preventDefault()"
-           [attr.aria-label]="'Evolución mensual de ingresos y gastos, últimos ' + (scope() === 'six' ? '6' : '12') + ' meses disponibles'">
+           [attr.aria-label]="'Evolución mensual de ingresos y gastos, últimos ' + (scope() === 'six' ? '6' : '12') + ' meses'">
         <defs>
           <linearGradient id="ff-trend-income-fill" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stop-color="#477cff" stop-opacity=".14"/>
@@ -72,15 +77,16 @@
           <text [attr.x]="point.x" y="199" text-anchor="middle" class="chart-month">{{ point.month }}</text>
         }
       </svg>
+      <p id="trend-instructions" class="visually-hidden">Usa las flechas izquierda y derecha o los botones de cada mes para consultar los importes.</p>
       <div class="chart-points" role="group" aria-label="Seleccionar mes">
         @for (point of chartPoints(); track point.monthKey) {
           <button type="button" class="point-button" [class.selected]="selectedMonth() === point.monthKey"
-                  [attr.aria-pressed]="selectedMonth() === point.monthKey" (click)="selectPoint(point.monthKey)">{{ point.month }}</button>
+                  [attr.aria-label]="monthLabel(point.monthKey)" [attr.aria-pressed]="selectedMonth() === point.monthKey" (click)="selectPoint(point.monthKey)">{{ point.month }}</button>
         }
       </div>
       @if (activePoint(); as selected) {
         <div class="selected-values" role="status" aria-live="polite">
-          <strong>{{ selected.month }} · {{ selected.monthKey }}</strong>
+          <strong>{{ monthLabel(selected.monthKey) }}</strong>
           @if (filter() !== 'expense') { <span>Ingresos: {{ selected.income | appCurrency }}</span> }
           @if (filter() !== 'income') { <span>Gastos: {{ selected.expenses | appCurrency }}</span> }
         </div>
@@ -100,6 +106,6 @@
         <strong [class.negative]="netValue() < 0">{{ netValue() | appCurrency }}</strong>
       </div>
     </div>
-    <p class="insight-note">Tendencia calculada a partir de los meses disponibles en tu historial, sin estimaciones.</p>
+    <p class="insight-note">Importes registrados en los últimos {{ scope() === 'six' ? '6' : '12' }} meses, incluido el actual. Los meses sin movimientos se muestran en cero.</p>
   }
 </section>

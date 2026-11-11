@@ -1,21 +1,26 @@
-<section class="transactions-card" aria-label="Transacciones recientes">
+<section class="transactions-card" aria-label="Transacciones recientes" [attr.aria-busy]="loading()">
   <div class="card-header">
     <div><span class="panel-kicker">ÚLTIMOS MOVIMIENTOS</span><h2>Transacciones recientes</h2></div>
     <span class="badge">Últimas 5</span>
   </div>
   <ng-container *ngIf="loading()">
-    <div class="list"><div *ngFor="let i of [1, 2, 3, 4, 5]" class="transaction-item skeleton"></div></div>
+    <div role="status"><span class="visually-hidden">Cargando transacciones recientes…</span><div class="list" aria-hidden="true"><div *ngFor="let i of [1, 2, 3, 4, 5]" class="transaction-item skeleton"></div></div></div>
   </ng-container>
-  <ng-container *ngIf="!loading() && transactions().length === 0">
-    <div class="empty-state"><p>No hay transacciones aún</p><small>Agrega tu primera transacción para comenzar</small></div>
+  <div *ngIf="!loading() && loadError()" class="empty-state error-state" role="alert">
+    <p>No pudimos cargar tus movimientos</p>
+    <small>Vuelve a intentarlo para consultar tus transacciones recientes.</small>
+    <button type="button" class="state-action" (click)="load()">Reintentar</button>
+  </div>
+  <ng-container *ngIf="!loading() && !loadError() && transactions().length === 0">
+    <div class="empty-state"><p>No hay transacciones aún</p><small>Agrega tu primera transacción para comenzar</small><a routerLink="/transactions" class="state-action">Ir a movimientos</a></div>
   </ng-container>
-  <ul *ngIf="!loading() && transactions().length > 0" class="list">
+  <ul *ngIf="!loading() && !loadError() && transactions().length > 0" class="list">
     <li *ngFor="let tx of transactions(); trackBy: trackById" class="transaction-item">
       <div class="tx-icon" [class]="tx.type" aria-hidden="true">{{ tx.type === "income" ? "↑" : "↓" }}</div>
-      <div class="tx-info"><span class="tx-title">{{ tx.description }}</span><span class="tx-meta">{{ tx.date | date: "dd MMM yyyy" }}</span></div>
+      <div class="tx-info"><span class="tx-title" [title]="tx.description">{{ tx.description }}</span><span class="tx-meta">{{ tx.date | date: "dd MMM yyyy" }}</span></div>
       <div class="tx-actions">
-        <span class="tx-amount" [class.income]="tx.type === 'income'" [class.expense]="tx.type === 'expense'">{{ tx.type === "income" ? "+" : "-" }}{{ tx.amount | appCurrency }}</span>
-        <button type="button" class="btn-delete" (click)="confirmDelete(tx)" [attr.aria-label]="'Eliminar transacción ' + tx.description" title="Eliminar transacción">✕</button>
+        <span class="tx-amount" [class.income]="tx.type === 'income'" [class.expense]="tx.type === 'expense'">{{ tx.type === "income" ? "+" : "-" }}{{ tx.amount | appCurrency:tx.currency }}</span>
+        <button type="button" class="btn-delete" (click)="confirmDelete(tx)" [disabled]="deletingIds().has(tx.id)" [attr.aria-busy]="deletingIds().has(tx.id)" [attr.aria-label]="(deletingIds().has(tx.id) ? 'Eliminando transacción ' : 'Eliminar transacción ') + tx.description" title="Eliminar transacción"><span aria-hidden="true">✕</span></button>
       </div>
     </li>
   </ul>

@@ -1,5 +1,7 @@
-import { Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
+import { Subscription, finalize, map } from 'rxjs';
 import { AppCurrencyPipe } from '../../../shared/pipes/currency.pipe';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { DashboardRefreshService } from '../../../core/services/dashboard-refresh.service';
@@ -14,7 +16,7 @@ interface ChartPoint { monthKey: string; month: string; x: number; incomeY: numb
 @Component({
   selector: 'app-overview',
   standalone: true,
-  imports: [AppCurrencyPipe],
+  imports: [AppCurrencyPipe, RouterLink],
   templateUrl: './overview.component.html',
   styleUrl: './overview.component.scss',
 })
@@ -22,6 +24,7 @@ export class OverviewComponent {
   private readonly txService = inject(TransactionService);
   private readonly refresh = inject(DashboardRefreshService);
   private readonly destroyRef = inject(DestroyRef);
+  private loadSubscription?: Subscription;
 
   readonly loading = signal(true);
   readonly loadError = signal(false);
@@ -32,6 +35,7 @@ export class OverviewComponent {
   readonly activePoint = computed(() => this.chartPoints().find(p => p.monthKey === this.selectedMonth()) ?? null);
 
   readonly filteredData = computed(() => {
+    if (!this.monthlyData().length) return [];
     const count = this.scope() === 'six' ? 6 : 12;
     // Always show a continuous calendar timeline, even when the API omits empty months.
     const today = new Date();
@@ -45,10 +49,12 @@ export class OverviewComponent {
   readonly totalIncome = computed(() => this.filteredData().reduce((sum, point) => sum + point.income, 0));
   readonly totalExpenses = computed(() => this.filteredData().reduce((sum, point) => sum + point.expenses, 0));
   readonly netValue = computed(() => this.totalIncome() - this.totalExpenses());
+  readonly hasHistory = computed(() => this.monthlyData().some(row => row.income > 0 || row.expenses > 0));
 
   readonly chartPoints = computed<ChartPoint[]>(() => {
     const rows = this.filteredData();
-    if (!rows.length) return [];
+    // Calendar padding must not turn an empty account or period into a zero-valued chart.
+    if (!rows.some(row => row.income > 0 || row.expenses > 0)) return [];
     const max = Math.max(1, ...rows.flatMap(row => [row.income, row.expenses]));
     const range = Math.max(rows.length - 1, 1);
     return rows.map((row, index) => {
@@ -68,31 +74,27 @@ export class OverviewComponent {
   constructor() {
     effect(() => {
       this.refresh.version();
-      this.load();
+      untracked(() => this.load());
     }, { allowSignalWrites: true });
   }
 
   load(): void {
+    // A later refresh owns the result; older requests must never overwrite it.
+    this.loadSubscription?.unsubscribe();
     this.loading.set(true);
     this.loadError.set(false);
-    this.txService.getMonthlyStats().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.loadSubscription = this.txService.getMonthlyStats().pipe(
+      map(data => this.parseMonthlyData(data)),
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.loading.set(false)),
+    ).subscribe({
       next: data => {
-        const values = Array.isArray(data) ? data : [];
-        this.monthlyData.set(values
-          .filter((s: any) => typeof s?.month === 'string' && /^\d{4}-\d{2}$/.test(s.month))
-          .map((s: any) => ({
-            monthKey: s.month,
-            month: this.formatMonth(s.month),
-            income: this.amount(s.income),
-            expenses: this.amount(s.expenses),
-          }))
-          .sort((a: MonthlyData, b: MonthlyData) => a.monthKey.localeCompare(b.monthKey)));
-        this.loading.set(false);
+        this.monthlyData.set(data);
+        if (!this.chartPoints().some(point => point.monthKey === this.selectedMonth())) {
+          this.selectedMonth.set(null);
+        }
       },
-      error: () => {
-        this.loadError.set(true);
-        this.loading.set(false);
-      },
+      error: () => this.loadError.set(true),
     });
   }
 
@@ -111,14 +113,40 @@ export class OverviewComponent {
     const rows = this.chartPoints();
     if (!rows.length) return;
     const current = rows.findIndex(row => row.monthKey === this.selectedMonth());
-    const index = Math.max(0, Math.min(rows.length - 1, (current < 0 ? rows.length - 1 : current) + delta));
+    const index = current < 0
+      ? (delta < 0 ? rows.length - 1 : 0)
+      : Math.max(0, Math.min(rows.length - 1, current + delta));
     this.selectedMonth.set(rows[index].monthKey);
   }
   setFilter(filter: 'all' | 'income' | 'expense'): void { this.filter.set(filter); }
 
+  monthLabel(key: string): string {
+    const [year, month] = key.split('-').map(Number);
+    return new Intl.DateTimeFormat('es-CO', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1));
+  }
+
+  private parseMonthlyData(data: unknown): MonthlyData[] {
+    if (!Array.isArray(data)) throw new Error('Invalid monthly statistics');
+    const months = new Set<string>();
+    return data.map(row => {
+      if (typeof row?.month !== 'string' || !/^\d{4}-(0[1-9]|1[0-2])$/.test(row.month) || months.has(row.month)) {
+        throw new Error('Invalid statistics month');
+      }
+      months.add(row.month);
+      return {
+        monthKey: row.month,
+        month: this.formatMonth(row.month),
+        income: this.amount(row.income),
+        expenses: this.amount(row.expenses),
+      };
+    }).sort((a, b) => a.monthKey.localeCompare(b.monthKey));
+  }
+
   private amount(value: unknown): number {
-    const n = Number(value);
-    return Number.isFinite(n) ? Math.max(0, n) : 0;
+    const n = typeof value === 'number' || (typeof value === 'string' && value.trim() !== '') ? Number(value) : NaN;
+    // Corrupt financial data is an error, not a fabricated zero.
+    if (!Number.isFinite(n) || n < 0) throw new Error('Invalid monthly amount');
+    return n;
   }
 
   private makePath(rows: ChartPoint[], field: 'incomeY' | 'expenseY'): string {

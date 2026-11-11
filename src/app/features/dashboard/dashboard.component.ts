@@ -8,6 +8,7 @@ import { ToastContainerComponent } from '../../shared/components/toast-container
 import { TransactionStatsComponent } from './transaction-stats/transaction-stats.component';
 import { OverviewComponent } from './overview/overview.component';
 import { RecentTransactionsComponent } from './recent-transactions/recent-transactions.component';
+import { MonthlyFocusComponent } from './monthly-focus/monthly-focus.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,6 +20,7 @@ import { RecentTransactionsComponent } from './recent-transactions/recent-transa
     TransactionStatsComponent,
     OverviewComponent,
     RecentTransactionsComponent,
+    MonthlyFocusComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],

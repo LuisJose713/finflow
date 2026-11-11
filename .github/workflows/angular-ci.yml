@@ -37,3 +37,9 @@ jobs:
         run: npm run build:prod
       - name: Authentication regression tests (Chrome Headless)
         run: npm test -- --watch=false --browsers=ChromeHeadless --include=src/app/core/interceptors/auth.interceptor.spec.ts
+      - name: Dashboard and currency regression tests (Chrome Headless)
+        run: npm test -- --watch=false --browsers=ChromeHeadless --include='src/app/features/dashboard/**/*.spec.ts' --include=src/app/shared/pipes/currency.pipe.spec.ts
+      - name: Session guard regression tests (Chrome Headless)
+        run: npm test -- --watch=false --browsers=ChromeHeadless --include=src/app/core/guards/session-token.spec.ts --include=src/app/core/services/auth.service.spec.ts
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
