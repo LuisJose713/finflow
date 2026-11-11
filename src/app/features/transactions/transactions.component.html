@@ -10,13 +10,13 @@
         <p class="subtitle">{{ transactions().length }} registros encontrados</p>
       </div>
       <div class="header-actions">
-        <button class="btn-export csv" (click)="exportCsv()" title="Exportar CSV">
+        <button class="btn-export csv" (click)="exportXlsx()" title="Descargar Excel FinFlow (.xlsx)">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             <polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
-          CSV
+          Excel
         </button>
         <button class="btn-export pdf" (click)="exportPdf()" title="Exportar PDF">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
