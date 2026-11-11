@@ -1,0 +1,50 @@
+<section class="monthly-focus" aria-labelledby="monthly-focus-heading">
+  <header class="focus-header">
+    <div><span class="eyebrow">DE LOS NÚMEROS A LAS DECISIONES</span><h2 id="monthly-focus-heading">Tu mes, con un plan</h2></div>
+    <span class="period">{{ monthLabel() }} · COP</span>
+  </header>
+  <div class="focus-grid">
+    <article class="month-card" [attr.aria-busy]="monthLoading()">
+      @if (monthLoading()) {
+        <p class="loading-copy" role="status">Preparando tu resumen del mes…</p>
+      } @else if (monthError()) {
+        <div class="status-copy" role="alert"><h3>No pudimos consultar este mes</h3><p>Reintenta para ver cifras actualizadas.</p><button type="button" (click)="loadMonth()">Reintentar resumen</button></div>
+      } @else {
+        @if (summary(); as month) {
+        <span class="card-label">Balance registrado este mes</span>
+        <strong class="month-balance" [class.negative]="month.balance < 0">{{ month.balance | appCurrency }}</strong>
+        <p class="month-context">
+          @if (!hasActivity()) { Tu mes empieza con el primer movimiento. }
+          @else if (month.balance < 0) { Este mes has registrado más gastos que ingresos. Revisa qué puedes ajustar. }
+          @else { Tus ingresos registrados cubren los gastos de este mes. Revisa también tus próximos pagos. }
+        </p>
+        <details class="calculation">
+          <summary>Ver cómo se calcula</summary>
+          <dl><div><dt>Ingresos del mes</dt><dd>{{ month.income | appCurrency }}</dd></div><div><dt>Menos gastos del mes</dt><dd>{{ month.expenses | appCurrency }}</dd></div></dl>
+          <p>Es la diferencia de tus movimientos del mes. No incluye saldos iniciales, pagos pendientes ni reservas para metas; no representa dinero disponible para gastar.</p>
+        </details>
+        <a class="focus-link" routerLink="/transactions">Revisar mis movimientos <span aria-hidden="true">↗</span></a>
+        }
+      }
+    </article>
+    <article class="payments-card" [attr.aria-busy]="paymentsLoading()">
+      <div class="payments-heading"><h3>Lo que viene</h3><span class="payment-symbol" aria-hidden="true">↗</span></div>
+      @if (paymentsLoading()) {
+        <p class="loading-copy" role="status">Consultando tus pagos planeados…</p>
+      } @else if (paymentsError()) {
+        <div class="status-copy" role="alert"><p>No pudimos consultar tus pagos pendientes.</p><button type="button" (click)="loadPayments()">Reintentar pagos</button></div>
+      } @else if (pending().length > 0) {
+        <p class="payments-count">{{ pending().length }} {{ pending().length === 1 ? 'pago pendiente' : 'pagos pendientes' }}@if (overdue() > 0) { · {{ overdue() }} por revisar con fecha vencida }</p>
+        <ul class="payment-list">
+          @for (payment of pending().slice(0, 3); track payment.id) {
+            <li><div><strong>{{ payment.title }}</strong><span>{{ paymentDate(payment) }}</span></div><span class="payment-amount">{{ payment.amount | appCurrency }}</span></li>
+          }
+        </ul>
+      } @else {
+        <p class="empty-title">Dale un lugar a tu próximo pago</p><p class="empty-copy">Planea un gasto y revísalo aquí antes de registrarlo como pagado.</p>
+      }
+      <a class="focus-link" routerLink="/planned-expenses">{{ pending().length ? 'Revisar pagos planeados' : 'Planear un gasto' }} <span aria-hidden="true">↗</span></a>
+      @if (budgetsReady) { <a class="budget-link" routerLink="/budgets">Ajustar mis presupuestos <span aria-hidden="true">→</span></a> }
+    </article>
+  </div>
+</section>

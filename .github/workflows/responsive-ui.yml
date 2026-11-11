@@ -51,6 +51,7 @@ jobs:
             if curl --silent --fail http://127.0.0.1:4200/ > /dev/null; then
               echo "Angular server ready"
               node scripts/responsive-smoke.mjs
+              node scripts/dashboard-experience-smoke.mjs
               exit $?
             fi
             if ! kill -0 "$SERVER_PID" 2>/dev/null; then
@@ -69,6 +70,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: finflow-responsive-browser-qa
-          path: artifacts/responsive/
+          path: |
+            artifacts/responsive/
+            artifacts/dashboard/
           if-no-files-found: ignore
           retention-days: 7

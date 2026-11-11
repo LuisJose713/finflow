@@ -7,7 +7,11 @@ import { chromium } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
+const browser = await chromium.launch({
+  headless: true,
+  ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}),
+  args: ['--no-sandbox'],
+});
 const base = 'http://127.0.0.1:4200';
 const widths = [320, 375, 430, 768, 1024, 1440];
 const failures = [];
