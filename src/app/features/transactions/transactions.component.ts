@@ -127,8 +127,8 @@ export class TransactionsComponent implements OnInit {
     });
   }
 
-  exportCsv() {
-    this.txService.exportCsv(
+  exportXlsx() {
+    this.txService.exportXlsx(
       this.filterType()       || undefined,
       this.filterMonth()      ?? undefined,
       this.filterYear()       ?? undefined,
@@ -137,13 +137,13 @@ export class TransactionsComponent implements OnInit {
     ).subscribe({
       next: (blob) => {
         const url = URL.createObjectURL(blob);
-        const a   = document.createElement('a');
-        a.href     = url;
-        a.download = 'transacciones.csv';
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'FinFlow_Movimientos.xlsx';
         a.click();
-        URL.revokeObjectURL(url);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
       },
-      error: () => this.toast.error('Error al exportar CSV'),
+      error: () => this.toast.error('No se pudo generar el Excel'),
     });
   }
 
@@ -153,6 +153,7 @@ export class TransactionsComponent implements OnInit {
     this.filterMonth()      ?? undefined,
     this.filterYear()       ?? undefined,
     this.filterCategoryId() ?? undefined,
+    this.filterSearch()     || undefined,
   ).subscribe({
     next: (blob) => {
       const url = URL.createObjectURL(blob);
@@ -160,7 +161,7 @@ export class TransactionsComponent implements OnInit {
       a.href     = url;
       a.download = 'transacciones.pdf';
       a.click();
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     },
     error: () => this.toast.error('Error al exportar PDF'),
   });

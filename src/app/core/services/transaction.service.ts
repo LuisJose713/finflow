@@ -196,17 +196,29 @@ export class TransactionService {
     return this.http.get<any[]>(`${this.apiUrl}/monthly-stats`);
   }
 
-  exportPdf(type?: string, month?: number, year?: number, categoryId?: number) {
+  exportPdf(type?: string, month?: number, year?: number, categoryId?: number, search?: string) {
     let params = new HttpParams();
     if (type) params = params.set("type", type);
     if (month) params = params.set("month", month.toString());
     if (year) params = params.set("year", year.toString());
     if (categoryId) params = params.set("categoryId", categoryId.toString());
+    if (search) params = params.set("search", search);
 
     return this.http.get(`${this.apiUrl}/export/pdf`, {
       params,
       responseType: "blob",
     });
+  }
+
+  // XLSX nativo: columnas tipadas, filtros y plantilla FinFlow.
+  exportXlsx(type?: string, month?: number, year?: number, categoryId?: number, search?: string) {
+    let params = new HttpParams();
+    if (type) params = params.set('type', type);
+    if (month) params = params.set('month', month.toString());
+    if (year) params = params.set('year', year.toString());
+    if (categoryId) params = params.set('categoryId', categoryId.toString());
+    if (search) params = params.set('search', search);
+    return this.http.get(`${this.apiUrl}/export/xlsx`, { params, responseType: 'blob' });
   }
 
   exportCsv(
