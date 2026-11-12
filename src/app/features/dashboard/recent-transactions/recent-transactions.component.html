@@ -2,7 +2,7 @@
   <div class="card-header">
     <div><span class="panel-kicker">ÚLTIMOS MOVIMIENTOS</span><h2>Transacciones recientes</h2></div>
     <div class="recent-count-control" role="group" aria-label="Cantidad de transacciones recientes">
-      <span class="recent-count-label">Mostrar</span>
+      <span class="recent-count-label">Ver</span>
       <button *ngFor="let count of countOptions" type="button"
         class="recent-count-button"
         [class.active]="visibleCount() === count"
@@ -24,16 +24,16 @@
   </ng-container>
   <ul *ngIf="!loading() && !loadError() && transactions().length > 0" class="list">
     <li *ngFor="let tx of displayedTransactions(); trackBy: trackById" class="transaction-item">
-      <div class="tx-icon" [class]="tx.type" aria-hidden="true">{{ tx.type === "income" ? "↑" : "↓" }}</div>
+      <div class="tx-icon" [class]="tx.type" aria-hidden="true"><span>{{ tx.type === "income" ? "↗" : "↙" }}</span></div>
       <div class="tx-info">
         <span class="tx-title" [title]="tx.description">{{ tx.description }}</span>
-        <div class="tx-details">
-          <time class="tx-meta" [attr.datetime]="tx.date">{{ tx.date | date: "dd MMM yyyy" }}</time>
-          <span class="tx-amount" [class.income]="tx.type === 'income'" [class.expense]="tx.type === 'expense'"
-            [attr.aria-label]="(tx.type === 'income' ? 'Ingreso ' : 'Gasto ') + (tx.amount | appCurrency:tx.currency)">
-            {{ tx.type === "income" ? "+" : "−" }}{{ tx.amount | appCurrency:tx.currency:'symbol' }}
-          </span>
-        </div>
+        <time class="tx-meta" [attr.datetime]="tx.date">{{ tx.date | date: "dd MMM yyyy" }}</time>
+      </div>
+      <span class="tx-amount" [class.income]="tx.type === 'income'" [class.expense]="tx.type === 'expense'"
+        [attr.aria-label]="(tx.type === 'income' ? 'Ingreso ' : 'Gasto ') + (tx.amount | appCurrency:tx.currency)">
+        {{ tx.amount | appCurrency:tx.currency:'symbol' }}
+      </span>
+      <div class="tx-action-slot">
       </div>
       <button type="button" class="btn-delete" (click)="confirmDelete(tx)" [disabled]="deletingIds().has(tx.id)" [attr.aria-busy]="deletingIds().has(tx.id)" [attr.aria-label]="(deletingIds().has(tx.id) ? 'Eliminando transacción ' : 'Eliminar transacción ') + tx.description" title="Eliminar transacción">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13M10 11v5m4-5v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
