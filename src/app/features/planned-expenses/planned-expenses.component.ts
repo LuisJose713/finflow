@@ -53,6 +53,7 @@ export class PlannedExpensesComponent {
 
   // Computed: totales
   totalPending  = computed(() => this.expenses().filter(e => e.status === 'pending').reduce((a, e) => a + e.amount, 0));
+  pendingCount  = computed(() => this.expenses().filter(e => e.status === 'pending').length);
   totalDone     = computed(() => this.expenses().filter(e => e.status === 'done').reduce((a, e) => a + e.amount, 0));
   overdue       = computed(() => {
     const today = new Date().toISOString().split('T')[0];
