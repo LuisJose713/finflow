@@ -41,6 +41,21 @@ try {
     assert.ok(Math.abs(await page.evaluate(() => visualViewport.scale) - 1) < .01);
     authenticated = true;
     await page.goto(base + '/categories');
+    // Synthetic touch events exercise the edge-swipe contract without writing data.
+    const swipe = async (x0, y0, x1, y1) => page.evaluate(([x0, y0, x1, y1]) => {
+      const target = document.querySelector('.main-content') || document.body;
+      const start = new Touch({ identifier: 1, target, clientX: x0, clientY: y0 });
+      const end = new Touch({ identifier: 1, target, clientX: x1, clientY: y1 });
+      target.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, touches: [start], changedTouches: [start] }));
+      target.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: [end] }));
+    }, [x0, y0, x1, y1]);
+    const sidebar = page.locator('#finflow-sidebar');
+    await swipe(8, 240, 155, 243);
+    assert.equal(await sidebar.evaluate(el => el.classList.contains('open')), false, 'Back-gesture safe zone must be preserved');
+    await swipe(48, 240, 180, 245);
+    await page.waitForFunction(() => document.querySelector('#finflow-sidebar')?.classList.contains('open'));
+    await swipe(200, 245, 55, 245);
+    await page.waitForFunction(() => !document.querySelector('#finflow-sidebar')?.classList.contains('open'));
     const categories = page.locator('.categories-heading'); await categories.waitFor();
     await Promise.all([page.waitForResponse(r => r.url().includes('/preferences/ui/categories.intro') && r.request().method() === 'PUT'), categories.getByRole('button', { name: 'Ocultar presentación', exact: true }).click()]);
     await categories.waitFor({ state: 'hidden' });
