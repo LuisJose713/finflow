@@ -80,3 +80,23 @@
   .balance-value { font-size: clamp(1.85rem, 7vw, 2.6rem); }
 }
 @media(prefers-reduced-motion:reduce) { .stat-card.skeleton { animation: none; } }
+
+/* FinFlow V5: prevent cramped financial metrics on 320px devices. */
+.stat-card { min-width: 0; }
+.stat-label { line-height: 1.45; }
+.stat-value, .savings-value {
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 370px) {
+  .stats-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "balance" "income" "expense" "savings";
+    gap: .7rem;
+  }
+  .stat-card.balance { min-height: 226px; }
+  .stat-card.income, .stat-card.expense { min-height: 110px; }
+  .stat-card.savings { min-height: 125px; }
+  .balance-value { font-size: clamp(1.8rem, 8.4vw, 2.3rem); }
+  .stat-value { font-size: 1.45rem; }
+}
