@@ -11,6 +11,10 @@
               [attr.aria-pressed]="scope() === 'year'" (click)="setScope('year')">12 meses</button>
     </div>
   </div>
+  <div class="chart-mode-toggle" role="group" aria-label="Tipo de gráfico">
+    <button type="button" class="scope-btn" [class.active]="chartType() === 'line'" [attr.aria-pressed]="chartType() === 'line'" (click)="setChartType('line')">Lineal</button>
+    <button type="button" class="scope-btn" [class.active]="chartType() === 'donut'" [attr.aria-pressed]="chartType() === 'donut'" (click)="setChartType('donut')">Circular</button>
+  </div>
   <div class="tabs" role="group" aria-label="Series que se muestran en el gráfico">
     <button type="button" class="tab" [class.active]="filter() === 'all'"
             [attr.aria-pressed]="filter() === 'all'" (click)="setFilter('all')">Ambos</button>
@@ -40,6 +44,26 @@
     </div>
   } @else {
     <div class="chart-surface">
+      @if (chartType() === 'donut') {
+        <div class="donut-layout" role="img" [attr.aria-label]="'Distribución del periodo: ingresos ' + totalIncome() + ', gastos ' + totalExpenses()">
+          <svg viewBox="0 0 240 240" class="donut-chart" aria-hidden="true">
+            <circle cx="120" cy="120" r="88" fill="none" stroke="var(--border)" stroke-width="24"/>
+            @if (donutTotal() > 0) {
+              @if (donutIncomePercent() > 0) {
+                <circle cx="120" cy="120" r="88" fill="none" stroke="#477cff" stroke-width="24" [attr.stroke-dasharray]="donutIncomePercent() + ' ' + (100 - donutIncomePercent())" pathLength="100" transform="rotate(-90 120 120)"/>
+              }
+              @if (donutExpensePercent() > 0) {
+                <circle cx="120" cy="120" r="88" fill="none" stroke="#d7a94d" stroke-width="24" [attr.stroke-dasharray]="donutExpensePercent() + ' ' + (100 - donutExpensePercent())" [attr.stroke-dashoffset]="-donutIncomePercent()" pathLength="100" transform="rotate(-90 120 120)"/>
+              }
+            }
+          </svg>
+          <div class="donut-center">
+            <span>Total del periodo</span>
+            <strong>{{ donutTotal() | appCurrency }}</strong>
+          </div>
+        </div>
+        <p class="donut-description">Distribución de los importes del periodo seleccionado. Cambia entre ingresos, gastos o ambos para comparar.</p>
+      } @else {
       <svg viewBox="0 0 680 210" xmlns="http://www.w3.org/2000/svg"
            class="trend-chart" role="group" tabindex="0"
            aria-describedby="trend-instructions"
@@ -90,6 +114,7 @@
           @if (filter() !== 'expense') { <span>Ingresos: {{ selected.income | appCurrency }}</span> }
           @if (filter() !== 'income') { <span>Gastos: {{ selected.expenses | appCurrency }}</span> }
         </div>
+      }
       }
     </div>
     <div class="chart-summary" aria-label="Resumen del periodo seleccionado">
