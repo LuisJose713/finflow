@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { DailyRemindersService } from '../../core/services/daily-reminders.service';
 import { AuthService } from '../../core/services/auth.service';
 import { environment } from '@environments/environment';
 
@@ -15,6 +16,8 @@ import { environment } from '@environments/environment';
 export class SecurityComponent {
  private readonly http=inject(HttpClient);
  readonly auth=inject(AuthService);
+ readonly reminders=inject(DailyRemindersService);
+ readonly pushBusy=signal(false);
  readonly busy=signal(false);
  readonly message=signal('');
  readonly error=signal('');
@@ -30,6 +33,24 @@ export class SecurityComponent {
  readonly showDeletePassword=signal(false);
  readonly api=environment.apiUrl+'/auth';
 
+ async activatePush() {
+   if (this.pushBusy()) return;
+   this.pushBusy.set(true); this.error.set(''); this.message.set('');
+   try {
+     const ok = await this.reminders.enable();
+     this.message.set(ok ? 'Notificaciones de FinFlow activadas en este dispositivo.' : 'No se pudo activar Web Push. Comprueba permisos y configuración del servidor.');
+   } catch { this.error.set('No se pudo activar Web Push.'); }
+   finally { this.pushBusy.set(false); }
+ }
+ async testPush() {
+   if (this.pushBusy()) return;
+   this.pushBusy.set(true); this.error.set(''); this.message.set('');
+   try {
+     const count = await this.reminders.testPush();
+     this.message.set(count ? 'Prueba enviada al servicio push. Comprueba tu iPhone.' : 'No se confirmó ningún envío. Revisa la suscripción y el servidor.');
+   } catch { this.error.set('No se pudo enviar la prueba de FinFlow.'); }
+   finally { this.pushBusy.set(false); }
+ }
  changePassword(){
    if(this.busy())return;
    this.error.set('');this.message.set('');
