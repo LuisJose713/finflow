@@ -1,0 +1,79 @@
+/* FinFlow motion: the drawer's calm settle, navy surfaces and discreet gold. */
+:root {
+  --ff-motion-press: 130ms;
+  --ff-motion-reveal: 220ms;
+  --ff-motion-panel: 300ms;
+  --ff-ease-out: cubic-bezier(.2, .8, .2, 1);
+  --ff-press-scale: .98;
+  --ff-hover-rise: -1px;
+}
+
+.app-shell button:enabled,
+.app-shell a.nav-item,
+.app-shell a.premium-link,
+.privacy-dialog button:enabled,
+.auth-wrapper button:enabled {
+  touch-action: manipulation;
+  transition: scale var(--ff-motion-press) var(--ff-ease-out),
+    translate var(--ff-motion-press) var(--ff-ease-out),
+    background-color var(--ff-motion-press) ease,
+    border-color var(--ff-motion-press) ease,
+    box-shadow var(--ff-motion-press) ease,
+    opacity var(--ff-motion-press) ease;
+}
+.app-shell button:enabled:active,
+.app-shell a.nav-item:active,
+.app-shell a.premium-link:active,
+.privacy-dialog button:enabled:active,
+.auth-wrapper button:enabled:active {
+  scale: var(--ff-press-scale);
+  translate: 0 0;
+}
+.app-shell :is(button, a, input, select, textarea):focus-visible,
+.privacy-dialog :is(button, a, input):focus-visible {
+  outline-color: var(--ff-gold, #c6a46c);
+  outline-offset: 3px;
+}
+.app-shell :is(input, select, textarea) {
+  transition: border-color var(--ff-motion-press) ease, box-shadow var(--ff-motion-press) ease;
+}
+.app-shell :is(input, select, textarea):focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ff-gold, #c6a46c) 14%, transparent);
+}
+.app-shell > .main-content {
+  animation: ff-page-reveal var(--ff-motion-reveal) var(--ff-ease-out);
+}
+app-root :is([role="dialog"], [role="alertdialog"], dialog[open]) {
+  background: var(--ff-v4-surface);
+  color: var(--ff-v4-ink);
+  border: 1px solid var(--ff-v4-stroke);
+  border-radius: 17px;
+  animation: ff-panel-reveal var(--ff-motion-panel) var(--ff-ease-out);
+}
+app-root :is(.toast, .toast-item, .update-notice) {
+  animation: ff-panel-reveal var(--ff-motion-reveal) var(--ff-ease-out);
+}
+@keyframes ff-page-reveal { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ff-panel-reveal {
+  from { opacity: 0; translate: 0 8px; }
+  to { opacity: 1; translate: 0 0; }
+}
+@media (hover: hover) and (pointer: fine) {
+  .app-shell button:enabled:hover,
+  .app-shell a.premium-link:hover {
+    translate: 0 var(--ff-hover-rise);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ff-motion-press: 0ms;
+    --ff-motion-reveal: 0ms;
+    --ff-motion-panel: 0ms;
+    --ff-press-scale: 1;
+    --ff-hover-rise: 0px;
+  }
+  .app-shell > .main-content,
+  app-root :is([role="dialog"], [role="alertdialog"], dialog[open], .toast, .toast-item, .update-notice) {
+    animation: none;
+  }
+}

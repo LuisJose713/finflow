@@ -5,8 +5,8 @@
   display: block;
   min-width: 0;
   width: 100%;
-  --chat-gold: #c39a61;
-  --chat-focus: #c39a61;
+  --chat-gold: var(--ff-gold);
+  --chat-focus: var(--ff-gold);
 }
 .app-shell {
   display: flex;
@@ -199,7 +199,7 @@
 .message.user .message-bubble {
   border: 1px solid rgba(215,169,77,.22);
   border-radius: 15px 5px 15px 15px;
-  background: #172b4a;
+  background: #1b2b43;
   color: #fff;
 }
 .message-bubble p {
@@ -301,12 +301,12 @@
   height: 44px;
   border: 1px solid rgba(215,169,77,.34);
   border-radius: 12px;
-  background: #122944;
+  background: #0e192b;
   color: #e4c18a;
   cursor: pointer;
 }
 .btn-send svg { width: 21px; height: 21px; }
-.btn-send:hover:not(:disabled) { background: #213d60; }
+.btn-send:hover:not(:disabled) { background: #22334a; }
 .btn-send:disabled { opacity: .45; cursor: not-allowed; }
 .btn-send:focus-visible { outline: 2px solid var(--chat-focus); outline-offset: 2px; }
 .composer-footer {
@@ -425,3 +425,4 @@
   :host .welcome-panel { padding: .8rem; }
   :host .message-body { max-width:88%; }
 }
+

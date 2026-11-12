@@ -228,7 +228,7 @@
     border-color: #7a8ca8;
     font-size: 1.75rem;
   }
-  .sidebar.open .sidebar-header {
+  .sidebar:is(.open, .dragging) .sidebar-header {
     padding-right: 3.25rem;
   }
 }
@@ -333,3 +333,49 @@
   }
   .sidebar .nav-label { white-space:normal; }
 }
+
+
+/* The panel tracks the finger without easing; only release animates. */
+@media (max-width: 768px) {
+  .sidebar,
+  .sidebar.collapsed {
+    visibility: hidden;
+    transition: transform var(--ff-motion-panel, 300ms) var(--ff-ease-out, ease-out),
+      visibility 0s var(--ff-motion-panel, 300ms);
+    touch-action: pan-y;
+  }
+  .sidebar.open,
+  .sidebar.dragging {
+    visibility: visible;
+    transition-delay: 0s;
+  }
+  .sidebar.dragging {
+    transform: translate3d(var(--drawer-offset, -320px), 0, 0);
+    transition: none;
+    will-change: transform;
+  }
+  .overlay {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    background: rgba(2, 6, 23, .7);
+    backdrop-filter: none;
+    touch-action: none;
+    transition: opacity var(--ff-motion-panel, 300ms) var(--ff-ease-out, ease-out),
+      visibility 0s var(--ff-motion-panel, 300ms);
+  }
+  .overlay.visible {
+    opacity: var(--drawer-progress, 1);
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 0s;
+  }
+  .overlay.dragging { transition: none; }
+}
+
+.mobile-menu-btn {
+  background: #0e192b;
+  color: #dcc29a;
+  border-color: #3c4d61;
+}
+.mobile-menu-btn.dragging { opacity: 0; pointer-events: none; }
