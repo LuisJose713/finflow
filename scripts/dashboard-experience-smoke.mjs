@@ -67,6 +67,25 @@ try {
       'Retrying payments must not reload the monthly summary');
     const geometry = await page.evaluate(() => ({ width: innerWidth, scroll: document.documentElement.scrollWidth }));
     assert.ok(geometry.scroll <= geometry.width + 2, `Dashboard overflows at ${width}px`);
+    // The hero and finance metrics must remain readable at 320px: never
+    // squeeze two amount cards side by side or clip a card out of view.
+    const metricLayout = await page.locator('.stats-grid').evaluate(grid => {
+      const cards = [...grid.querySelectorAll('.stat-card')].filter(el => el.getBoundingClientRect().height > 0);
+      return cards.map(card => {
+        const box = card.getBoundingClientRect();
+        return { x: box.x, right: box.right, top: box.top, bottom: box.bottom, width: box.width };
+      });
+    });
+    for (const metric of metricLayout) {
+      assert.ok(metric.x >= -2 && metric.right <= width + 2,
+        `Financial card clipped at ${width}px: ${JSON.stringify(metric)}`);
+    }
+    if (width === 320 && metricLayout.length > 2) {
+      assert.ok(metricLayout[1].top >= metricLayout[0].bottom - 1,
+        'Narrow iPhone: income metric must stack under the balance');
+      assert.ok(metricLayout[2].top >= metricLayout[1].bottom - 1,
+        'Narrow iPhone: expense metric must stack under income');
+    }
     for (const link of await focus.locator('a').all()) {
       assert.ok((await link.boundingBox()).height >= 44, 'Actions need 44px touch targets');
     }
