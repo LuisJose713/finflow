@@ -783,3 +783,111 @@ html { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
     overflow-wrap: anywhere;
   }
 }
+
+
+
+/* FinFlow atelier · coherent financial pages inspired by the approved drawer. */
+/* Shared spacing and typography; sidebar, chat, dialogs and all behavior
+   remain under their own component contracts. */
+.app-shell > .main-content:not(.advisor-main) {
+  --ff-page-gap: clamp(.85rem,1.55vw,1.4rem);
+  --ff-page-radius: 17px;
+}
+.app-shell > .main-content:not(.advisor-main) :is(
+  .premium-page-intro,.account-hero,.budget-hero,.recurring-hero,
+  .security-hero,.admin-heading,.billing-hero
+) {
+  min-width: 0;
+  border-radius: var(--ff-page-radius);
+  padding: clamp(1rem,1.75vw,1.65rem);
+  margin-bottom: var(--ff-page-gap);
+  box-shadow: 0 10px 28px rgba(9,22,42,.095);
+}
+.app-shell > .main-content:not(.advisor-main) :is(
+  .premium-page-intro,.account-hero,.budget-hero,.recurring-hero,
+  .security-hero,.admin-heading,.billing-hero
+) :is(h1,h2) {
+  font-family: 'Inter','Segoe UI',system-ui,sans-serif;
+  font-size: clamp(1.35rem,1.1rem + .7vw,1.95rem);
+  font-weight: 760;
+  line-height: 1.22;
+  letter-spacing: -.04em;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+.app-shell > .main-content:not(.advisor-main) :is(
+  .premium-page-intro,.account-hero,.budget-hero,.recurring-hero,
+  .security-hero,.admin-heading,.billing-hero
+) :is(p,.subtitle,small) {
+  font-size: clamp(.8rem,.75rem + .2vw,.9rem);
+  line-height: 1.52;
+}
+.app-shell > .main-content:not(.advisor-main) :is(
+  .premium-page-intro,.account-hero,.budget-hero,.recurring-hero,
+  .security-hero,.admin-heading,.billing-hero
+) :is(.premium-overline,.account-kicker,.budget-kicker,
+      .recurring-kicker,.security-kicker,.admin-eyebrow) {
+  letter-spacing: .105em;
+  font-size: .68rem;
+}
+.app-shell > .main-content:not(.advisor-main) :is(
+  .filters-card,.ledger-panel,.account-panel,.recurring-panel,.budget-panel,
+  .categories-panel,.security-panel,.admin-section,.goal-card,
+  .summary-card,.expense-card,.transactions-card,.overview-card
+) {
+  min-width: 0;
+  max-width: 100%;
+  border-radius: var(--ff-page-radius);
+  box-shadow: 0 8px 28px rgba(9,22,42,.045);
+}
+.app-shell > .main-content:not(.advisor-main) :is(
+  .page-header,.categories-heading,.panel-header,.recurring-panel-header,
+  .admin-section-heading,.section-heading,.panel-heading
+) {
+  min-width: 0;
+  gap: .75rem;
+}
+.app-shell > .main-content:not(.advisor-main) :is(
+  .page-header h1,.categories-heading h1,.section-heading h2,
+  .panel-heading h2,.admin-section-heading h2
+) {
+  min-width: 0;
+  line-height: 1.26;
+  word-break: normal;
+  overflow-wrap: break-word;
+  letter-spacing: -.035em;
+}
+.app-shell > .main-content:not(.advisor-main) :is(
+  .account-line,.budget-line,.recurring-list li,.category-item,.expense-card,.tx-item
+) {
+  min-width: 0;
+  border-radius: 12px;
+}
+.app-shell > .main-content:not(.advisor-main) :is(
+  .account-amount,.recurring-item-money,.summary-value,
+  .stat-value,.balance-value,.tx-amount,.expense-amount
+) {
+  font-variant-numeric: tabular-nums;
+}
+@media(max-width:768px) {
+  .app-shell > .main-content:not(.advisor-main) :is(
+    .premium-page-intro,.account-hero,.budget-hero,.recurring-hero,
+    .security-hero,.admin-heading,.billing-hero
+  ) {
+    padding: 1rem;
+    border-radius: 16px;
+    margin-bottom: .9rem;
+  }
+  .app-shell > .main-content:not(.advisor-main) :is(
+    .premium-page-intro,.account-hero,.budget-hero,.recurring-hero,
+    .security-hero,.admin-heading,.billing-hero
+  ) :is(h1,h2) {
+    font-size: clamp(1.24rem,5vw,1.6rem);
+  }
+  .app-shell > .main-content:not(.advisor-main) :is(
+    .filters-card,.ledger-panel,.account-panel,.recurring-panel,
+    .budget-panel,.categories-panel,.security-panel,.admin-section
+  ) {
+    margin-bottom: .85rem;
+  }
+}
