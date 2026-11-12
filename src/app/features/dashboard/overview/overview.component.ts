@@ -30,6 +30,7 @@ export class OverviewComponent {
   readonly loadError = signal(false);
   readonly monthlyData = signal<MonthlyData[]>([]);
   readonly filter = signal<'all' | 'income' | 'expense'>('all');
+  readonly chartType = signal<'line' | 'donut'>(this.readChartType());
   readonly scope = signal<'six' | 'year'>('six');
   readonly selectedMonth = signal<string | null>(null);
   readonly activePoint = computed(() => this.chartPoints().find(p => p.monthKey === this.selectedMonth()) ?? null);
@@ -49,6 +50,9 @@ export class OverviewComponent {
   readonly totalIncome = computed(() => this.filteredData().reduce((sum, point) => sum + point.income, 0));
   readonly totalExpenses = computed(() => this.filteredData().reduce((sum, point) => sum + point.expenses, 0));
   readonly netValue = computed(() => this.totalIncome() - this.totalExpenses());
+  readonly donutTotal = computed(() => (this.filter() !== 'expense' ? this.totalIncome() : 0) + (this.filter() !== 'income' ? this.totalExpenses() : 0));
+  readonly donutIncomePercent = computed(() => this.donutTotal() > 0 && this.filter() !== 'expense' ? this.totalIncome() / this.donutTotal() * 100 : 0);
+  readonly donutExpensePercent = computed(() => this.donutTotal() > 0 && this.filter() !== 'income' ? this.totalExpenses() / this.donutTotal() * 100 : 0);
   readonly hasHistory = computed(() => this.monthlyData().some(row => row.income > 0 || row.expenses > 0));
 
   readonly chartPoints = computed<ChartPoint[]>(() => {
@@ -96,6 +100,15 @@ export class OverviewComponent {
       },
       error: () => this.loadError.set(true),
     });
+  }
+
+  setChartType(type: 'line' | 'donut'): void {
+    this.chartType.set(type);
+    try { localStorage.setItem('finflow.dashboard.chartType', type); } catch { /* Storage can be unavailable. */ }
+  }
+  private readChartType(): 'line' | 'donut' {
+    try { return localStorage.getItem('finflow.dashboard.chartType') === 'donut' ? 'donut' : 'line'; }
+    catch { return 'line'; }
   }
 
   setScope(scope: 'six' | 'year'): void { this.scope.set(scope); this.selectedMonth.set(null); }
