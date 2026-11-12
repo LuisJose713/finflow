@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal, output, effect, untracked } from '@angular/core';
+import { Component, DestroyRef, inject, signal, computed, output, effect, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -25,7 +25,15 @@ export class RecentTransactionsComponent {
 
   transactions = signal<Transaction[]>([]);
   loading      = signal(true);
+  readonly refreshing = signal(false);
   readonly loadError = signal(false);
+  readonly selectedType = signal<'all' | 'income' | 'expense'>('all');
+  readonly visibleTransactions = computed(() => {
+    const type = this.selectedType();
+    return type === 'all' ? this.transactions() : this.transactions().filter(tx => tx.type === type);
+  });
+  readonly incomeCount = computed(() => this.transactions().filter(tx => tx.type === 'income').length);
+  readonly expenseCount = computed(() => this.transactions().filter(tx => tx.type === 'expense').length);
   readonly deletingIds = signal<ReadonlySet<string>>(new Set());
   deleted      = output<string>();
 
@@ -38,7 +46,11 @@ export class RecentTransactionsComponent {
 
   load(): void {
     this.loadSubscription?.unsubscribe();
-    this.loading.set(true);
+    // Avoid replacing already rendered financial movements with skeleton rows
+    // on refresh. On failure, show the last-known result with a clear warning.
+    const keepVisible = this.transactions().length > 0;
+    this.loading.set(!keepVisible);
+    this.refreshing.set(keepVisible);
     this.loadError.set(false);
     this.loadSubscription = this.txService.getRecent().pipe(
       map(data => {
@@ -46,7 +58,10 @@ export class RecentTransactionsComponent {
         return data;
       }),
       takeUntilDestroyed(this.destroyRef),
-      finalize(() => this.loading.set(false)),
+      finalize(() => {
+        this.loading.set(false);
+        this.refreshing.set(false);
+      }),
     ).subscribe({
       next: data => this.transactions.set(data),
       error: () => this.loadError.set(true),
