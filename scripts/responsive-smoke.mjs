@@ -209,17 +209,25 @@ for (const width of widths) {
         await page.getByRole('dialog', { name: 'Nueva transacción' }).waitFor({ state: 'hidden' });
       }
       if (route === '/advisor') {
-        await page.getByRole('heading', { name: /Una visión clara/i }).waitFor({ state: 'visible' });
-        // Use the real FinFlow brand assets, not a hand-drawn F or stock chatbot icon.
+        await page.getByRole('heading', { name: '¿En qué puedo ayudarte?' }).waitFor({ state: 'visible' });
         await page.locator('.chat-topbar img.brand-avatar[src="/finflow-icon-classic.svg"]').waitFor({ state: 'visible' });
         await page.locator('.welcome-panel img.welcome-mark[src="/finflow-icon-classic.svg"]').waitFor({ state: 'visible' });
-        await page.getByRole('button', { name: /Consejos de ahorro/i }).waitFor({ state: 'visible' });
+        assert(await page.locator('.cards-grid, .advisor-header').count() === 0,
+          `${width}px /advisor: old panels must not occupy the chat`);
+        const layout = await page.locator('.chat-layout').boundingBox();
+        const header = await page.locator('.chat-topbar').boundingBox();
+        const input = await page.locator('#finflow-advisor-input').boundingBox();
+        assert(layout && header && input && input.y > header.y + header.height,
+          `${width}px /advisor: composer must stay below a compact chat header`);
         if ([320, 768, 1440].includes(width)) {
-          await page.getByRole('button', { name: /Consejos de ahorro/i }).click();
+          await page.locator('#finflow-advisor-input').fill('¿Cómo organizo mis gastos?');
+          await page.getByRole('button', { name: 'Enviar mensaje' }).click();
           await page.getByText('Respuesta de prueba del asesor.').waitFor({ state: 'visible' });
-          await page.getByRole('button', { name: 'Copiar respuesta del asesor' }).waitFor({ state: 'visible' });
+          await page.getByRole('button', { name: 'Copiar respuesta de FinFlow AI' }).waitFor({ state: 'visible' });
           await measureViewport(page, 'advisor-chat', width);
           await page.screenshot({ path: path.join(output, `${width}-advisor-chat.png`) });
+          await page.getByRole('button', { name: 'Iniciar un chat nuevo' }).click();
+          await page.getByRole('heading', { name: '¿En qué puedo ayudarte?' }).waitFor({ state: 'visible' });
         }
       }
       if (route === '/admin') {
