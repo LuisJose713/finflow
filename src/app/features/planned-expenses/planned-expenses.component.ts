@@ -1,3 +1,4 @@
+import { CurrencyInputDirective } from '../../shared/directives/currency-input.directive';
 import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
@@ -14,7 +15,7 @@ import { AppCurrencyPipe } from '@shared/pipes/currency.pipe';
 @Component({
   selector: 'app-planned-expenses',
   standalone: true,
-  imports: [DismissibleCardDirective, 
+  imports: [CurrencyInputDirective, DismissibleCardDirective, 
     CommonModule, FormsModule, ReactiveFormsModule,
     ToastContainerComponent,
     NavbarComponent,
@@ -39,8 +40,6 @@ export class PlannedExpensesComponent {
   editingId   = signal<string | null>(null);
   modalLoading= signal(false);
 
-  // Display signal para monto
-  amountDisplay = signal('');
 
   // Filtro activo
   filterStatus = signal<'all' | 'pending' | 'done' | 'cancelled'>('all');
@@ -85,14 +84,12 @@ export class PlannedExpensesComponent {
   // ── Modal ────────────────────────────────────────────────
   openCreate() {
     this.editingId.set(null);
-    this.amountDisplay.set('');
     this.form.reset();
     this.showModal.set(true);
   }
 
   openEdit(e: PlannedExpense) {
     this.editingId.set(e.id);
-    this.amountDisplay.set(e.amount.toLocaleString('es-CO', { maximumFractionDigits: 0 }));
     this.form.patchValue({
       title:      e.title,
       amount:     e.amount,
@@ -105,29 +102,15 @@ export class PlannedExpensesComponent {
   }
 
   closeModal() {
+    if (this.modalLoading()) return;
     this.showModal.set(false);
     this.editingId.set(null);
-    this.amountDisplay.set('');
     this.form.reset();
   }
 
-  onAmountInput(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const raw   = input.value.replace(/\D/g, '');
-    if (!raw) {
-      this.form.get('amount')?.setValue(null, { emitEvent: false });
-      this.amountDisplay.set('');
-      input.value = '';
-      return;
-    }
-    const numeric   = parseInt(raw, 10);
-    const formatted = numeric.toLocaleString('es-CO', { maximumFractionDigits: 0 });
-    input.value = formatted;
-    this.amountDisplay.set(formatted);
-    this.form.get('amount')?.setValue(numeric, { emitEvent: false });
-  }
 
   save() {
+    if (this.modalLoading()) return;
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.modalLoading.set(true);
     const raw = this.form.getRawValue();
@@ -155,8 +138,8 @@ export class PlannedExpensesComponent {
           this.expenses.update(list => [...list, saved]);
           this.toast.success('Gasto planeado creado');
         }
-        this.closeModal();
         this.modalLoading.set(false);
+        this.closeModal();
       },
       error: () => { this.toast.error('Error al guardar'); this.modalLoading.set(false); },
     });

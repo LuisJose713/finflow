@@ -37,6 +37,17 @@ describe('CurrencyInputDirective', () => {
     expect(input.value).toBe('1.250,50');
   });
 
+  it('keeps the peso amount while typing and deleting beside thousands separators', () => {
+    enter('25000'); enter('25.0000'); expect(value).toBe(250000);
+    enter('250.00'); expect(value).toBe(25000);
+  });
+
+  it('rejects extra cents, negative and oversized values without changing the amount', () => {
+    enter('1250,50'); enter('1.250,505'); expect(value).toBe(1250.5);
+    enter('-1250'); expect(value).toBe(1250.5);
+    enter('1000000000000,01'); expect(value).toBe(1250.5);
+  });
+
   it('preserves zero and clears an empty field', () => {
     enter('0');
     expect(value).toBe(0);

@@ -1,3 +1,4 @@
+import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +13,7 @@ type CategoryType = 'Income' | 'Expense';
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent],
+  imports: [DismissibleCardDirective, CommonModule, FormsModule, NavbarComponent],
   templateUrl: './categories.component.html',
   styleUrl: './categories.component.scss',
 })

@@ -5,17 +5,20 @@ import { Pipe, PipeTransform } from '@angular/core';
   standalone: true,
 })
 export class AppCurrencyPipe implements PipeTransform {
-  transform(value: number | null | undefined, currency?: string | null): string {
+  private readonly formats = new Map<string, Intl.NumberFormat>();
+  transform(value: number | null | undefined, currency?: string | null, display: 'code' | 'symbol' = 'code'): string {
     if (value == null || !Number.isFinite(Number(value))) return '—';
     const normalizedCurrency = currency?.trim().toUpperCase() || 'COP';
     // Old records with blank currency are COP, matching the backend contract.
     const currencyCode = /^[A-Z]{3}$/.test(normalizedCurrency) ? normalizedCurrency : 'COP';
-    return new Intl.NumberFormat('es-CO', {
+    const key = currencyCode + ':' + display;
+    if (!this.formats.has(key)) this.formats.set(key, new Intl.NumberFormat('es-CO', {
       style: 'currency',
       currency: currencyCode,
-      currencyDisplay: 'code',
-      minimumFractionDigits: 0,
+      currencyDisplay: currencyCode === 'COP' && display === 'symbol' ? 'narrowSymbol' : 'code',
+      minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    }).format(value);
+    }));
+    return this.formats.get(key)!.format(value);
   }
 }

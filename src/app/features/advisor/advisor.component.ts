@@ -1,3 +1,4 @@
+import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import {
   Component, DestroyRef, NgZone, effect, inject, signal, OnInit,
   ElementRef, viewChild,
@@ -13,7 +14,7 @@ import { DatePipe } from '@angular/common';
 @Component({
   selector: 'app-advisor',
   standalone: true,
-  imports: [FormsModule, NavbarComponent, ToastContainerComponent, DatePipe],
+  imports: [DismissibleCardDirective, FormsModule, NavbarComponent, ToastContainerComponent, DatePipe],
   template: `
     <div class="app-shell">
       <app-navbar />
@@ -23,16 +24,12 @@ import { DatePipe } from '@angular/common';
           <span class="live-dot" aria-hidden="true"></span> FINFLOW
           <span class="topline-version">ASESOR IA</span>
         </div>
-        <header class="page-header advisor-header">
+        <header class="page-header advisor-header" appDismissibleCard="advisor.intro">
           <div class="heading-copy">
             <span class="eyebrow">TU ESPACIO FINANCIERO</span>
             <h1>Una visión clara. <span class="heading-accent">Mejores decisiones.</span></h1>
             <p class="subtitle">Explora tus finanzas con el asesor de FinFlow.</p>
-            <button class="btn-clear" type="button" (click)="clearChat()"
-                    [disabled]="messages().length === 0 || responding()"
-                    aria-label="Comenzar una conversación nueva">
-              <span aria-hidden="true">↻</span> Nueva conversación
-            </button>
+
           </div>
           <img class="hero-symbol" src="/finflow-icon-classic.svg" width="96" height="96"
                alt="" aria-hidden="true" />
@@ -40,6 +37,11 @@ import { DatePipe } from '@angular/common';
 
         <section class="chat-layout" aria-label="Conversación con el asesor financiero">
           <div class="chat-topbar">
+            <button class="btn-clear" type="button" (click)="clearChat()"
+                    [disabled]="messages().length === 0 || responding()"
+                    aria-label="Comenzar una conversación nueva">
+              <span aria-hidden="true">↻</span> Nueva conversación
+            </button>
             <span class="assistant-identity">
               <img class="brand-avatar" src="/finflow-icon-classic.svg" width="44" height="44" alt="" aria-hidden="true" />
               <span class="identity-copy"><strong>FinFlow AI</strong><small>Asistente de finanzas personales</small></span>

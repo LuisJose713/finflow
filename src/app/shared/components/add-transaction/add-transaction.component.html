@@ -1,5 +1,5 @@
 <!-- Trigger button -->
-<button class="btn-add" [class.floating]="floating" type="button" (click)="open()"
+<button *ngIf="showTrigger" class="btn-add" [class.floating]="floating" type="button" (click)="open()"
         aria-label="Nueva transacción" [attr.aria-expanded]="isOpen()">
   <span class="btn-add-icon" aria-hidden="true">+</span>
   <span class="btn-add-label">Nueva transacción</span>
@@ -9,7 +9,7 @@
 <div *ngIf="isOpen()" class="modal-backdrop" (click)="close()">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="transaction-dialog-title" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2 id="transaction-dialog-title">Nueva transacción</h2>
+      <h2 id="transaction-dialog-title">{{ editing() ? "Editar movimiento" : "Nueva transacción" }}</h2>
       <button type="button" class="btn-close" (click)="close()" aria-label="Cerrar formulario">✕</button>
     </div>
 
@@ -40,7 +40,7 @@
           <label>Título</label>
           <input
             type="text"
-            formControlName="description"
+            formControlName="description" maxlength="255"
             placeholder="Ej: Compra del supermercado"
             [class.error]="f['description'].invalid && f['description'].touched"
           />
@@ -51,11 +51,9 @@
           <label>Monto</label>
           <input
             type="text"
-            inputmode="numeric"
-            placeholder="0"
-            [value]="amountDisplay()"
-            (input)="onAmountInput($event)"
-            (blur)="f['amount'].markAsTouched()"
+            inputmode="decimal"
+            placeholder="0,00"
+            appCurrencyInput formControlName="amount"
             [class.error]="f['amount'].invalid && f['amount'].touched"
           />
         </div>

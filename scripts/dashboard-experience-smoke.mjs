@@ -38,6 +38,9 @@ try {
       let data = [];
       if (p === '/auth/me') data = user;
       if (p === '/preferences/ui') data = { hiddenCards: [] };
+      if (p === '/transactions/recent') data = empty ? [] : [
+        ['Salario',2000000,'income'],['celular',1000000,'expense'],['chicle',1000,'expense'],['comida',100,'expense'],['comida mami',50000,'expense']
+      ].map(([description,amount,type], index) => ({ id: index + 1, description, amount, type, currency: 'COP', date: '2026-11-07T00:00:00' }));
       if (p === '/transactions/stats') data = { totalIncome: 1000000, totalExpenses: 1200000, balance: -200000, savingsRate: -20 };
       if (p === '/transactions/monthly-stats') data = empty ? [] : [{ month, income: 1000000, expenses: 1200000 }];
       if (p === '/planned-expenses') {
@@ -68,6 +71,22 @@ try {
       assert.ok((await link.boundingBox()).height >= 44, 'Actions need 44px touch targets');
     }
     await page.screenshot({ path: `artifacts/dashboard/${width}-monthly-plan.png`, fullPage: true });
+    const recent = page.locator('app-recent-transactions');
+    await recent.locator('.transaction-item').first().waitFor();
+    const rows = await recent.locator('.transaction-item').evaluateAll(items => items.map(row => {
+      const info = row.querySelector('.tx-info').getBoundingClientRect();
+      const date = row.querySelector('.tx-meta').getBoundingClientRect();
+      const amount = row.querySelector('.tx-amount').getBoundingClientRect();
+      const action = row.querySelector('.btn-delete').getBoundingClientRect();
+      return { height: row.getBoundingClientRect().height, dateRight: date.right, amountLeft: amount.left, amountRight: amount.right, actionLeft: action.left };
+    }));
+    assert.equal(rows.length, 5);
+    for (const row of rows) {
+      assert.ok(row.height <= 80, `Recent movement wastes space: ${row.height}px at ${width}px`);
+      assert.ok(row.dateRight + 3 <= row.amountLeft && row.amountRight <= row.actionLeft, `Movement fields overlap at ${width}px`);
+    }
+    await recent.screenshot({ path: `artifacts/dashboard/${width}-recent-movements.png` });
+
     await focus.getByRole('link', { name: 'Revisar pagos planeados' }).click();
     await page.waitForURL('**/planned-expenses');
     empty = true;

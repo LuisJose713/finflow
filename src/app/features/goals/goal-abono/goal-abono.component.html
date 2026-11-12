@@ -43,11 +43,9 @@
             <input
               class="field-input prefixed"
               type="text"
-              inputmode="numeric"
-              placeholder="0"
-              [value]="amountDisplay()"
-              (input)="onInput($event)"
-              (blur)="f['amount'].markAsTouched()"
+              inputmode="decimal"
+              placeholder="0,00"
+              appCurrencyInput formControlName="amount"
               [class.invalid]="f['amount'].invalid && f['amount'].touched"
             />
           </div>

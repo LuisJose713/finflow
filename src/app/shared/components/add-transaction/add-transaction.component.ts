@@ -1,3 +1,4 @@
+import { CurrencyInputDirective } from '../../directives/currency-input.directive';
 import { Component, inject, signal, output, OnInit, Input, HostListener, DestroyRef } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -7,12 +8,12 @@ import { CategoryService } from '../../../core/services/category.service';
 import { AccountService, FinancialAccount } from '../../../core/services/account.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { DashboardRefreshService } from '../../../core/services/dashboard-refresh.service';
-import { CreateTransactionRequest, TransactionType, Category } from '../../../core/models';
+import { CreateTransactionRequest, TransactionType, Category, Transaction } from '../../../core/models';
 
 @Component({
   selector: 'app-add-transaction',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [CurrencyInputDirective, ReactiveFormsModule, CommonModule],
   templateUrl: './add-transaction.component.html',
   styleUrls: ['./add-transaction.component.scss'],
 })
@@ -26,13 +27,14 @@ export class AddTransactionComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   @Input() floating = false;
+  @Input() showTrigger = true;
+  readonly editing = signal<Transaction | null>(null);
 
   isOpen         = signal(false);
   loading        = signal(false);
   allCategories  = signal<Category[]>([]);
   accounts = signal<FinancialAccount[]>([]);
   filteredCategories = signal<Category[]>([]);
-  amountDisplay  = signal('');
 
   created = output<void>();
 
@@ -42,12 +44,16 @@ export class AddTransactionComponent implements OnInit {
     categoryId:  [null as number | null, Validators.required],
     accountId:   [null as number | null],
     description: ['', [Validators.required, Validators.minLength(2)]],
-    date:        [new Date().toISOString().split('T')[0], Validators.required],
+    date:        [this.today(), Validators.required],
     currency:    ['COP'],
     status:      ['completed'],
   });
 
   get f() { return this.form.controls; }
+  private today(): string {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  }
 
   ngOnInit() {
     // The floating control lives in the navbar on every authenticated page.
@@ -70,25 +76,17 @@ export class AddTransactionComponent implements OnInit {
     this.filteredCategories.set(this.allCategories().filter(c => c.type === mapped));
   }
 
-  onAmountInput(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const raw   = input.value.replace(/\D/g, '');
-    if (!raw) {
-      this.form.get('amount')?.setValue(null, { emitEvent: false });
-      this.amountDisplay.set('');
-      input.value = '';
-      return;
-    }
-    const numeric   = parseInt(raw, 10);
-    const formatted = numeric.toLocaleString('es-CO', { maximumFractionDigits: 0 });
-    input.value = formatted;
-    this.amountDisplay.set(formatted);
-    this.form.get('amount')?.setValue(numeric, { emitEvent: false });
-  }
 
-  open() {
+  open(transaction?: Transaction) {
     if (this.loading()) return;
-    this.amountDisplay.set('');
+    this.editing.set(transaction ?? null);
+    this.form.reset({
+      amount: transaction?.amount ?? null,
+      description: transaction?.description ?? '',
+      type: transaction?.type ?? 'expense', categoryId: transaction?.categoryId ?? null,
+      accountId: transaction?.accountId ?? null, date: transaction?.date?.split('T')[0] ?? this.today(),
+      currency: transaction?.currency ?? 'COP', status: transaction?.status ?? 'completed',
+    }, { emitEvent: false });
     this.isOpen.set(true);
     this.categoryService.getAll()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -102,35 +100,39 @@ export class AddTransactionComponent implements OnInit {
     this.accountService.list()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: accounts => this.accounts.set(accounts.filter(a => !a.archived && a.currency === 'COP')),
+        next: accounts => this.accounts.set(accounts.filter(a => (!a.archived || a.id === transaction?.accountId) && a.currency === 'COP')),
         error: () => this.toast.error('No pudimos cargar las cuentas'),
       });
   }
 
   close() {
+    if (this.loading()) return;
     this.isOpen.set(false);
-    this.amountDisplay.set('');
+    this.editing.set(null);
     this.form.reset({
       type: 'expense', categoryId: null, accountId: null,
-      date: new Date().toISOString().split('T')[0],
+      date: this.today(),
       currency: 'COP', status: 'completed',
     });
   }
 
   onSubmit() {
+    if (this.loading()) return;
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.loading.set(true);
     const data = this.form.getRawValue() as CreateTransactionRequest;
 
-    this.txService.create(data).subscribe({
+    const editing = this.editing();
+    const request = editing ? this.txService.update(editing.id, data) : this.txService.create(data);
+    request.subscribe({
       next: () => {
-        this.toast.success('Transacción agregada');
+        this.toast.success(editing ? 'Movimiento actualizado' : 'Transacción agregada');
         this.refresh.trigger(); // 👈 dispara el signal — todos los componentes reaccionan
         this.created.emit();
-        this.close();
         this.loading.set(false);
+        this.close();
       },
-      error: () => { this.toast.error('Error al guardar'); this.loading.set(false); },
+      error: () => { this.toast.error('No pudimos confirmar el cambio. Revisa el historial antes de volver a guardar.'); this.loading.set(false); },
     });
   }
 }

@@ -40,7 +40,7 @@ jobs:
       - name: Authentication regression tests (Chrome Headless)
         run: npm test -- --watch=false --browsers=ChromeHeadless --include='src/app/core/interceptors/**/*.spec.ts'
       - name: Dashboard and currency regression tests (Chrome Headless)
-        run: npm test -- --watch=false --browsers=ChromeHeadless --include='src/app/features/dashboard/**/*.spec.ts' --include=src/app/shared/pipes/currency.pipe.spec.ts --include=src/app/shared/directives/currency-input.directive.spec.ts --include=src/app/shared/directives/dismissible-card.directive.spec.ts
+        run: npm test -- --watch=false --browsers=ChromeHeadless --include='src/app/features/dashboard/**/*.spec.ts' --include=src/app/shared/pipes/currency.pipe.spec.ts --include=src/app/shared/directives/currency-input.directive.spec.ts --include=src/app/shared/directives/dismissible-card.directive.spec.ts --include=src/app/shared/components/add-transaction/add-transaction.component.spec.ts
       - name: Session guard regression tests (Chrome Headless)
         run: npm test -- --watch=false --browsers=ChromeHeadless --include=src/app/core/guards/session-token.spec.ts --include=src/app/core/services/auth.service.spec.ts --include=src/app/core/services/cookie-session.spec.ts --include=src/app/core/services/web-update.service.spec.ts
       - name: Audit production dependencies

@@ -17,11 +17,19 @@
   <ul *ngIf="!loading() && !loadError() && transactions().length > 0" class="list">
     <li *ngFor="let tx of transactions(); trackBy: trackById" class="transaction-item">
       <div class="tx-icon" [class]="tx.type" aria-hidden="true">{{ tx.type === "income" ? "↑" : "↓" }}</div>
-      <div class="tx-info"><span class="tx-title" [title]="tx.description">{{ tx.description }}</span><span class="tx-meta">{{ tx.date | date: "dd MMM yyyy" }}</span></div>
-      <div class="tx-actions">
-        <span class="tx-amount" [class.income]="tx.type === 'income'" [class.expense]="tx.type === 'expense'">{{ tx.type === "income" ? "+" : "-" }}{{ tx.amount | appCurrency:tx.currency }}</span>
-        <button type="button" class="btn-delete" (click)="confirmDelete(tx)" [disabled]="deletingIds().has(tx.id)" [attr.aria-busy]="deletingIds().has(tx.id)" [attr.aria-label]="(deletingIds().has(tx.id) ? 'Eliminando transacción ' : 'Eliminar transacción ') + tx.description" title="Eliminar transacción"><span aria-hidden="true">✕</span></button>
+      <div class="tx-info">
+        <span class="tx-title" [title]="tx.description">{{ tx.description }}</span>
+        <div class="tx-details">
+          <time class="tx-meta" [attr.datetime]="tx.date">{{ tx.date | date: "dd MMM yyyy" }}</time>
+          <span class="tx-amount" [class.income]="tx.type === 'income'" [class.expense]="tx.type === 'expense'"
+            [attr.aria-label]="(tx.type === 'income' ? 'Ingreso ' : 'Gasto ') + (tx.amount | appCurrency:tx.currency)">
+            {{ tx.type === "income" ? "+" : "−" }}{{ tx.amount | appCurrency:tx.currency:'symbol' }}
+          </span>
+        </div>
       </div>
+      <button type="button" class="btn-delete" (click)="confirmDelete(tx)" [disabled]="deletingIds().has(tx.id)" [attr.aria-busy]="deletingIds().has(tx.id)" [attr.aria-label]="(deletingIds().has(tx.id) ? 'Eliminando transacción ' : 'Eliminar transacción ') + tx.description" title="Eliminar transacción">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13M10 11v5m4-5v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </li>
   </ul>
 </section>

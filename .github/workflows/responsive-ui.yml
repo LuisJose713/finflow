@@ -46,7 +46,7 @@ jobs:
         run: |
           npm ci
           npm install --no-save --ignore-scripts playwright@1.56.1
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps chromium webkit
 
       - name: Verify enforced security policy against production build
         run: |
@@ -66,6 +66,7 @@ jobs:
               echo "Angular server ready"
               node scripts/responsive-smoke.mjs
               node scripts/dashboard-experience-smoke.mjs
+              node scripts/ios-pwa-smoke.mjs
               exit $?
             fi
             if ! kill -0 "$SERVER_PID" 2>/dev/null; then
@@ -87,5 +88,6 @@ jobs:
           path: |
             artifacts/responsive/
             artifacts/dashboard/
+            artifacts/ios-web/
           if-no-files-found: ignore
           retention-days: 7

@@ -1,3 +1,4 @@
+import { CurrencyInputDirective } from '../../../shared/directives/currency-input.directive';
 import { Component, inject, signal, output } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -9,7 +10,7 @@ import { Goal, CreateGoalRequest } from '../../../core/models';
 @Component({
   selector: 'app-goal-form',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [CurrencyInputDirective, ReactiveFormsModule, CommonModule],
   templateUrl: './goal-form.component.html',
   styleUrls: ['./goal-form.component.scss'],
 })
@@ -24,9 +25,6 @@ export class GoalFormComponent {
   loading   = signal(false);
   error     = signal('');
 
-  // Signals de display para los campos con formato
-  targetDisplay  = signal('');
-  currentDisplay = signal('');
 
   form = this.fb.group({
     title:         ['', [Validators.required, Validators.minLength(2)]],
@@ -38,10 +36,6 @@ export class GoalFormComponent {
 
   get f() { return this.form.controls; }
 
-  private fmt(value: number | null): string {
-    if (value == null) return '';
-    return value.toLocaleString('es-CO', { maximumFractionDigits: 0 });
-  }
 
   open(goal?: Goal) {
     this.error.set('');
@@ -54,42 +48,20 @@ export class GoalFormComponent {
         deadline:      goal.deadline.split('T')[0],
         description:   goal.description ?? '',
       });
-      this.targetDisplay.set(this.fmt(goal.targetAmount));
-      this.currentDisplay.set('');
     } else {
       this.form.reset({ currentAmount: null });
-      this.targetDisplay.set('');
-      this.currentDisplay.set('');
     }
     this.isOpen.set(true);
   }
 
   close() {
+    if (this.loading()) return;
     this.error.set('');
     this.isOpen.set(false);
     this.editGoal.set(null);
     this.form.reset({ currentAmount: null });
-    this.targetDisplay.set('');
-    this.currentDisplay.set('');
   }
 
-  onInput(event: Event, controlName: 'targetAmount' | 'currentAmount'): void {
-    const input   = event.target as HTMLInputElement;
-    const raw     = input.value.replace(/\D/g, '');
-    if (!raw) {
-      this.form.get(controlName)?.setValue(null, { emitEvent: false });
-      if (controlName === 'targetAmount') this.targetDisplay.set('');
-      else this.currentDisplay.set('');
-      input.value = '';
-      return;
-    }
-    const numeric   = parseInt(raw, 10);
-    const formatted = numeric.toLocaleString('es-CO', { maximumFractionDigits: 0 });
-    input.value = formatted;
-    this.form.get(controlName)?.setValue(numeric, { emitEvent: false });
-    if (controlName === 'targetAmount') this.targetDisplay.set(formatted);
-    else this.currentDisplay.set(formatted);
-  }
 
   onSubmit() {
     if (this.loading()) return;
@@ -130,8 +102,8 @@ export class GoalFormComponent {
       next: () => {
         this.toast.success(goal ? 'Meta actualizada' : 'Meta creada');
         this.saved.emit();
-        this.close();
         this.loading.set(false);
+        this.close();
       },
       error: (err: HttpErrorResponse) => {
         const message = err.status === 401 ? 'La sesión expiró. Inicia sesión nuevamente.'

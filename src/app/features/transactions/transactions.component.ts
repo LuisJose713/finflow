@@ -1,5 +1,5 @@
 import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
-import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, effect, ViewChild } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransactionService } from '@core/services/transaction.service';
@@ -17,12 +17,14 @@ import { AddTransactionComponent } from '@shared/components/add-transaction/add-
   standalone: true,
   imports: [DismissibleCardDirective, 
     CommonModule, DatePipe, FormsModule,
-    AppCurrencyPipe, NavbarComponent, ToastContainerComponent
+    AppCurrencyPipe, NavbarComponent, ToastContainerComponent, AddTransactionComponent
 ],
   templateUrl: './transactions.component.html',
   styleUrls: ['./transactions.component.scss'],
 })
 export class TransactionsComponent implements OnInit {
+  @ViewChild("transactionEditor") private transactionEditor?: AddTransactionComponent;
+  edit(transaction: Transaction) { this.transactionEditor?.open(transaction); }
   private txService       = inject(TransactionService);
   private categoryService = inject(CategoryService);
   private toast           = inject(ToastService);

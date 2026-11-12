@@ -25,11 +25,9 @@
           <label>Monto objetivo</label>
           <input
             type="text"
-            inputmode="numeric"
-            placeholder="0"
-            [value]="targetDisplay()"
-            (input)="onInput($event, 'targetAmount')"
-            (blur)="f['targetAmount'].markAsTouched()"
+            inputmode="decimal"
+            placeholder="0,00"
+            appCurrencyInput formControlName="targetAmount"
             [class.error]="f['targetAmount'].invalid && f['targetAmount'].touched"
           />
         </div>
@@ -38,10 +36,9 @@
           <label>Ya tengo ahorrado</label>
           <input
             type="text"
-            inputmode="numeric"
-            placeholder="0"
-            [value]="currentDisplay()"
-            (input)="onInput($event, 'currentAmount')"
+            inputmode="decimal"
+            placeholder="0,00"
+            appCurrencyInput formControlName="currentAmount"
           />
         </div>
 

@@ -705,3 +705,8 @@
   .advisor-header .hero-symbol { display: none; }
   .advisor-main .chat-topbar .brand-avatar { width: 39px; height: 39px; }
 }
+
+.advisor-main .chat-topbar {flex-wrap:wrap;}
+.advisor-main .chat-topbar .btn-clear {margin-left:auto;min-height:44px;font-size:.78rem;padding:.5rem .75rem;}
+.advisor-main .chat-topbar .assistant-identity {min-width:0;}
+.advisor-main [appDismissibleCard] {flex-shrink:0;}

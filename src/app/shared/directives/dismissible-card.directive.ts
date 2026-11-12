@@ -35,16 +35,18 @@ export class DismissibleCardDirective implements AfterViewInit {
     this.close!.type = 'button'; this.close!.textContent = '×';
     this.renderer.setAttribute(this.close, 'aria-label', 'Ocultar presentación');
     this.renderer.setAttribute(this.close, 'title', 'Ocultar esta tarjeta');
-    this.style(this.close!, { position: 'absolute', top: '10px', right: '10px', width: '36px', height: '36px',
+    this.style(this.close!, { position: 'absolute', top: '10px', right: '10px', width: '44px', height: '44px',
       border: '1px solid #ffffff40', borderRadius: '10px', background: '#09162a70', color: '#ffffff',
       cursor: 'pointer', fontSize: '24px', lineHeight: '1', zIndex: '2' });
     this.renderer.setStyle(this.host, 'position', 'relative');
-    this.renderer.setStyle(this.host, 'padding-right', '54px');
+    this.renderer.setStyle(this.host, 'padding-right', '64px');
     this.renderer.appendChild(this.host, this.close);
 
     this.restore = this.renderer.createElement('div');
-    this.style(this.restore!, { display: 'none', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', margin: '8px 0 16px' });
-    const heading = this.host.querySelector('h1');
+    this.style(this.restore!, { display: 'none', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', margin: '0' });
+    const pageHeader = this.host.parentElement?.querySelector<HTMLElement>(':scope > .page-header');
+    const inlineTarget = pageHeader && pageHeader !== this.host ? pageHeader.querySelector('.header-actions') || pageHeader : null;
+    const heading = inlineTarget ? null : this.host.querySelector('h1');
     if (heading) {
       const compact = this.renderer.createElement('h1');
       this.renderer.setProperty(compact, 'textContent', heading.textContent);
@@ -54,9 +56,10 @@ export class DismissibleCardDirective implements AfterViewInit {
     this.restoreButton = this.renderer.createElement('button');
     this.restoreButton!.type = 'button'; this.restoreButton!.textContent = 'Mostrar presentación';
     this.style(this.restoreButton!, { border: '1px solid var(--border, #ccd5df)', borderRadius: '9px', padding: '7px 12px',
-      minHeight: '36px', color: 'var(--text-primary)', background: 'var(--bg-secondary, transparent)', cursor: 'pointer', font: 'inherit', fontSize: '.78rem' });
+      minHeight: '44px', color: 'var(--text-primary)', background: 'var(--bg-secondary, transparent)', cursor: 'pointer', font: 'inherit', fontSize: '.78rem' });
     this.renderer.appendChild(this.restore, this.restoreButton);
-    this.renderer.insertBefore(this.host.parentNode, this.restore, this.host);
+    if (inlineTarget) this.renderer.appendChild(inlineTarget, this.restore);
+    else this.renderer.insertBefore(this.host.parentNode, this.restore, this.host);
     const removeClose = this.renderer.listen(this.close, 'click', (event: Event) => { event.stopPropagation(); this.preferences.setHidden(this.cardId(), true); });
     const removeRestore = this.renderer.listen(this.restoreButton, 'click', () => this.preferences.setHidden(this.cardId(), false));
     this.initialized.set(true);

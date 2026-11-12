@@ -42,7 +42,7 @@
         <input
           class="search-input"
           type="text"
-          placeholder="Buscar por descripción..."
+          placeholder="Buscar por título..."
           [ngModel]="filterSearch()"
           (ngModelChange)="filterSearch.set($event)"
         />
@@ -50,37 +50,37 @@
 
       <div class="filters-row">
         <!-- Tipo -->
-        <select class="filter-select"
+        <label class="filter-control"><span>Tipo</span><select class="filter-select"
           [ngModel]="filterType()"
           (ngModelChange)="filterType.set($event); load()">
-          <option value="">Todos los tipos</option>
+          <option value="">Todos</option>
           <option value="income">Ingresos</option>
           <option value="expense">Egresos</option>
-        </select>
+        </select></label>
 
         <!-- Mes -->
-        <select class="filter-select"
+        <label class="filter-control"><span>Mes</span><select class="filter-select"
           [ngModel]="filterMonth()"
           (ngModelChange)="filterMonth.set($event ? +$event : null); load()">
-          <option [ngValue]="null">Todos los meses</option>
+          <option [ngValue]="null">Todos</option>
           <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
-        </select>
+        </select></label>
 
         <!-- Año -->
-        <select class="filter-select"
+        <label class="filter-control"><span>Año</span><select class="filter-select"
           [ngModel]="filterYear()"
           (ngModelChange)="filterYear.set($event ? +$event : null); load()">
-          <option [ngValue]="null">Todos los años</option>
+          <option [ngValue]="null">Todos</option>
           <option *ngFor="let y of years()" [value]="y">{{ y }}</option>
-        </select>
+        </select></label>
 
         <!-- Categoría -->
-        <select class="filter-select"
+        <label class="filter-control"><span>Categoría</span><select class="filter-select"
           [ngModel]="filterCategoryId()"
           (ngModelChange)="filterCategoryId.set($event ? +$event : null); load()">
-          <option [ngValue]="null">Todas las categorías</option>
+          <option [ngValue]="null">Todas</option>
           <option *ngFor="let c of categories()" [value]="c.id">{{ c.name }}</option>
-        </select>
+        </select></label>
 
         <!-- Limpiar -->
         <button class="btn-clear" *ngIf="hasFilters" (click)="clearFilters()">
@@ -104,41 +104,38 @@
       </button>
     </div>
 
-    <!-- Lista -->
-    <ul *ngIf="!loading() && transactions().length > 0" class="list">
-      <li *ngFor="let tx of transactions(); trackBy: trackById" class="tx-item">
-
-        <div class="tx-icon" [class]="tx.type">
-          <svg *ngIf="tx.type === 'income'" width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          <svg *ngIf="tx.type === 'expense'" width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <path d="M12 5v14M19 12l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </div>
-
-        <div class="tx-info">
-          <span class="tx-title">{{ tx.description }}</span>
-          <span class="tx-meta">
-            {{ categoryName(tx.categoryId) }} · {{ tx.date | date:'dd MMM yyyy' }}
-          </span>
-        </div>
-
-        <div class="tx-right">
-          <span class="tx-amount" [class.income]="tx.type === 'income'" [class.expense]="tx.type === 'expense'">
-            {{ tx.type === 'income' ? '+' : '-' }}{{ tx.amount | appCurrency }}
-          </span>
-          <button class="btn-delete" (click)="delete(tx)" title="Eliminar">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </button>
-        </div>
-
-      </li>
-    </ul>
+    <section *ngIf="!loading() && transactions().length > 0" class="ledger-panel" aria-label="Historial de movimientos">
+      <div class="ledger-columns" aria-hidden="true"><span></span><span>Movimiento</span><span>Categoría</span><span>Fecha</span><span class="amount-heading">Monto</span><span></span></div>
+      <ul class="list ledger-list">
+        <li *ngFor="let tx of transactions(); trackBy: trackById" class="tx-item">
+          <div class="tx-icon" [class]="tx.type" aria-hidden="true">{{tx.type === 'income' ? '↑' : '↓'}}</div>
+          <div class="tx-info">
+            <span class="tx-title" [title]="tx.description">{{tx.description}}</span>
+            <div class="tx-details">
+              <span class="tx-meta" [title]="categoryName(tx.categoryId) + ' · ' + (tx.date | date:'dd MMM yyyy')">
+                <time class="tx-date" [attr.datetime]="tx.date">{{tx.date | date:'dd MMM yy'}}</time>
+                <span class="meta-separator" aria-hidden="true">·</span>
+                <span class="tx-category">{{categoryName(tx.categoryId)}}</span>
+              </span>
+              <span class="tx-amount" [class.income]="tx.type === 'income'" [class.expense]="tx.type === 'expense'"
+                [attr.aria-label]="(tx.type === 'income' ? 'Ingreso ' : 'Gasto ') + (tx.amount | appCurrency:tx.currency)">
+                {{tx.type === 'income' ? '+' : '−'}}{{tx.amount | appCurrency:tx.currency:'symbol'}}
+              </span>
+            </div>
+          </div>
+          <details class="tx-menu" #actions (keydown.escape)="actions.open = false">
+            <summary [attr.aria-label]="'Acciones de ' + tx.description" title="Acciones del movimiento">⋯</summary>
+            <div class="tx-menu-panel">
+              <button type="button" (click)="actions.open = false; edit(tx)">Editar movimiento</button>
+              <button type="button" class="delete-action" (click)="actions.open = false; delete(tx)">Eliminar movimiento</button>
+            </div>
+          </details>
+        </li>
+      </ul>
+    </section>
 
   </main>
 
+  <app-add-transaction #transactionEditor [showTrigger]="false" (created)="load()"/>
   <app-toast-container></app-toast-container>
 </div>

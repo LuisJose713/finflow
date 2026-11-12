@@ -1,3 +1,4 @@
+import { SelectReadabilityService } from './core/services/select-readability.service';
 import { Component, ElementRef, HostListener, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet, RouterLink } from '@angular/router';
 import { catchError, filter, forkJoin, of } from 'rxjs';
@@ -110,6 +111,7 @@ import { PrivacyPolicyComponent } from './shared/components/privacy-policy.compo
   `]
 })
 export class AppComponent {
+  private readonly selectReadability = inject(SelectReadabilityService);
   readonly auth = inject(AuthService);
   private readonly privacy = inject(PrivacyService);
   private readonly router = inject(Router);

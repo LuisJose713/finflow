@@ -6,6 +6,11 @@ describe('AppCurrencyPipe', () => {
     expect(pipe.transform(1500000)).toContain('COP');
     expect(pipe.transform(1500000)).toContain('1.500.000');
   });
+  it('uses compact COP symbols and always shows two decimals', () => {
+    expect(pipe.transform(1500000, 'COP', 'symbol')).toContain('$');
+    expect(pipe.transform(1500000, 'COP', 'symbol')).toContain('1.500.000,00');
+    expect(pipe.transform(12.5, 'USD', 'symbol')).toContain('USD');
+  });
   it('preserves explicit currencies, zero and the negative sign', () => {
     expect(pipe.transform(12.5, 'USD')).toContain('USD');
     expect(pipe.transform(-50000)).toContain('-');
