@@ -1,132 +1,35 @@
 <section class="transactions-card" aria-label="Transacciones recientes" [attr.aria-busy]="loading()">
-  <header class="card-header">
-    <div class="card-heading">
-      <span class="panel-kicker">TU ACTIVIDAD FINANCIERA</span>
-      <h2>Movimientos recientes</h2>
-    </div>
-    <div class="header-actions">
-      <button type="button" class="refresh-action" (click)="load()"
-        [disabled]="loading() || refreshing()"
-        [attr.aria-label]="refreshing() ? 'Actualizando movimientos' : 'Actualizar movimientos recientes'"
-        title="Actualizar movimientos">
-        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor"
-          stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
-          [class.spinning]="refreshing()">
-          <path d="M20 7v5h-5M4 17v-5h5"/>
-          <path d="M5.7 9A7 7 0 0 1 18 6l2 1M4 17l2 1a7 7 0 0 0 12.3-3"/>
-        </svg>
-      </button>
-      <a routerLink="/transactions" class="view-all" aria-label="Ver todos los movimientos">
-        Ver todos
-        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
-          stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M5 12h14m-6-6 6 6-6 6"/>
-        </svg>
-      </a>
-    </div>
-  </header>
-
-  <div class="preview-toolbar" *ngIf="!loading() && transactions().length > 0">
-    <div class="type-filter" role="group" aria-label="Filtrar los últimos movimientos">
-      <button type="button" [class.active]="selectedType() === 'all'"
-        [attr.aria-pressed]="selectedType() === 'all'" (click)="selectedType.set('all')">
-        Todos <span class="filter-count">{{ transactions().length }}</span>
-      </button>
-      <button type="button" [class.active]="selectedType() === 'income'"
-        [attr.aria-pressed]="selectedType() === 'income'" (click)="selectedType.set('income')">
-        Ingresos <span class="filter-count">{{ incomeCount() }}</span>
-      </button>
-      <button type="button" [class.active]="selectedType() === 'expense'"
-        [attr.aria-pressed]="selectedType() === 'expense'" (click)="selectedType.set('expense')">
-        Gastos <span class="filter-count">{{ expenseCount() }}</span>
-      </button>
-    </div>
-    <span class="preview-caption">Últimos {{ transactions().length }}</span>
+  <div class="card-header">
+    <div><span class="panel-kicker">ÚLTIMOS MOVIMIENTOS</span><h2>Transacciones recientes</h2></div>
+    <span class="badge">Últimas 5</span>
   </div>
-
   <ng-container *ngIf="loading()">
-    <div role="status">
-      <span class="visually-hidden">Cargando transacciones recientes…</span>
-      <div class="list" aria-hidden="true">
-        <div *ngFor="let i of [1, 2, 3, 4, 5]" class="transaction-item skeleton"></div>
-      </div>
-    </div>
+    <div role="status"><span class="visually-hidden">Cargando transacciones recientes…</span><div class="list" aria-hidden="true"><div *ngFor="let i of [1, 2, 3, 4, 5]" class="transaction-item skeleton"></div></div></div>
   </ng-container>
-
-  <div *ngIf="!loading() && loadError() && transactions().length === 0"
-    class="empty-state error-state" role="alert">
+  <div *ngIf="!loading() && loadError()" class="empty-state error-state" role="alert">
     <p>No pudimos cargar tus movimientos</p>
-    <small>Comprueba la conexión y vuelve a intentarlo.</small>
+    <small>Vuelve a intentarlo para consultar tus transacciones recientes.</small>
     <button type="button" class="state-action" (click)="load()">Reintentar</button>
   </div>
-
-  <p *ngIf="!loading() && loadError() && transactions().length > 0" class="stale-state" role="status">
-    No se pudieron actualizar. Se muestran los últimos movimientos consultados.
-    <button type="button" (click)="load()">Reintentar</button>
-  </p>
-
-  <div *ngIf="!loading() && !loadError() && transactions().length === 0" class="empty-state">
-    <p>No hay transacciones aún</p>
-    <small>Registra tu primer movimiento para empezar a ver tu actividad.</small>
-    <a routerLink="/transactions" class="state-action">Ir a movimientos</a>
-  </div>
-
-  <div *ngIf="!loading() && transactions().length > 0 && visibleTransactions().length === 0" class="filter-empty">
-    <p>No hay {{ selectedType() === 'income' ? 'ingresos' : 'gastos' }} entre estos últimos movimientos.</p>
-    <button type="button" (click)="selectedType.set('all')">Mostrar todos</button>
-  </div>
-
-  <ul *ngIf="!loading() && visibleTransactions().length > 0" class="list movement-list">
-    <li *ngFor="let tx of visibleTransactions(); trackBy: trackById" class="transaction-item">
-      <span class="tx-icon" [class.income]="tx.type === 'income'"
-        [class.expense]="tx.type === 'expense'" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
-          stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="9"/>
-          <path *ngIf="tx.type === 'income'" d="M12 17V7m0 0-4 4m4-4 4 4"/>
-          <path *ngIf="tx.type !== 'income'" d="M12 7v10m0 0-4-4m4 4 4-4"/>
-        </svg>
-      </span>
-
+  <ng-container *ngIf="!loading() && !loadError() && transactions().length === 0">
+    <div class="empty-state"><p>No hay transacciones aún</p><small>Agrega tu primera transacción para comenzar</small><a routerLink="/transactions" class="state-action">Ir a movimientos</a></div>
+  </ng-container>
+  <ul *ngIf="!loading() && !loadError() && transactions().length > 0" class="list">
+    <li *ngFor="let tx of transactions(); trackBy: trackById" class="transaction-item">
+      <div class="tx-icon" [class]="tx.type" aria-hidden="true">{{ tx.type === "income" ? "↑" : "↓" }}</div>
       <div class="tx-info">
-        <span class="tx-title" [title]="tx.description || 'Movimiento'">
-          {{ tx.description || 'Movimiento sin título' }}
-        </span>
+        <span class="tx-title" [title]="tx.description">{{ tx.description }}</span>
         <div class="tx-details">
-          <time class="tx-meta" [attr.datetime]="tx.date"
-            [title]="(tx.date | date:'dd MMM yyyy') || ''">
-            {{ dateLabel(tx.date || tx.createdAt) }}
-          </time>
-          <span class="tx-amount" [class.income]="tx.type === 'income'"
-            [class.expense]="tx.type === 'expense'"
-            [attr.aria-label]="(tx.type === 'income' ? 'Ingreso ' : 'Gasto ') + (tx.amount | appCurrency:tx.currency)"
-            [title]="tx.amount | appCurrency:tx.currency">
-            {{ tx.type === 'income' ? '+' : '−' }}{{ tx.amount | appCurrency:tx.currency:'symbol' }}
+          <time class="tx-meta" [attr.datetime]="tx.date">{{ tx.date | date: "dd MMM yyyy" }}</time>
+          <span class="tx-amount" [class.income]="tx.type === 'income'" [class.expense]="tx.type === 'expense'"
+            [attr.aria-label]="(tx.type === 'income' ? 'Ingreso ' : 'Gasto ') + (tx.amount | appCurrency:tx.currency)">
+            {{ tx.type === "income" ? "+" : "−" }}{{ tx.amount | appCurrency:tx.currency:'symbol' }}
           </span>
         </div>
       </div>
-
-      <details class="tx-menu" #actions (keydown.escape)="actions.open = false">
-        <summary class="tx-menu-trigger"
-          [attr.aria-label]="'Acciones de ' + (tx.description || 'movimiento')"
-          title="Acciones del movimiento">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
-            <circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/>
-          </svg>
-        </summary>
-        <div class="tx-menu-panel">
-          <button type="button" class="btn-delete" (click)="actions.open = false; confirmDelete(tx)"
-            [disabled]="deletingIds().has(tx.id)" [attr.aria-busy]="deletingIds().has(tx.id)"
-            [attr.aria-label]="(deletingIds().has(tx.id) ? 'Eliminando transacción ' : 'Eliminar transacción ') + tx.description">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-              stroke-linejoin="round" aria-hidden="true">
-              <path d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13M10 11v5m4-5v5"/>
-            </svg>
-            <span>{{ deletingIds().has(tx.id) ? 'Eliminando…' : 'Eliminar movimiento' }}</span>
-          </button>
-        </div>
-      </details>
+      <button type="button" class="btn-delete" (click)="confirmDelete(tx)" [disabled]="deletingIds().has(tx.id)" [attr.aria-busy]="deletingIds().has(tx.id)" [attr.aria-label]="(deletingIds().has(tx.id) ? 'Eliminando transacción ' : 'Eliminar transacción ') + tx.description" title="Eliminar transacción">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13M10 11v5m4-5v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </li>
   </ul>
 </section>
