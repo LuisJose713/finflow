@@ -525,3 +525,62 @@
   .expense-right { flex: 1 1 100%; justify-content: space-between; min-width: 0; }
   .modal-body { gap: 1rem; }
 }
+
+
+/* FinFlow menu-inspired list density and actions on touchscreens. */
+.summary-cards { gap:clamp(.65rem,1.5vw,1rem); }
+.summary-card {
+  min-width:0;
+  min-height:120px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:.35rem;
+  border-radius:18px;
+  padding:clamp(1rem,2vw,1.35rem);
+  box-shadow:0 8px 25px rgba(9,22,42,.055);
+}
+.summary-count { display:block; color:var(--text-secondary); font-size:.78rem; line-height:1.4; }
+.summary-value { font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.filter-tabs { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.25rem; }
+.filter-tabs .tab {
+  min-width:0;
+  min-height:44px;
+  padding:.55rem .6rem;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:.84rem;
+  line-height:1.35;
+}
+.expense-card { gap:.85rem; border-radius:15px; box-shadow:none; }
+.expense-title { font-size:.95rem; line-height:1.4; }
+.expense-meta { font-family:Inter,system-ui,sans-serif; font-size:.78rem; line-height:1.4; }
+.expense-amount { font-size:1rem; font-variant-numeric:tabular-nums; }
+.expense-actions { opacity:1; gap:.4rem; }
+.expense-actions :is(.btn-execute,.icon-btn) {
+  display:inline-grid;
+  place-items:center;
+  width:44px;
+  height:44px;
+  min-height:44px;
+  min-width:44px;
+  border-radius:11px;
+  border:1px solid var(--border);
+  background:var(--bg-primary);
+}
+.expense-actions :is(.btn-execute,.icon-btn) svg { display:block; width:19px; height:19px; }
+.expense-actions :is(.btn-execute,.icon-btn):focus-visible { outline:2px solid #b38a4b; outline-offset:2px; }
+.expense-actions .btn-execute { color:var(--success); border-color:color-mix(in srgb,var(--success) 35%,var(--border)); }
+.empty-icon svg { display:block; width:42px; height:42px; color:#b38a4b; }
+@media (max-width:600px) {
+  .filter-tabs { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .expense-right { gap:.55rem; }
+  .expense-actions { width:100%; display:flex; justify-content:flex-end; }
+  .expense-card { padding:1rem; }
+}
+@media (max-width:360px) {
+  .filter-tabs .tab { font-size:.8rem; }
+  .expense-amount { font-size:.91rem; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .expense-card { animation:none; }
+}
