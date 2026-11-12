@@ -86,6 +86,34 @@ describe('RecentTransactionsComponent', () => {
     expect(fixture.nativeElement.querySelector('.tx-amount').textContent).not.toContain('COP');
   });
 
+  it('shows the latest 2, 3 or 5 transactions without fetching again or hiding available records', () => {
+    const transactions = Array.from({ length: 5 }, (_, index) => ({
+      ...transaction, id: 'tx-' + (index + 1), description: 'Movimiento ' + (index + 1),
+    }));
+    respond(transactions);
+    const buttons: HTMLButtonElement[] = Array.from(
+      fixture.nativeElement.querySelectorAll('.recent-count-button'),
+    );
+    expect(buttons.length).toBe(3);
+    expect(fixture.nativeElement.querySelectorAll('.transaction-item').length).toBe(5);
+
+    buttons[0].click();
+    fixture.detectChanges();
+    expect(component.visibleCount()).toBe(2);
+    expect(fixture.nativeElement.querySelectorAll('.transaction-item').length).toBe(2);
+    expect(fixture.nativeElement.textContent).toContain('Movimiento 1');
+    expect(fixture.nativeElement.textContent).not.toContain('Movimiento 3');
+
+    buttons[1].click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('.transaction-item').length).toBe(3);
+
+    buttons[2].click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('.transaction-item').length).toBe(5);
+    expect(service.getRecent).toHaveBeenCalledTimes(1);
+  });
+
   it('cancels an older refresh before accepting the newest movements', () => {
     const stale = requests[0];
     TestBed.inject(DashboardRefreshService).trigger();
