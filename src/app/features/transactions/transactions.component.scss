@@ -454,3 +454,25 @@
 }
 
 .app-shell .btn-export,.app-shell .btn-clear {font-family:inherit;}
+
+/* FinFlow V5: readable compact financial ledger on small devices. */
+.filters-row { align-items: end; }
+.filter-control { min-width: 0; }
+.filter-control > span:first-child { line-height: 1.45; }
+.ledger-list .tx-title { font-size: clamp(.86rem, .8rem + .22vw, .96rem); }
+.ledger-list .tx-meta { font-size: .77rem; }
+.ledger-list .tx-amount { font-size: clamp(.78rem, .73rem + .23vw, .9rem); font-weight: 740; }
+.tx-menu-panel { max-width: min(230px, calc(100vw - 28px)); }
+.tx-menu-panel button { font-size: .875rem; }
+@container transactions-workspace (max-width: 440px) {
+  .filters-row { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .filters-card { gap: .75rem; }
+  .filter-control .filter-select { font-size: 1rem; }
+  .ledger-list .tx-info { gap: .35rem; }
+  .ledger-list .tx-details { gap: .5rem; }
+}
+@media (max-width: 375px) {
+  .header-actions { min-width: 0; }
+  .btn-export { min-width: 0; }
+  .app-shell .ledger-list .tx-item { column-gap: .5rem; padding: .55rem .65rem; }
+}
