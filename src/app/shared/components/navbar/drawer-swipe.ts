@@ -28,10 +28,12 @@ export class DrawerSwipe {
     this.lastTime = time;
   }
 
-  static canStart(x: number, viewportWidth: number, open: boolean): boolean {
+  static canStart(x: number, viewportWidth: number, open: boolean, fromMenuButton = false): boolean {
     if (viewportWidth > 768 || viewportWidth <= 0) return false;
-    // Keep the system/browser back edge free; the rest of the left zone is generous.
-    return open || (x >= 24 && x <= Math.min(112, viewportWidth * .32));
+    // Preserve the system back gesture except where the visible menu button owns the touch.
+    if (open) return true;
+    if (fromMenuButton && x >= 0 && x <= Math.min(88, viewportWidth * .36)) return true;
+    return x >= 24 && x <= Math.min(128, viewportWidth * .36);
   }
 
   get active(): boolean { return this.axis === 'horizontal'; }
@@ -39,10 +41,19 @@ export class DrawerSwipe {
   move(x: number, y: number, time: number): number | null {
     const dx = x - this.startX;
     const dy = y - this.startY;
-    if (this.axis === 'pending' && Math.max(Math.abs(dx), Math.abs(dy)) >= 10) {
+    if (this.axis === 'pending') {
+      const absX = Math.abs(dx);
+      const absY = Math.abs(dy);
       const wrongDirection = this.initiallyOpen ? dx > 0 : dx < 0;
-      if (Math.abs(dy) >= Math.abs(dx) || wrongDirection) this.axis = 'rejected';
-      else if (Math.abs(dx) >= Math.abs(dy) * 1.35) this.axis = 'horizontal';
+      // Do not reject a pan on the first small diagonal wobble: let the
+      // finger establish intent before giving the gesture to vertical scroll.
+      if (absX >= 12 && absX > absY * 1.15 && !wrongDirection) {
+        this.axis = 'horizontal';
+      } else if (absY >= 18 && absY > absX * 1.25) {
+        this.axis = 'rejected';
+      } else if (wrongDirection && absX >= 18 && absX > absY) {
+        this.axis = 'rejected';
+      }
     }
     if (!this.active) return null;
     const elapsed = time - this.lastTime;
@@ -59,7 +70,7 @@ export class DrawerSwipe {
     const velocity = time - this.lastTime > 80 ? 0 : this.velocity;
     // A deliberate flick can finish a short drag, including a reversal.
     if (Math.abs(this.dx) >= 20 && Math.abs(velocity) >= .35) return velocity > 0;
-    const distance = Math.min(88, this.width * .28);
+    const distance = Math.min(72, this.width * .22);
     return this.initiallyOpen ? this.dx > -distance : this.dx >= distance;
   }
 }
