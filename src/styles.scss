@@ -682,3 +682,104 @@ html { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
 @media(display-mode:standalone) {
   .auth-wrapper,.pricing-page {padding-top:calc(1rem + env(safe-area-inset-top));padding-bottom:calc(1rem + env(safe-area-inset-bottom));}
 }
+
+/* FinFlow V5 | refined typography and rhythm, navigation excluded.
+   Keep the trusted mobile drawer untouched and bring the financial workspace
+   to the same legibility, contrast, spacing and touch-target standard. */
+:root {
+  --ff-ui-gold: #c39a61;
+  --ff-ui-card-radius: 18px;
+  --ff-ui-field-radius: 12px;
+  --ff-ui-space: clamp(.85rem, 1.6vw, 1.35rem);
+}
+.app-shell > .main-content {
+  min-width: 0;
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+.app-shell > .main-content :is(.account-panel,.recurring-panel,.budget-panel,
+  .categories-panel,.security-panel,.admin-section,.filters-card,.ledger-panel,
+  .summary-card,.expense-card,.goal-card,.stat-card) {
+  min-width: 0;
+  border-radius: var(--ff-ui-card-radius);
+}
+.app-shell > .main-content :is(.account-panel,.recurring-panel,.budget-panel,
+  .categories-panel,.security-panel,.admin-section) :is(h2,h3) {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  font-size: clamp(1.13rem, 1.05rem + .32vw, 1.4rem);
+  font-weight: 760;
+  line-height: 1.3;
+  letter-spacing: -.03em;
+  overflow-wrap: anywhere;
+}
+.app-shell > .main-content :is(.account-panel,.recurring-panel,.budget-panel,
+  .categories-panel,.security-panel) label,
+.app-shell > .main-content .filter-control > span:first-child {
+  color: var(--text-primary);
+  font-size: .84rem;
+  font-weight: 690;
+  line-height: 1.45;
+}
+.app-shell > .main-content :is(.account-panel,.recurring-panel,.budget-panel,
+  .categories-panel,.security-panel,.filters-card) :is(input,select,textarea) {
+  min-width: 0;
+  max-width: 100%;
+  min-height: 46px;
+  border-radius: var(--ff-ui-field-radius);
+  font-family: inherit;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+}
+.app-shell > .main-content :is(.account-panel,.recurring-panel,.budget-panel,
+  .categories-panel,.security-panel,.filters-card) :is(input,select,textarea):focus-visible {
+  outline: 2px solid var(--ff-ui-gold);
+  outline-offset: 2px;
+}
+.app-shell > .main-content :is(.account-panel,.recurring-panel,.budget-panel,
+  .categories-panel,.security-panel,.filters-card) :is(input,select,textarea)::placeholder {
+  color: var(--text-secondary);
+  opacity: .78;
+}
+.app-shell > .main-content :is(.account-primary,.recurring-primary,.security-primary,
+  .btn-primary,.btn-export,.btn-clear,.btn-ghost,.account-bottom button,
+  .recurring-actions button) {
+  min-height: 44px;
+  border-radius: 11px;
+  font-family: inherit;
+  font-size: .88rem;
+  font-weight: 680;
+  line-height: 1.4;
+}
+.app-shell > .main-content :is(.account-panel,.recurring-panel,.budget-panel,
+  .categories-panel,.security-panel,.filters-card,.ledger-panel,.summary-card,
+  .stat-card,.expense-card) :is(p,small,.subtitle) {
+  overflow-wrap: anywhere;
+  line-height: 1.55;
+}
+.app-shell > .main-content :is(.account-amount,.recurring-item-money,.summary-value,
+  .stat-value,.balance-value,.tx-amount,.expense-amount) {
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 768px) {
+  .app-shell > .main-content :is(.account-hero,.recurring-hero,.security-hero,
+    .budget-hero,.admin-heading,.premium-page-intro,.billing-hero) {
+    margin-bottom: var(--ff-ui-space);
+  }
+  .app-shell > .main-content :is(.account-panel,.recurring-panel,.security-panel,
+    .categories-panel,.budget-panel) {
+    padding: clamp(1rem, 3.5vw, 1.25rem);
+  }
+  .app-shell > .main-content :is(.account-panel,.recurring-panel,.security-panel,
+    .categories-panel,.budget-panel) :is(button,input,select,textarea) {
+    touch-action: manipulation;
+  }
+}
+@media (max-width: 375px) {
+  .app-shell > .main-content :is(.account-summary,.reminders,.admin-section) {
+    padding: 1rem;
+  }
+  .app-shell > .main-content :is(.account-summary strong,.account-amount,
+    .recurring-item-money) {
+    font-size: clamp(1.25rem, 6.5vw, 1.8rem);
+    overflow-wrap: anywhere;
+  }
+}
