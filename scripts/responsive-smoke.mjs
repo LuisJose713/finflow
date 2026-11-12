@@ -72,6 +72,11 @@ async function mockApi(route, authenticated = true) {
   ];
   else if (p === '/categories') response = categories;
   else if (p === '/accounts') response = accounts;
+  else if (p === '/planned-expenses') response = [
+    { id: 'pending-1', title: 'Arriendo QA', amount: 450000, status: 'pending', dueDate: '2027-01-10', categoryId: 10 },
+    { id: 'pending-2', title: 'Servicios QA', amount: 120000, status: 'pending', dueDate: '2027-01-20', categoryId: 10 },
+    { id: 'done-1', title: 'Compra QA', amount: 50000, status: 'done', dueDate: '2026-11-01', categoryId: 10 }
+  ];
   else if (p === '/advisor/cards') response = [];
   else if (p === '/advisor/chat') response = { response: 'Respuesta de prueba del asesor.' };
   else if (p === '/transactions/stats') response = {
@@ -253,6 +258,14 @@ for (const width of widths) {
     });
 
     await page.goto(base + '/goals', { waitUntil: 'domcontentloaded' });
+    await page.locator('.goal-card .goal-actions').first().waitFor({ state: 'visible' });
+    const iconActions = await page.locator('.goal-card .goal-actions .btn-icon').first().evaluate(button => ({
+      icon: Boolean(button.querySelector('svg')),
+      width: button.getBoundingClientRect().width,
+      height: button.getBoundingClientRect().height,
+    }));
+    assert(iconActions.icon && iconActions.width >= 44 && iconActions.height >= 44,
+      `${width}px goal actions need menu-style vector icons and 44px touch targets`);
     await checkDialog(page, width, 'crear-meta', async () => {
       await page.locator('button.btn-new').first().click();
     });
@@ -268,6 +281,13 @@ for (const width of widths) {
     });
 
     await page.goto(base + '/planned-expenses', { waitUntil: 'domcontentloaded' });
+    await page.getByText('2 pendientes', { exact: true }).waitFor({ state: 'visible' });
+    const pendingActions = await page.locator('.expense-actions .btn-execute').first().evaluate(button => {
+      const bounds = button.getBoundingClientRect();
+      return { opacity: getComputedStyle(button.parentElement).opacity, width: bounds.width, height: bounds.height };
+    });
+    assert(pendingActions.opacity === '1' && pendingActions.width >= 44 && pendingActions.height >= 44,
+      `${width}px pending expense actions need visible 44px touch targets`);
     await checkDialog(page, width, 'crear-gasto', async () => {
       await page.getByRole('button', { name: /Nuevo gasto/i }).first().click();
     });
