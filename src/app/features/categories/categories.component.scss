@@ -116,3 +116,35 @@
 .categories-panel { box-shadow: var(--ff-v4-elev); border-color: var(--ff-v4-stroke,var(--border)); }
 .category-item { border-color: var(--ff-v4-stroke,var(--border)); }
 @media(max-width:600px) { .categories-heading { padding: 1.2rem; } }
+
+/* FinFlow drawer language: clear labels, compact financial groups, reliable actions. */
+.categories-layout { gap:1rem; }
+.categories-panel { border-radius:18px; box-shadow:0 8px 25px rgba(9,22,42,.05); }
+.categories-panel h2 { font-size:clamp(1.14rem,1.1rem + .3vw,1.4rem); line-height:1.35; }
+.category-items { margin-top:.65rem; }
+.category-item { min-height:66px; gap:.7rem; padding:.75rem 0; }
+.category-item-description { align-items:center; }
+.category-item-description strong { font-size:1rem; font-weight:670; line-height:1.35; }
+.category-item-description div > span { font-size:.8rem; line-height:1.4; color:var(--text-secondary); }
+.category-symbol { width:40px; height:40px; border-radius:12px; }
+.category-actions { gap:.4rem; }
+.category-actions button {
+  min-height:44px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--bg-primary);
+  padding:.55rem .75rem;
+  font-size:.83rem;
+  font-weight:670;
+}
+.category-actions button:focus-visible { outline:2px solid #b38a4b; outline-offset:2px; }
+.category-form-panel label { font-size:.84rem; line-height:1.4; }
+.category-form-panel form { gap:.7rem; margin-top:1rem; }
+.category-form-panel button { border-radius:11px; }
+@media(max-width:600px) {
+  .categories-heading { margin-bottom:.85rem; }
+  .categories-layout { gap:.85rem; }
+  .category-item { min-height:65px; }
+  .category-actions { gap:.5rem; }
+  .category-actions button { width:100%; }
+}
