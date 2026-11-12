@@ -1,12 +1,11 @@
-import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import {
-  Component, DestroyRef, NgZone, effect, inject, signal, OnInit,
+  Component, DestroyRef, NgZone, effect, inject, signal,
   ElementRef, viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AdvisorService } from '../../core/services/advisor.service';
 import { ToastService } from '../../core/services/toast.service';
-import { AdvisorMessage, AdvisorCard } from '../../core/models';
+import { AdvisorMessage } from '../../core/models';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { ToastContainerComponent } from '../../shared/components/toast-container/toast-container.component';
 import { DatePipe } from '@angular/common';
@@ -14,114 +13,77 @@ import { DatePipe } from '@angular/common';
 @Component({
   selector: 'app-advisor',
   standalone: true,
-  imports: [DismissibleCardDirective, FormsModule, NavbarComponent, ToastContainerComponent, DatePipe],
+  imports: [FormsModule, NavbarComponent, ToastContainerComponent, DatePipe],
   template: `
     <div class="app-shell">
       <app-navbar />
 
       <main class="main-content advisor-main">
-        <div class="advisor-topline">
-          <span class="live-dot" aria-hidden="true"></span> FINFLOW
-          <span class="topline-version">ASESOR IA</span>
-        </div>
-        <header class="page-header advisor-header" appDismissibleCard="advisor.intro">
-          <div class="heading-copy">
-            <span class="eyebrow">TU ESPACIO FINANCIERO</span>
-            <h1>Una visión clara. <span class="heading-accent">Mejores decisiones.</span></h1>
-            <p class="subtitle">Explora tus finanzas con el asesor de FinFlow.</p>
-
-          </div>
-          <img class="hero-symbol" src="/finflow-icon-classic.svg" width="96" height="96"
-               alt="" aria-hidden="true" />
-        </header>
-
-        <section class="chat-layout" aria-label="Conversación con el asesor financiero">
-          <div class="chat-topbar">
+        <section class="chat-layout" aria-label="Conversación con FinFlow AI">
+          <header class="chat-topbar">
+            <div class="assistant-identity">
+              <img class="brand-avatar" src="/finflow-icon-classic.svg" width="42" height="42" alt="" aria-hidden="true" />
+              <div class="identity-copy">
+                <strong>FinFlow AI</strong>
+                <small>Tu asistente financiero</small>
+              </div>
+            </div>
             <button class="btn-clear" type="button" (click)="clearChat()"
                     [disabled]="messages().length === 0 || responding()"
-                    aria-label="Comenzar una conversación nueva">
-              <span aria-hidden="true">↻</span> Nueva conversación
+                    aria-label="Iniciar un chat nuevo" title="Nuevo chat">
+              <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor"
+                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              <span>Nuevo chat</span>
             </button>
-            <span class="assistant-identity">
-              <img class="brand-avatar" src="/finflow-icon-classic.svg" width="44" height="44" alt="" aria-hidden="true" />
-              <span class="identity-copy"><strong>FinFlow AI</strong><small>Asistente de finanzas personales</small></span>
-            </span>
-            <span class="conversation-status" aria-label="Conversación actual">
-              <span class="status-dot" aria-hidden="true"></span> Esta conversación
-            </span>
-          </div>
+          </header>
 
-          <div class="messages-wrapper" #messagesContainer role="log" aria-label="Mensajes de la conversación" aria-live="polite" aria-relevant="additions">
+          <div class="messages-wrapper" #messagesContainer role="log"
+               aria-label="Mensajes de FinFlow AI" aria-live="polite" aria-relevant="additions">
             @if (messages().length === 0) {
               <div class="welcome-panel">
-                <img class="welcome-mark" src="/finflow-icon-classic.svg" width="58" height="58" alt="" aria-hidden="true" />
-                <span class="welcome-eyebrow">TU PRÓXIMA BUENA DECISIÓN EMPIEZA AQUÍ</span>
-                <h2>¿Qué te gustaría <em>explorar hoy?</em></h2>
-                <p>Desde organizar tus gastos hasta planear una meta: empieza con una pregunta o elige una idea.</p>
-              </div>
-              <div class="suggestions-heading">
-                <span>PRUEBA CON UNA DE ESTAS IDEAS</span>
-              </div>
-              <div class="cards-grid">
-                @if (cardsLoading()) {
-                  @for (i of [1, 2, 3, 4]; track i) {
-                    <div class="advisor-card skeleton" aria-hidden="true"></div>
-                  }
-                } @else {
-                  @for (card of cards(); track card.id) {
-                    <button class="advisor-card" type="button"
-                            (click)="sendPrompt(card.prompt)" [disabled]="responding()">
-                      <span class="card-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                             stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M4 17l6-6 4 4 6-8"/>
-                          <path d="M16 7h4v4"/>
-                          <path d="M4 21h16"/>
-                        </svg>
-                      </span>
-                      <span class="card-copy"><strong>{{ card.title }}</strong><small>{{ card.description }}</small></span>
-                      <span class="card-arrow" aria-hidden="true">↗</span>
-                    </button>
-                  }
-                }
+                <img class="welcome-mark" src="/finflow-icon-classic.svg" width="52" height="52"
+                     alt="" aria-hidden="true" />
+                <h1>¿En qué puedo ayudarte?</h1>
+                <p>Pregunta lo que quieras sobre tus finanzas.</p>
               </div>
             } @else {
-              <div class="conversation-label">CONVERSACIÓN ACTUAL</div>
               @for (msg of messages(); track $index) {
                 <div class="message" [class.user]="msg.role === 'user'"
                      [class.assistant]="msg.role === 'assistant'">
                   @if (msg.role === 'assistant') {
-                    <img class="message-avatar" src="/finflow-icon-classic.svg" width="33" height="33" alt="" aria-hidden="true" />
+                    <img class="message-avatar" src="/finflow-icon-classic.svg"
+                         width="32" height="32" alt="" aria-hidden="true" />
                   }
                   <div class="message-body">
-                    <div class="message-author">{{ msg.role === 'assistant' ? 'FinFlow AI' : 'Tú' }}</div>
-                    <div class="message-bubble">
-                      <p>{{ msg.content }}</p>
-                    </div>
+                    <div class="message-bubble"><p>{{ msg.content }}</p></div>
                     <div class="message-meta">
-                      <time>{{ msg.timestamp | date: 'HH:mm' }}</time>
+                      <time>{{ msg.timestamp | date:'HH:mm' }}</time>
                       @if (msg.role === 'assistant') {
                         <button type="button" class="copy-btn" (click)="copyMessage(msg.content)"
-                                aria-label="Copiar respuesta del asesor" title="Copiar respuesta">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-                               aria-hidden="true">
+                                aria-label="Copiar respuesta de FinFlow AI" title="Copiar respuesta">
+                          <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+                               stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                               stroke-linejoin="round" aria-hidden="true">
                             <rect x="8" y="8" width="12" height="12" rx="2"></rect>
                             <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path>
-                          </svg> Copiar
+                          </svg>
+                          Copiar
                         </button>
                       }
                     </div>
                   </div>
                 </div>
               }
-
               @if (responding()) {
-                <div class="message assistant" role="status" aria-label="FinFlow está preparando una respuesta">
-                  <img class="message-avatar" src="/finflow-icon-classic.svg" width="33" height="33" alt="" aria-hidden="true" />
+                <div class="message assistant" role="status" aria-label="FinFlow está escribiendo">
+                  <img class="message-avatar" src="/finflow-icon-classic.svg"
+                       width="32" height="32" alt="" aria-hidden="true" />
                   <div class="message-body">
-                    <div class="message-author">FinFlow AI</div>
-                    <div class="message-bubble typing"><span></span><span></span><span></span></div>
+                    <div class="message-bubble typing" aria-hidden="true">
+                      <span></span><span></span><span></span>
+                    </div>
                   </div>
                 </div>
               }
@@ -129,34 +91,27 @@ import { DatePipe } from '@angular/common';
           </div>
 
           <div class="composer-shell">
-            <label for="finflow-advisor-input" class="composer-label">ESCRIBE TU PREGUNTA</label>
+            <label class="visually-hidden" for="finflow-advisor-input">Mensaje para FinFlow AI</label>
             <div class="input-area">
-              <textarea
-                id="finflow-advisor-input"
-                [(ngModel)]="userInput"
-                placeholder="¿Cómo puedo organizar mejor mi presupuesto?"
-                rows="2"
-                maxlength="2000"
-                (keydown.enter)="onEnter($event)"
-                [disabled]="responding()"
-                aria-label="Pregunta para el asesor financiero"
-              ></textarea>
-              <button class="btn-send" type="button"
-                      (click)="send()"
+              <textarea id="finflow-advisor-input" [(ngModel)]="userInput"
+                        placeholder="Escribe tu mensaje…"
+                        rows="1" maxlength="2000"
+                        (keydown.enter)="onEnter($event)" [disabled]="responding()"
+                        aria-label="Escribe un mensaje para el asistente financiero"></textarea>
+              <button class="btn-send" type="button" (click)="send()"
                       [disabled]="!userInput.trim() || responding()"
-                      [attr.aria-label]="responding() ? 'Preparando respuesta' : 'Enviar pregunta'">
+                      [attr.aria-label]="responding() ? 'Preparando respuesta' : 'Enviar mensaje'">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="m5 12 14-7-4 14-3.4-6.6L5 12Z"></path>
+                  <path d="M5 12 19 5l-4 14-3.4-6.6L5 12Z"></path>
                   <path d="m11.6 12.4 7.4-7.4"></path>
                 </svg>
               </button>
             </div>
             <div class="composer-footer">
-              <span>Enter para enviar · Shift + Enter para nueva línea</span>
-              <span>{{ userInput.length }}/2000</span>
+              <span>La IA puede equivocarse. Verifica la información importante.</span>
+              @if (userInput.length > 1700) { <span class="message-limit">{{ userInput.length }}/2000</span> }
             </div>
-            <p class="ai-disclaimer">Las sugerencias de IA son orientativas; verifica la información antes de tomar decisiones financieras.</p>
           </div>
         </section>
       </main>
@@ -166,7 +121,7 @@ import { DatePipe } from '@angular/common';
   `,
   styleUrl: './advisor.component.scss',
 })
-export class AdvisorComponent implements OnInit {
+export class AdvisorComponent {
   private advisorService = inject(AdvisorService);
   private toast = inject(ToastService);
   private readonly zone = inject(NgZone);
@@ -174,8 +129,6 @@ export class AdvisorComponent implements OnInit {
   private scrollFrame: number | null = null;
 
   messages = signal<AdvisorMessage[]>([]);
-  cards = signal<AdvisorCard[]>([]);
-  cardsLoading = signal(true);
   responding = signal(false);
   userInput = '';
 
@@ -202,24 +155,6 @@ export class AdvisorComponent implements OnInit {
         this.scrollToBottom();
       });
     });
-  }
-
-  ngOnInit() {
-    this.advisorService.getCards().subscribe({
-      next: (data) => {
-        this.cards.set(data.length ? data : this.defaultCards());
-        this.cardsLoading.set(false);
-      },
-      error: () => {
-        this.cards.set(this.defaultCards());
-        this.cardsLoading.set(false);
-      },
-    });
-  }
-
-  sendPrompt(prompt: string) {
-    this.userInput = prompt;
-    this.send();
   }
 
   onEnter(event: Event) {
@@ -283,12 +218,4 @@ export class AdvisorComponent implements OnInit {
     if (el) el.scrollTop = el.scrollHeight;
   }
 
-  private defaultCards(): AdvisorCard[] {
-    return [
-      { id: '1', icon: '📊', title: 'Analizar gastos', description: '¿En qué estoy gastando más?', prompt: 'Analiza mis gastos principales y dime en qué categorías gasto más.' },
-      { id: '2', icon: '💰', title: 'Consejos de ahorro', description: 'Estrategias para ahorrar más', prompt: '¿Qué estrategias me recomiendas para ahorrar más dinero cada mes?' },
-      { id: '3', icon: '🎯', title: 'Revisar metas', description: 'Estado de mis objetivos', prompt: 'Revisa mis metas financieras y dime si voy por buen camino.' },
-      { id: '4', icon: '📈', title: 'Inversiones', description: 'Ideas para hacer crecer tu dinero', prompt: '¿Qué opciones de inversión básicas me recomiendas para comenzar?' },
-    ];
-  }
 }
