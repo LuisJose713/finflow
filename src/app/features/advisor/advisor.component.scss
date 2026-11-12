@@ -710,3 +710,17 @@
 .advisor-main .chat-topbar .btn-clear {margin-left:auto;min-height:44px;font-size:.78rem;padding:.5rem .75rem;}
 .advisor-main .chat-topbar .assistant-identity {min-width:0;}
 .advisor-main [appDismissibleCard] {flex-shrink:0;}
+
+/* Menu-consistent adviser hierarchy and comfortable mobile interaction sizes. */
+.advisor-main .advisor-card { border-radius:15px; }
+.advisor-main .advisor-card :is(h3,strong) { line-height:1.4; }
+.advisor-main .btn-send { min-width:44px; min-height:44px; border-radius:11px; }
+.advisor-main .chat-topbar .btn-clear { min-height:44px; font-size:.84rem; }
+.advisor-main .message .message-bubble { line-height:1.6; overflow-wrap:anywhere; }
+.advisor-main .chat-layout { border-radius:18px; }
+@media(max-width:600px) {
+  .advisor-main .advisor-header { margin-bottom:.7rem; }
+  .advisor-main .chat-topbar { gap:.6rem; }
+  .advisor-main .chat-topbar .btn-clear { font-size:.82rem; }
+  .advisor-main .advisor-card { min-width:0; }
+}
