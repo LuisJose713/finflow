@@ -47,6 +47,14 @@ export class NavbarComponent {
     { path: '/budgets', label: 'Presupuestos', icon: '▥' }
   ].filter(item => environment.budgetsReady || item.path !== '/budgets');
 
+  readonly navGroups = [
+    { label: 'TU PANORAMA', items: this.navItems.filter(item =>
+      ['/dashboard', '/transactions', '/goals', '/planned-expenses'].includes(item.path)) },
+    { label: 'TU DINERO', items: this.navItems.filter(item =>
+      ['/accounts', '/budgets', '/recurring', '/categories', '/advisor'].includes(item.path)) },
+    { label: 'TU CUENTA', items: this.navItems.filter(item => item.path === '/security') },
+  ];
+
   toggleCollapse() {
     const next = !this.collapsed();
     this.collapsed.set(next);
