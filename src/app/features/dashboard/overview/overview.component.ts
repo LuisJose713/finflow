@@ -31,6 +31,7 @@ export class OverviewComponent {
   readonly monthlyData = signal<MonthlyData[]>([]);
   readonly filter = signal<'all' | 'income' | 'expense'>('all');
   readonly chartType = signal<'line' | 'donut'>(this.readChartType());
+  readonly selectedDonutSegment = signal<'income' | 'expense' | null>(null);
   readonly scope = signal<'six' | 'year'>('six');
   readonly selectedMonth = signal<string | null>(null);
   readonly activePoint = computed(() => this.chartPoints().find(p => p.monthKey === this.selectedMonth()) ?? null);
@@ -53,6 +54,21 @@ export class OverviewComponent {
   readonly donutTotal = computed(() => (this.filter() !== 'expense' ? this.totalIncome() : 0) + (this.filter() !== 'income' ? this.totalExpenses() : 0));
   readonly donutIncomePercent = computed(() => this.donutTotal() > 0 && this.filter() !== 'expense' ? this.totalIncome() / this.donutTotal() * 100 : 0);
   readonly donutExpensePercent = computed(() => this.donutTotal() > 0 && this.filter() !== 'income' ? this.totalExpenses() / this.donutTotal() * 100 : 0);
+  readonly highlightedDonutSegment = computed<'income' | 'expense' | null>(() => {
+    if (this.filter() === 'income') return 'income';
+    if (this.filter() === 'expense') return 'expense';
+    return this.selectedDonutSegment();
+  });
+  readonly highlightedDonutValue = computed(() => {
+    const selected = this.highlightedDonutSegment();
+    return selected === 'income' ? this.totalIncome() : selected === 'expense' ? this.totalExpenses() : this.donutTotal();
+  });
+  readonly highlightedDonutLabel = computed(() => this.highlightedDonutSegment() === 'income' ? 'Ingresos' : this.highlightedDonutSegment() === 'expense' ? 'Gastos' : 'Total del periodo');
+  readonly highlightedDonutPercent = computed(() => this.highlightedDonutSegment() === 'income' ? this.donutIncomePercent() : this.highlightedDonutSegment() === 'expense' ? this.donutExpensePercent() : null);
+  selectDonutSegment(segment: 'income' | 'expense'): void {
+    if (this.filter() === 'income' || this.filter() === 'expense') return;
+    this.selectedDonutSegment.set(segment);
+  }
   readonly hasHistory = computed(() => this.monthlyData().some(row => row.income > 0 || row.expenses > 0));
 
   readonly chartPoints = computed<ChartPoint[]>(() => {
@@ -131,7 +147,7 @@ export class OverviewComponent {
       : Math.max(0, Math.min(rows.length - 1, current + delta));
     this.selectedMonth.set(rows[index].monthKey);
   }
-  setFilter(filter: 'all' | 'income' | 'expense'): void { this.filter.set(filter); }
+  setFilter(filter: 'all' | 'income' | 'expense'): void { this.filter.set(filter); this.selectedDonutSegment.set(null); }
 
   monthLabel(key: string): string {
     const [year, month] = key.split('-').map(Number);
