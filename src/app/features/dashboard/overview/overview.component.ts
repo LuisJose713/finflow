@@ -1,6 +1,7 @@
 import { Component, DestroyRef, computed, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 import { Subscription, finalize, map } from 'rxjs';
 import { AppCurrencyPipe } from '../../../shared/pipes/currency.pipe';
 import { TransactionService } from '../../../core/services/transaction.service';
@@ -16,7 +17,7 @@ interface ChartPoint { monthKey: string; month: string; x: number; incomeY: numb
 @Component({
   selector: 'app-overview',
   standalone: true,
-  imports: [AppCurrencyPipe, RouterLink],
+  imports: [AppCurrencyPipe, RouterLink, DecimalPipe],
   templateUrl: './overview.component.html',
   styleUrl: './overview.component.scss',
 })
