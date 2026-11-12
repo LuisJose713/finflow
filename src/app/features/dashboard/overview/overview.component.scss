@@ -61,3 +61,12 @@
 .point-button.selected { border-color: #d7a94d; color: var(--text-primary); background: rgba(215,169,77,.12); }
 .point-button:focus-visible { outline: 2px solid #d7a94d; }
 .selected-values { display: flex; flex-wrap: wrap; gap: .45rem 1rem; align-items: center; margin-top: .65rem; padding: .75rem; border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary); font-size: .8rem; font-variant-numeric: tabular-nums; }
+
+/* User-selectable financial visualization. */
+.chart-mode-toggle { display: inline-flex; gap: 3px; padding: 4px; margin-bottom: .65rem; border: 1px solid var(--border); border-radius: 11px; background: var(--bg-primary); }
+.donut-layout { position: relative; width: min(100%, 290px); margin: 1rem auto .4rem; aspect-ratio: 1; display: grid; place-items: center; }
+.donut-chart { display: block; width: 100%; height: auto; }
+.donut-center { position: absolute; inset: 29%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: .35rem; pointer-events: none; }
+.donut-center span { color: var(--text-secondary); font-size: .7rem; }
+.donut-center strong { color: var(--text-primary); font-size: clamp(.8rem, 2.2vw, 1.15rem); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.donut-description { margin: .4rem .5rem .8rem; text-align: center; color: var(--text-secondary); font-size: .75rem; line-height: 1.5; }
