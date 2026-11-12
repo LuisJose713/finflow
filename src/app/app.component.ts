@@ -3,14 +3,16 @@ import { NavigationEnd, Router, RouterOutlet, RouterLink } from '@angular/router
 import { catchError, filter, forkJoin, of } from 'rxjs';
 import { AuthService } from './core/services/auth.service';
 import { PrivacyPolicy, PrivacyService } from './core/services/privacy.service';
+import { UpdateNoticeComponent } from './shared/components/update-notice.component';
 import { PrivacyPolicyComponent } from './shared/components/privacy-policy.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, PrivacyPolicyComponent],
+  imports: [RouterOutlet, RouterLink, PrivacyPolicyComponent, UpdateNoticeComponent],
   template: `
     <router-outlet/>
+    <app-update-notice/>
     @if (needsConsent()) {
       <div class="privacy-shield">
         <section class="privacy-dialog" role="dialog" aria-modal="true"
