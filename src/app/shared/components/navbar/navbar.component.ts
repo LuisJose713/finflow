@@ -119,10 +119,12 @@ export class NavbarComponent {
     const target = event.target instanceof Element ? event.target : null;
     if (target?.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="slider"], [data-no-drawer-swipe], dialog, [aria-modal="true"], [role="dialog"]')) return;
     const open = this.mobileOpen();
-    if (!DrawerSwipe.canStart(touch.clientX, window.innerWidth, open)) return;
+    const fromMenuButton = !!target?.closest('.mobile-menu-btn');
+    if (!DrawerSwipe.canStart(touch.clientX, window.innerWidth, open, fromMenuButton)) return;
     if (!open) {
       if (document.querySelector('[aria-modal="true"], dialog[open]')) return;
-      if (target?.closest('button, a, canvas, svg, [role="tablist"], .chart-container, .chart-wrapper')) return;
+      // The visible hamburger button is a valid drag handle as well as a tap target.
+      if (!fromMenuButton && target?.closest('button, a, canvas, svg, [role="tablist"], .chart-container, .chart-wrapper')) return;
       for (let element = target; element; element = element.parentElement) {
         if (/(auto|scroll)/.test(window.getComputedStyle(element).overflowX)
             && element.scrollWidth > element.clientWidth + 1) return;
