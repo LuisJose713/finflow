@@ -43,20 +43,32 @@ export class DismissibleCardDirective implements AfterViewInit {
     this.renderer.appendChild(this.host, this.close);
 
     this.restore = this.renderer.createElement('div');
-    this.style(this.restore!, { display: 'none', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', margin: '0' });
+    // Keep the restore control as a compact toolbar element, not a second hero.
+    this.style(this.restore!, { display: 'none', alignItems: 'center', justifyContent: 'flex-end',
+      gap: '8px', flexWrap: 'nowrap', minWidth: '0', maxWidth: '100%',
+      margin: '0 0 .65rem' });
     const pageHeader = this.host.parentElement?.querySelector<HTMLElement>(':scope > .page-header');
     const inlineTarget = pageHeader && pageHeader !== this.host ? pageHeader.querySelector('.header-actions') || pageHeader : null;
     const heading = inlineTarget ? null : this.host.querySelector('h1');
     if (heading) {
       const compact = this.renderer.createElement('h1');
       this.renderer.setProperty(compact, 'textContent', heading.textContent);
-      this.style(compact, { margin: '0', fontSize: '1.35rem', color: 'var(--text-primary)' });
+      this.style(compact, { margin: '0 auto 0 0', fontSize: 'clamp(1rem, 2.7vw, 1.16rem)',
+        fontWeight: '720', minWidth: '0', overflow: 'hidden', textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap', color: 'var(--text-primary)' });
       this.renderer.appendChild(this.restore, compact);
     }
     this.restoreButton = this.renderer.createElement('button');
-    this.restoreButton!.type = 'button'; this.restoreButton!.textContent = 'Mostrar presentación';
-    this.style(this.restoreButton!, { border: '1px solid var(--border, #ccd5df)', borderRadius: '9px', padding: '7px 12px',
-      minHeight: '44px', color: 'var(--text-primary)', background: 'var(--bg-secondary, transparent)', cursor: 'pointer', font: 'inherit', fontSize: '.78rem' });
+    this.restoreButton!.type = 'button';
+    this.restoreButton!.textContent = '↗';
+    this.renderer.setAttribute(this.restoreButton!, 'aria-label', 'Mostrar presentación');
+    this.renderer.setAttribute(this.restoreButton!, 'title', 'Mostrar presentación');
+    this.style(this.restoreButton!, { flex: '0 0 40px', width: '40px', height: '40px',
+      minWidth: '40px', minHeight: '40px', border: '1px solid var(--border, #ccd5df)',
+      borderRadius: '11px', padding: '0', color: 'var(--text-primary)',
+      background: 'var(--bg-secondary, transparent)', cursor: 'pointer',
+      font: 'inherit', fontSize: '1.15rem', fontWeight: '650', lineHeight: '1',
+      display: 'inline-grid', placeItems: 'center' });
     this.renderer.appendChild(this.restore, this.restoreButton);
     if (inlineTarget) this.renderer.appendChild(inlineTarget, this.restore);
     else this.renderer.insertBefore(this.host.parentNode, this.restore, this.host);
