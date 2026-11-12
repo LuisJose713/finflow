@@ -378,7 +378,7 @@ for (const width of widths) {
       return { opacity: getComputedStyle(button.parentElement).opacity, width: bounds.width, height: bounds.height };
     });
     assert(pendingActions.opacity === '1' && pendingActions.width >= 44 && pendingActions.height >= 44,
-      `${width}px pending expense actions need visible 44px touch targets`);
+      `${width}px pending expense actions need visible 44px touch targets: ${JSON.stringify(pendingActions)}`);
     await checkDialog(page, width, 'crear-gasto', async () => {
       await page.getByRole('button', { name: /Nuevo gasto/i }).first().click();
     });

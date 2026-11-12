@@ -63,7 +63,6 @@
   transition: transform 0.15s, box-shadow 0.15s;
 
   &:hover {
-    transform: translateY(-2px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
 
@@ -268,11 +267,12 @@
 .amounts { font-variant-numeric:tabular-nums; }
 @media(max-width:600px) {
   .goal-card { min-height:0; padding:1.1rem; gap:.85rem; }
-  .goal-footer { flex-direction:column; align-items:stretch; }
-  .goal-actions { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); width:100%; }
+  .goal-footer { display:grid; grid-template-columns:minmax(0,1fr); align-items:stretch; }
+  .goal-actions { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); width:100%; min-width:0; max-width:100%; flex:none; }
   .goal-actions .btn-icon { width:100%; min-width:0; }
   .goal-header h3 { font-size:1rem; }
 }
 @media(prefers-reduced-motion:reduce) {
   .goal-actions .btn-icon { transition:none; }
 }
+

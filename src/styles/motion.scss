@@ -29,6 +29,12 @@
   scale: var(--ff-press-scale);
   translate: 0 0;
 }
+/* Icon controls keep their full touch target while giving press feedback. */
+.app-shell button[aria-label]:enabled:active,
+.app-shell :is(.btn-execute, .icon-btn, .btn-icon):enabled:active {
+  scale: 1;
+  opacity: .82;
+}
 .app-shell :is(button, a, input, select, textarea):focus-visible,
 .privacy-dialog :is(button, a, input):focus-visible {
   outline-color: var(--ff-gold, #c6a46c);
