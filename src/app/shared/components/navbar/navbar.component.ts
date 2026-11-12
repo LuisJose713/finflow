@@ -31,7 +31,8 @@ export class NavbarComponent {
   auth = inject(AuthService);
 
   collapsed = signal(this.readCollapsedPreference());
-  mobileOpen = signal(false); // 🔥 CLAVE
+  mobileOpen = signal(false);
+  private swipeStart: { x: number; y: number; closing: boolean } | null = null;
 
   navItems: NavItem[] = [
     { path: '/dashboard', label: 'Dashboard', icon: '📊' },
@@ -65,6 +66,43 @@ export class NavbarComponent {
   @HostListener('document:keydown.escape')
   onEscape(): void {
     this.closeMobile();
+  }
+
+  // Mobile edge swipe: open to the right, close to the left.
+  // Leave the first 24px to the browser/OS back navigation gesture,
+  // and never claim vertical scrolling or a gesture on an input.
+  @HostListener('document:touchstart', ['$event'])
+  onTouchStart(event: TouchEvent): void {
+    this.swipeStart = null;
+    if (typeof window === 'undefined' || window.innerWidth > 768 || event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    const target = event.target instanceof Element ? event.target : null;
+    if (target?.closest('input, textarea, select, [contenteditable="true"], [role="slider"], [data-no-drawer-swipe]')) return;
+    const closing = this.mobileOpen();
+    if (closing) {
+      if (touch.clientX > Math.min(320, window.innerWidth - 16)) return;
+    } else if (touch.clientX < 24 || touch.clientX > 88) {
+      return;
+    }
+    this.swipeStart = { x: touch.clientX, y: touch.clientY, closing };
+  }
+
+  @HostListener('document:touchend', ['$event'])
+  onTouchEnd(event: TouchEvent): void {
+    const start = this.swipeStart;
+    this.swipeStart = null;
+    if (!start || event.changedTouches.length !== 1) return;
+    const touch = event.changedTouches[0];
+    const dx = touch.clientX - start.x;
+    const dy = Math.abs(touch.clientY - start.y);
+    if (dy > 45 || Math.abs(dx) < 72 || Math.abs(dx) < dy * 1.5) return;
+    if (start.closing && dx < 0) this.closeMobile();
+    else if (!start.closing && dx > 0) this.mobileOpen.set(true);
+  }
+
+  @HostListener('document:touchcancel')
+  onTouchCancel(): void {
+    this.swipeStart = null;
   }
 
   toggleMobile() {
