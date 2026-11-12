@@ -35,15 +35,15 @@ export class NavbarComponent {
   private swipeStart: { x: number; y: number; closing: boolean } | null = null;
 
   navItems: NavItem[] = [
-    { path: '/dashboard', label: 'Dashboard', icon: '📊' },
+    { path: '/dashboard', label: 'Inicio', icon: '📊' },
     { path: '/goals',     label: 'Metas',     icon: '🎯' },
     { path: '/accounts', label: 'Cuentas y billeteras', icon: '◫' },
     { path: '/recurring', label: 'Recurrentes', icon: '↻' },
     { path: '/security', label: 'Seguridad', icon: '⛨' },
     { path: '/advisor',   label: 'Asesor IA', icon: '🤖' },
-    { path: '/transactions', label: 'Transacciones', icon: '💳' },
-    { path: '/planned-expenses', label: 'Gastos Planeados', icon: '📅' },
-    { path: '/categories', label: 'Mis categorías', icon: '▦' },
+    { path: '/transactions', label: 'Movimientos', icon: '💳' },
+    { path: '/planned-expenses', label: 'Gastos planeados', icon: '📅' },
+    { path: '/categories', label: 'Categorías', icon: '▦' },
     { path: '/budgets', label: 'Presupuestos', icon: '▥' }
   ].filter(item => environment.budgetsReady || item.path !== '/budgets');
 
