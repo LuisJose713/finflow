@@ -115,10 +115,13 @@ try {
     const previewButtons = recent.locator('.recent-count-button');
     assert.equal(await previewButtons.count(), 3);
     await previewButtons.nth(0).click();
+    await page.waitForFunction(() => document.querySelectorAll('app-recent-transactions .transaction-item').length === 2);
     assert.equal(await recent.locator('.transaction-item').count(), 2);
     await previewButtons.nth(1).click();
+    await page.waitForFunction(() => document.querySelectorAll('app-recent-transactions .transaction-item').length === 3);
     assert.equal(await recent.locator('.transaction-item').count(), 3);
     await previewButtons.nth(2).click();
+    await page.waitForFunction(() => document.querySelectorAll('app-recent-transactions .transaction-item').length === 5);
     assert.equal(await recent.locator('.transaction-item').count(), 5);
     assert.equal(requests.filter(p => p === '/transactions/recent').length, recentRequestCount,
       'Changing the number of recent transactions must not make another API request');
@@ -142,3 +145,4 @@ try {
 } finally {
   await browser.close();
 }
+
