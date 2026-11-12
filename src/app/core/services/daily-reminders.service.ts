@@ -7,12 +7,6 @@ const DAILY: ReminderSlot[] = [
     title: 'Es hora de registrar tus movimientos',
     body: 'Mantén tus finanzas al día. Registra tus ingresos y gastos.',
     url: '/transactions'
-  },
-  {
-    hour: 16,
-    title: '¿Cuánto has gastado hoy?',
-    body: 'Consulta el resumen de tus gastos de hoy en FinFlow.',
-    url: '/dashboard'
   }
 ];
 
@@ -28,13 +22,14 @@ export class DailyRemindersService {
     this.supported ? Notification.permission : 'denied'
   );
   private userId: string | null = null;
+  private readonly allowedEmail = 'stpptx@icloud.com';
   private timer?: ReturnType<typeof setInterval>;
 
   start(userId: string | null): void {
     if (this.userId === userId) return;
     this.stop();
     this.userId = userId;
-    if (!userId || !this.supported) return;
+    if (!userId || userId.toLowerCase() !== this.allowedEmail || !this.supported) return;
     const preferred = this.read(this.preferenceKey(userId)) === 'true';
     this.enabled.set(preferred && Notification.permission === 'granted');
     this.permission.set(Notification.permission);
@@ -50,7 +45,7 @@ export class DailyRemindersService {
   }
 
   async enable(): Promise<boolean> {
-    if (!this.userId || !this.supported) return false;
+    if (!this.userId || this.userId.toLowerCase() !== this.allowedEmail || !this.supported) return false;
     // Called directly from a user click: required by browsers / iOS installed PWAs.
     const permission = await Notification.requestPermission();
     this.permission.set(permission);
@@ -71,7 +66,7 @@ export class DailyRemindersService {
 
   private async tick(): Promise<void> {
     const id = this.userId;
-    if (!id || !this.enabled() || Notification.permission !== 'granted') return;
+    if (!id || id.toLowerCase() !== this.allowedEmail || !this.enabled() || Notification.permission !== 'granted') return;
     const now = new Date();
     const slot = DAILY.find(item => now.getHours() === item.hour && now.getMinutes() < 5);
     if (!slot) return;
