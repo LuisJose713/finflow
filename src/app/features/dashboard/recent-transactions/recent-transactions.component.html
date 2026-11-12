@@ -1,7 +1,15 @@
 <section class="transactions-card" aria-label="Transacciones recientes" [attr.aria-busy]="loading()">
   <div class="card-header">
     <div><span class="panel-kicker">ÚLTIMOS MOVIMIENTOS</span><h2>Transacciones recientes</h2></div>
-    <span class="badge">Últimas 5</span>
+    <div class="recent-count-control" role="group" aria-label="Cantidad de transacciones recientes">
+      <span class="recent-count-label">Mostrar</span>
+      <button *ngFor="let count of [2, 3, 5]" type="button"
+        class="recent-count-button"
+        [class.active]="visibleCount() === count"
+        [attr.aria-pressed]="visibleCount() === count"
+        [attr.aria-label]="'Mostrar las últimas ' + count + ' transacciones'"
+        (click)="visibleCount.set($any(count))">{{ count }}</button>
+    </div>
   </div>
   <ng-container *ngIf="loading()">
     <div role="status"><span class="visually-hidden">Cargando transacciones recientes…</span><div class="list" aria-hidden="true"><div *ngFor="let i of [1, 2, 3, 4, 5]" class="transaction-item skeleton"></div></div></div>
@@ -15,7 +23,7 @@
     <div class="empty-state"><p>No hay transacciones aún</p><small>Agrega tu primera transacción para comenzar</small><a routerLink="/transactions" class="state-action">Ir a movimientos</a></div>
   </ng-container>
   <ul *ngIf="!loading() && !loadError() && transactions().length > 0" class="list">
-    <li *ngFor="let tx of transactions(); trackBy: trackById" class="transaction-item">
+    <li *ngFor="let tx of displayedTransactions(); trackBy: trackById" class="transaction-item">
       <div class="tx-icon" [class]="tx.type" aria-hidden="true">{{ tx.type === "income" ? "↑" : "↓" }}</div>
       <div class="tx-info">
         <span class="tx-title" [title]="tx.description">{{ tx.description }}</span>
