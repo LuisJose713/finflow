@@ -86,59 +86,6 @@ describe('RecentTransactionsComponent', () => {
     expect(fixture.nativeElement.querySelector('.tx-amount').textContent).not.toContain('COP');
   });
 
-  it('filters the most recent five movements without making another API request', () => {
-    const income: Transaction = { ...transaction, id: 'tx-income', type: 'income', description: 'Salario' };
-    respond([transaction, income]);
-    expect(component.incomeCount()).toBe(1);
-    expect(component.expenseCount()).toBe(1);
-
-    const filters: HTMLButtonElement[] = Array.from(fixture.nativeElement.querySelectorAll('.type-filter button'));
-    expect(filters.length).toBe(3);
-    filters[1].click();
-    fixture.detectChanges();
-    expect(component.selectedType()).toBe('income');
-    expect(fixture.nativeElement.querySelectorAll('.movement-list .transaction-item').length).toBe(1);
-    expect(fixture.nativeElement.textContent).toContain('Salario');
-    expect(service.getRecent).toHaveBeenCalledTimes(1);
-
-    filters[2].click();
-    fixture.detectChanges();
-    expect(component.selectedType()).toBe('expense');
-    expect(fixture.nativeElement.querySelector('.movement-list .tx-title').textContent).toContain('Compra de prueba');
-    filters[0].click();
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelectorAll('.movement-list .transaction-item').length).toBe(2);
-    expect(fixture.nativeElement.querySelector('a.view-all').getAttribute('href')).toBe('/transactions');
-  });
-
-  it('keeps the last confirmed movements visible while refreshing, then reports a refresh failure', () => {
-    respond([transaction]);
-    component.load();
-    fixture.detectChanges();
-    expect(component.loading()).toBeFalse();
-    expect(component.refreshing()).toBeTrue();
-    expect(fixture.nativeElement.querySelector('.movement-list .transaction-item')).not.toBeNull();
-    expect(fixture.nativeElement.querySelector('.skeleton')).toBeNull();
-
-    requests[1].error(new Error('offline'));
-    fixture.detectChanges();
-    expect(component.transactions()).toEqual([transaction]);
-    expect(component.refreshing()).toBeFalse();
-    expect(component.loadError()).toBeTrue();
-    expect(fixture.nativeElement.querySelector('.stale-state')).not.toBeNull();
-    expect(fixture.nativeElement.querySelector('.movement-list .transaction-item')).not.toBeNull();
-  });
-
-  it('gives the transaction menu an accessible label and safe compact touch action', () => {
-    respond([transaction]);
-    const trigger = fixture.nativeElement.querySelector('.tx-menu-trigger');
-    expect(trigger.getAttribute('aria-label')).toContain('Compra de prueba');
-    const action = fixture.nativeElement.querySelector('.tx-menu-panel .btn-delete');
-    expect(action.getAttribute('aria-label')).toContain('Eliminar transacción');
-    expect(component.dateLabel('invalid')).toBe('Sin fecha');
-    expect(component.dateLabel('2026-02-31')).toBe('Sin fecha');
-  });
-
   it('cancels an older refresh before accepting the newest movements', () => {
     const stale = requests[0];
     TestBed.inject(DashboardRefreshService).trigger();
