@@ -41,10 +41,10 @@ const adminStats = {
   monthlyActivity: []
 };
 
-async function mockApi(route) {
+async function mockApi(route, authenticated = true) {
   const request = route.request();
   const url = new URL(request.url());
-  const isAPI = (url.hostname === '127.0.0.1' && url.port === '8081') ||
+  const isAPI = (url.origin === base && url.pathname.startsWith('/api/')) || (url.hostname === '127.0.0.1' && url.port === '8081') ||
     (url.hostname === 'localhost' && url.port === '8081') ||
     url.hostname === 'finflow-backend-yqhi.onrender.com' ||
     url.hostname === 'finflow-backend-production.up.railway.app';
@@ -58,9 +58,13 @@ async function mockApi(route) {
   if (request.method() === 'OPTIONS') {
     return route.fulfill({ status: 204, headers, body: '' });
   }
-  const p = url.pathname;
+  const p = url.pathname.replace(/^\/api(?=\/)/, '');
+  if (p === '/auth/me' && !authenticated) return route.fulfill({ status: 401, headers, body: '{}' });
   let response = [];
   if (p === '/auth/me') response = user;
+  else if (p === '/auth/session') response = { user };
+  else if (p === '/preferences/ui') response = { hiddenCards: [] };
+  else if (p.startsWith('/preferences/ui/')) response = { saved: true };
   else if (p === '/goals') response = goals;
   else if (p.endsWith('/contributions')) response = [
     { id: 10, goalId: 123, amount: 50000, note: 'Abono de prueba',
@@ -179,16 +183,6 @@ async function checkDialog(page, width, label, action, selector = '.modal') {
 for (const width of widths) {
   const context = await browser.newContext({ viewport: { width, height: 780 }, locale: 'es-CO' });
   await context.route('**/*', mockApi);
-  const payload = Buffer.from(JSON.stringify({ sub: user.email, exp: 4102444800, role: 'ADMIN' }))
-    .toString('base64url');
-  const fakeJWT = `qa.${payload}.qa`;
-  await context.addInitScript(({ token, user }) => {
-    // These credentials are dummy browser fixtures, never accepted by the backend.
-    if (location.hostname === '127.0.0.1') {
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-    }
-  }, { token: fakeJWT, user });
   const page = await context.newPage();
   page.on('pageerror', error => failures.push(`${width}px authenticated route: ${error.message.slice(0, 240)}`));
   page.setDefaultTimeout(7000);
@@ -285,7 +279,7 @@ for (const width of widths) {
   // Both public auth screens share the same stylesheet. Test them without
   // any fake stored session, including the smallest iPhone viewport.
   const guest = await browser.newContext({ viewport: { width, height: 780 }, locale: 'es-CO' });
-  await guest.route('**/*', mockApi);
+  await guest.route('**/*', route => mockApi(route, false));
   const guestPage = await guest.newPage();
   guestPage.on('pageerror', error => failures.push(`${width}px public route: ${error.message.slice(0, 240)}`));
   guestPage.setDefaultTimeout(7000);

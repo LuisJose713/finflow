@@ -10,7 +10,7 @@
   <ng-container *ngIf="!loading()">
    <section *ngIf="reminders().length>0" class="reminders" aria-labelledby="reminders-title">
      <div><span class="recurring-overline">PRÓXIMOS 7 DÍAS</span><h2 id="reminders-title">Tus recordatorios</h2>
-     <p *ngFor="let r of reminders()"><strong>{{r.title}}</strong> · {{r.nextDueDate}} · {{r.amount|currency:'COP':'symbol-narrow':'1.0-2'}}</p></div>
+     <p *ngFor="let r of reminders()"><strong>{{r.title}}</strong> · {{r.nextDueDate}} · {{r.amount|currency:'COP':'symbol-narrow':'1.2-2'}}</p></div>
      <button type="button" (click)="process()" [disabled]="saving()">Procesar vencidos</button>
    </section>
    <div class="recurring-grid">
@@ -44,7 +44,7 @@
        <ul *ngIf="rules().length>0" class="recurring-list">
          <li *ngFor="let r of rules()" [class.paused]="!r.active">
            <div class="recurring-item-title"><strong>{{r.title}}</strong><span>{{r.active?'Activo':'Pausado'}}</span></div>
-           <div class="recurring-item-money">{{r.amount|currency:'COP':'symbol-narrow':'1.0-2'}}</div>
+           <div class="recurring-item-money">{{r.amount|currency:'COP':'symbol-narrow':'1.2-2'}}</div>
            <p>{{r.type==='income'?'Ingreso':'Gasto'}} · {{categoryName(r.categoryId)}} · Día {{r.dayOfMonth}}</p>
            <small>Próxima fecha: {{r.nextDueDate}} · {{accountName(r.accountId)}}</small>
            <div class="recurring-actions"><button type="button" (click)="toggle(r)">{{r.active?'Pausar':'Reactivar'}}</button>

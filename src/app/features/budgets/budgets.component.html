@@ -17,8 +17,8 @@
     <p *ngIf="loading()" class="budget-loading" role="status">Consultando tus presupuestos…</p>
     <ng-container *ngIf="!loading()">
       <section class="budget-kpis" aria-label="Resumen">
-        <article><span>Presupuesto del mes</span><strong>{{totalLimit() | currency:'COP':'symbol-narrow':'1.0-2'}}</strong><small>Solo límites asignados</small></article>
-        <article><span>Gastos contabilizados</span><strong>{{totalSpent() | currency:'COP':'symbol-narrow':'1.0-2'}}</strong><small>Gastos realizados en COP</small></article>
+        <article><span>Presupuesto del mes</span><strong>{{totalLimit() | currency:'COP':'symbol-narrow':'1.2-2'}}</strong><small>Solo límites asignados</small></article>
+        <article><span>Gastos contabilizados</span><strong>{{totalSpent() | currency:'COP':'symbol-narrow':'1.2-2'}}</strong><small>Gastos realizados en COP</small></article>
         <article><span>Alertas de presupuesto</span><strong>{{alerts()}}</strong><small>Al 80 % o más del límite</small></article>
       </section>
       <div class="budget-grid">
@@ -54,15 +54,15 @@
                   {{b.status==='over'?'Límite superado':(b.status==='near'?'Cerca del límite':'En control')}}
                 </span>
               </div>
-              <div class="budget-line amounts"><span>{{b.spent|currency:'COP':'symbol-narrow':'1.0-2'}} gastados</span>
-                <span>de {{b.limitAmount|currency:'COP':'symbol-narrow':'1.0-2'}}</span></div>
+              <div class="budget-line amounts"><span>{{b.spent|currency:'COP':'symbol-narrow':'1.2-2'}} gastados</span>
+                <span>de {{b.limitAmount|currency:'COP':'symbol-narrow':'1.2-2'}}</span></div>
               <div class="budget-progress" role="progressbar" [attr.aria-label]="'Consumo de '+b.categoryName"
                 [attr.aria-valuenow]="progress(b)" aria-valuemin="0" aria-valuemax="100">
                 <div [style.width.%]="progress(b)" [class.warning]="b.status==='near'" [class.danger]="b.status==='over'"></div>
               </div>
               <div class="budget-line lower">
                 <span [class.negative]="b.remaining<0">{{b.remaining<0?'Exceso':'Disponible'}}:
-                  {{(b.remaining<0?-b.remaining:b.remaining)|currency:'COP':'symbol-narrow':'1.0-2'}}</span>
+                  {{(b.remaining<0?-b.remaining:b.remaining)|currency:'COP':'symbol-narrow':'1.2-2'}}</span>
                 <div><button type="button" (click)="edit(b)">Editar</button>
                      <button type="button" class="delete" (click)="remove(b)">Eliminar</button></div>
               </div>

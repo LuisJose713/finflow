@@ -39,6 +39,7 @@ try {
   const base = `http://127.0.0.1:${server.address().port}`;
   for (const route of ['/login', '/register']) {
     await page.goto(base + route);
+    assert.equal(await page.title(), 'FinFlow');
     await page.locator('.auth-card input').first().waitFor({ state: 'visible' });
     assert.deepEqual(await page.evaluate(() => window.securityViolations), [], `${route}: app must work under enforced CSP`);
     assert.equal(await page.evaluate(() => getComputedStyle(document.body).margin), '0px', 'Production stylesheet must load without an inline handler');

@@ -1,6 +1,15 @@
 name: FinFlow Responsive Browser QA
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'server/**'
+      - 'api/**'
+      - 'vercel.json'
+      - 'scripts/*smoke.mjs'
+      - '.github/workflows/responsive-ui.yml'
   pull_request:
     branches: [main]
     paths:

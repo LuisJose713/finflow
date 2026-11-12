@@ -23,32 +23,30 @@ try {
     const requests = [];
     await context.route('**/*', async route => {
       const url = new URL(route.request().url());
-      if (!['localhost', '127.0.0.1', 'finflow-backend-production.up.railway.app'].includes(url.hostname)
-        || (url.hostname !== 'finflow-backend-production.up.railway.app' && url.port !== '8081')) {
+      const isAPI = (url.origin === base && url.pathname.startsWith('/api/')) ||
+        (['localhost', '127.0.0.1'].includes(url.hostname) && url.port === '8081') ||
+        url.hostname === 'finflow-backend-production.up.railway.app';
+      if (!isAPI) {
         if (url.origin === base) return route.continue();
         return route.abort();
       }
+      const p = url.pathname.replace(/^\/api(?=\/)/, '');
       const headers = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'content-type': 'application/json' };
       if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
       assert.equal(route.request().method(), 'GET', 'Dashboard must not write financial data');
-      requests.push(url.pathname);
+      requests.push(p);
       let data = [];
-      if (url.pathname === '/auth/me') data = user;
-      if (url.pathname === '/transactions/stats') data = { totalIncome: 1000000, totalExpenses: 1200000, balance: -200000, savingsRate: -20 };
-      if (url.pathname === '/transactions/monthly-stats') data = empty ? [] : [{ month, income: 1000000, expenses: 1200000 }];
-      if (url.pathname === '/planned-expenses') {
+      if (p === '/auth/me') data = user;
+      if (p === '/preferences/ui') data = { hiddenCards: [] };
+      if (p === '/transactions/stats') data = { totalIncome: 1000000, totalExpenses: 1200000, balance: -200000, savingsRate: -20 };
+      if (p === '/transactions/monthly-stats') data = empty ? [] : [{ month, income: 1000000, expenses: 1200000 }];
+      if (p === '/planned-expenses') {
         if (failPayments) return route.fulfill({ status: 503, headers, body: '{}' });
         data = empty ? [] : [{ id: 'payment-1', title: 'Arriendo de prueba', amount: 450000,
           dueDate: `${month}-01`, status: 'pending', userId: 777 }];
       }
       return route.fulfill({ status: 200, headers, body: JSON.stringify(data) });
     });
-    await context.addInitScript(user => {
-      if (location.hostname !== '127.0.0.1') return;
-      const payload = btoa(JSON.stringify({ sub: user.email, exp: 4102444800, role: user.role }));
-      localStorage.setItem('token', `qa.${payload}.qa`);
-      localStorage.setItem('user', JSON.stringify(user));
-    }, user);
     const page = await context.newPage();
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(`${base}/dashboard`);
