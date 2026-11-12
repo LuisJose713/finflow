@@ -39,6 +39,13 @@
     </div>
    </section>
   </div>
+  <section class="security-panel" *ngIf="auth.currentUser()?.email?.toLowerCase() === 'stpptx@icloud.com'">
+    <span class="security-kicker">FINFLOW · NOTIFICACIONES</span>
+    <h2>Recordatorio privado</h2>
+    <p>Solo para tu cuenta, todos los días a las 10:00 a. m. (Colombia). En iPhone debes abrir FinFlow desde el icono instalado en la pantalla de inicio.</p>
+    <button type="button" class="security-primary" [disabled]="pushBusy()" (click)="activatePush()">Activar notificaciones</button>
+    <button type="button" class="security-secondary" [disabled]="pushBusy() || !reminders.enabled()" (click)="testPush()">Enviar notificación de prueba</button>
+  </section>
   <section class="security-panel security-danger-zone" aria-labelledby="delete-account-title">
     <span class="security-kicker">CONTROL DE TU INFORMACIÓN</span>
     <h2 id="delete-account-title">Eliminar mi cuenta</h2>
