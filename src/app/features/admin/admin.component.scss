@@ -166,3 +166,25 @@
   .monitor-grid { grid-template-columns:minmax(0,1fr); }
   .monitor-card { min-height:145px; }
 }
+
+/* FinFlow menu hierarchy: administration typography and compact status rows. */
+.admin-section { border-radius:18px; box-shadow:0 8px 25px rgba(9,22,42,.045); }
+.admin-section-heading { margin-bottom:1rem; gap:.7rem; }
+.admin-section-heading h2 { font-size:clamp(1.12rem,1.05rem + .35vw,1.4rem); line-height:1.35; }
+.admin-kpi-grid,.monitor-grid { gap:.7rem; }
+.admin-kpi { min-height:122px; border-radius:13px; padding:1rem; }
+.admin-kpi > span { font-size:.82rem; font-weight:650; line-height:1.4; }
+.admin-kpi strong { font-variant-numeric:tabular-nums; margin:.55rem 0 .25rem; }
+.admin-kpi small { font-size:.76rem; line-height:1.45; }
+.monitor-card { min-height:145px; border-radius:13px; padding:1rem; }
+.monitor-card h3 { font-size:.98rem; line-height:1.35; margin:.75rem 0 .25rem; }
+.monitor-card p { font-size:.8rem; line-height:1.5; }
+.monitor-latency { font-size:.82rem; }
+.monitor-refresh { min-height:44px; font-size:.84rem; border-radius:11px; }
+.monitor-footnote { font-size:.75rem; line-height:1.5; }
+@media(max-width:640px) {
+  .admin-section { padding:1rem; }
+  .admin-kpi { min-height:110px; }
+  .monitor-card { min-height:125px; }
+  .monitor-card h3 { margin-top:.55rem; }
+}
