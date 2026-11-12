@@ -23,7 +23,7 @@ export class SelectReadabilityService {
           entry.label.remove(); entries.delete(select);
         }
       }
-      for (const select of this.document.querySelectorAll('select:not([multiple])')) {
+      for (const select of Array.from(this.document.querySelectorAll('select:not([multiple])'))) {
         const field = select as HTMLSelectElement;
         let entry = entries.get(field);
         if (!entry) {
