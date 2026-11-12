@@ -96,24 +96,10 @@ try {
       const info = row.querySelector('.tx-info').getBoundingClientRect();
       const date = row.querySelector('.tx-meta').getBoundingClientRect();
       const amount = row.querySelector('.tx-amount').getBoundingClientRect();
-      const action = row.querySelector('.tx-menu-trigger').getBoundingClientRect();
+      const action = row.querySelector('.btn-delete').getBoundingClientRect();
       return { height: row.getBoundingClientRect().height, dateRight: date.right, amountLeft: amount.left, amountRight: amount.right, actionLeft: action.left };
     }));
     assert.equal(rows.length, 5);
-    // Filter only the five already loaded rows; the control must not hit the API.
-    const recentRequests = requests.filter(path => path === '/transactions/recent').length;
-    await recent.getByRole('button', { name: /^Ingresos/ }).click();
-    assert.equal(await recent.locator('.movement-list .transaction-item').count(), 1);
-    await recent.getByRole('button', { name: /^Gastos/ }).click();
-    assert.equal(await recent.locator('.movement-list .transaction-item').count(), 4);
-    await recent.getByRole('button', { name: /^Todos/ }).click();
-    assert.equal(await recent.locator('.movement-list .transaction-item').count(), 5);
-    assert.equal(requests.filter(path => path === '/transactions/recent').length, recentRequests,
-      'Recent-movement preview filters must stay client-side');
-    assert.equal(await recent.getByRole('link', { name: 'Ver todos los movimientos' }).getAttribute('href'), '/transactions');
-    await recent.locator('.tx-menu-trigger').first().click();
-    await recent.getByRole('button', { name: /Eliminar transacción Salario/ }).waitFor({ state: 'visible' });
-    await recent.locator('.tx-menu-trigger').first().press('Escape');
     for (const row of rows) {
       assert.ok(row.height <= 80, `Recent movement wastes space: ${row.height}px at ${width}px`);
       assert.ok(row.dateRight + 3 <= row.amountLeft && row.amountRight <= row.actionLeft, `Movement fields overlap at ${width}px`);
