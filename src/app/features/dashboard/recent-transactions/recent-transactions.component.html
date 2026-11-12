@@ -33,8 +33,6 @@
         [attr.aria-label]="(tx.type === 'income' ? 'Ingreso ' : 'Gasto ') + (tx.amount | appCurrency:tx.currency)">
         {{ tx.amount | appCurrency:tx.currency:'symbol' }}
       </span>
-      <div class="tx-action-slot">
-      </div>
       <button type="button" class="btn-delete" (click)="confirmDelete(tx)" [disabled]="deletingIds().has(tx.id)" [attr.aria-busy]="deletingIds().has(tx.id)" [attr.aria-label]="(deletingIds().has(tx.id) ? 'Eliminando transacción ' : 'Eliminar transacción ') + tx.description" title="Eliminar transacción">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13M10 11v5m4-5v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
