@@ -100,6 +100,19 @@ try {
       return { height: row.getBoundingClientRect().height, dateRight: date.right, amountLeft: amount.left, amountRight: amount.right, actionLeft: action.left };
     }));
     assert.equal(rows.length, 5);
+    // Changing the number of previewed movements is a local UI preference;
+    // it must not cause a refetch or hide the card entirely.
+    const recentRequestCount = requests.filter(p => p === '/transactions/recent').length;
+    const previewButtons = recent.locator('.recent-count-button');
+    assert.equal(await previewButtons.count(), 3);
+    await previewButtons.nth(0).click();
+    assert.equal(await recent.locator('.transaction-item').count(), 2);
+    await previewButtons.nth(1).click();
+    assert.equal(await recent.locator('.transaction-item').count(), 3);
+    await previewButtons.nth(2).click();
+    assert.equal(await recent.locator('.transaction-item').count(), 5);
+    assert.equal(requests.filter(p => p === '/transactions/recent').length, recentRequestCount,
+      'Changing the number of recent transactions must not make another API request');
     for (const row of rows) {
       assert.ok(row.height <= 80, `Recent movement wastes space: ${row.height}px at ${width}px`);
       assert.ok(row.dateRight + 3 <= row.amountLeft && row.amountRight <= row.actionLeft, `Movement fields overlap at ${width}px`);
