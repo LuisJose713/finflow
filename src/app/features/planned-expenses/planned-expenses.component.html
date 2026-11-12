@@ -59,7 +59,7 @@
       <div class="summary-card pending">
         <span class="summary-label">Por ejecutar</span>
         <span class="summary-value">{{ totalPending() | appCurrency }}</span>
-        <span class="summary-count">{{ totalPending() }} pendientes</span>
+        <span class="summary-count">{{ pendingCount() }} {{ pendingCount() === 1 ? 'pendiente' : 'pendientes' }}</span>
       </div>
       <div class="summary-card done">
         <span class="summary-label">Ya ejecutado</span>
@@ -111,7 +111,7 @@
     <!-- Empty -->
     @if (!loading() && filtered().length === 0) {
       <div class="empty-state">
-        <div class="empty-icon">📋</div>
+        <div class="empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h6"/></svg></div>
         <h3>Sin gastos planeados</h3>
         <p>Agrega los gastos que planeas hacer este mes</p>
         <button class="btn-primary" (click)="openCreate()">
@@ -136,7 +136,7 @@
                 <span class="expense-meta">
                   {{ categoryName(e.categoryId) }}
                   @if (e.dueDate) {
-                    · 📅 {{ e.dueDate | date: "dd MMM yyyy" }}
+                    · {{ e.dueDate | date: "dd MMM yyyy" }}
                   }
                   @if (isOverdue(e)) {
                     <span class="overdue-badge">Vencido</span>
