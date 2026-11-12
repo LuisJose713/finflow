@@ -92,6 +92,15 @@ try {
     await page.screenshot({ path: `artifacts/dashboard/${width}-monthly-plan.png`, fullPage: true });
     const recent = page.locator('app-recent-transactions');
     await recent.locator('.transaction-item').first().waitFor();
+    // Guard against the catastrophic one-letter-per-line header seen on
+    // a real iPhone. A long heading may wrap to two lines, never vertically.
+    const heading = await recent.locator('.card-header h2').evaluate(el => {
+      const bounds = el.getBoundingClientRect();
+      const styles = getComputedStyle(el);
+      return { width: bounds.width, height: bounds.height, lineHeight: parseFloat(styles.lineHeight) };
+    });
+    assert.ok(heading.width >= 125 && heading.height <= heading.lineHeight * 2.5,
+      `Recent title collapses on ${width}px screen: ${JSON.stringify(heading)}`);
     const rows = await recent.locator('.transaction-item').evaluateAll(items => items.map(row => {
       const info = row.querySelector('.tx-info').getBoundingClientRect();
       const date = row.querySelector('.tx-meta').getBoundingClientRect();
