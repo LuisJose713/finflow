@@ -28,6 +28,7 @@ try {
         const value = route.request().postDataJSON().hidden;
         value ? hidden.add(id) : hidden.delete(id); body = { saved: true };
       } else if (p === '/categories') body = [category];
+      else if (p === '/advisor/chat') body = { response: 'Respuesta de prueba para iPhone.' };
       else if (p === '/privacy/policy') body = { ready: false, version: 'test' };
       else if (p === '/transactions/years') body = [2026];
       else if (p === '/transactions') body = [{ id: 7, description: 'Compra de prueba', amount: 1250.5, type: 'expense', categoryId: 10, status: 'pending', currency: 'COP', date: '2026-11-12T00:00:00' }];
@@ -63,12 +64,15 @@ try {
     await page.getByRole('button', { name: 'Mostrar presentación', exact: true }).click();
     await categories.waitFor({ state: 'visible' });
     await page.goto(base + '/advisor');
-    const advisor = page.locator('.advisor-header'); await advisor.waitFor();
-    await advisor.getByRole('button', { name: 'Ocultar presentación', exact: true }).click();
-    await advisor.waitFor({ state: 'hidden' });
-    assert.ok(await page.getByRole('button', { name: 'Comenzar una conversación nueva' }).isVisible());
-    await page.getByRole('button', { name: 'Mostrar presentación', exact: true }).click();
-    await advisor.waitFor({ state: 'visible' });
+    const advisor = page.locator('.chat-layout'); await advisor.waitFor();
+    await page.getByRole('heading', { name: '¿En qué puedo ayudarte?' }).waitFor();
+    assert.equal(await page.locator('.advisor-header, .cards-grid').count(), 0,
+      'iPhone chat must not display obsolete introductory panels');
+    await page.locator('#finflow-advisor-input').fill('¿Qué puedo mejorar hoy?');
+    await page.getByRole('button', { name: 'Enviar mensaje' }).click();
+    await page.getByText('Respuesta de prueba para iPhone.').waitFor();
+    await page.getByRole('button', { name: 'Iniciar un chat nuevo' }).click();
+    await page.getByRole('heading', { name: '¿En qué puedo ayudarte?' }).waitFor();
     await page.goto(base + '/transactions');
     await page.getByRole('button', { name: 'Nueva transacción', exact: true }).click();
     const dialog = page.getByRole('dialog', { name: 'Nueva transacción', exact: true });
