@@ -24,7 +24,7 @@
   min-height: 0;
   height: 100dvh;
   overflow: hidden;
-  padding: clamp(.9rem, 1.7vw, 1.65rem);
+  padding: 0;
   background: var(--ff-v4-canvas, var(--bg-primary));
 }
 .chat-layout {
@@ -32,15 +32,15 @@
   flex: 1 1 auto;
   flex-direction: column;
   width: 100%;
-  max-width: 1120px;
+  max-width: none;
   min-width: 0;
   min-height: 0;
-  margin: 0 auto;
+  margin: 0;
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 18px;
+  border: 0;
+  border-radius: 0;
   background: var(--bg-secondary);
-  box-shadow: 0 10px 32px rgba(9, 22, 42, .055);
+  box-shadow: none;
 }
 .chat-topbar {
   display: flex;
@@ -340,10 +340,10 @@
     width: 100%;
     height: 100dvh;
     max-height: 100dvh;
-    padding: calc(4.75rem + env(safe-area-inset-top)) .7rem
-      calc(.65rem + env(safe-area-inset-bottom));
+    padding: calc(4.75rem + env(safe-area-inset-top)) 0
+      env(safe-area-inset-bottom);
   }
-  .chat-layout { border-radius: 16px; }
+  .chat-layout { border-radius: 0; }
   .chat-topbar { padding: .65rem .8rem; }
   .brand-avatar { width: 39px; height: 39px; flex-basis: 39px; }
   .messages-wrapper { padding: 1rem .8rem; gap: 1rem; }
@@ -367,4 +367,61 @@
 }
 @media(prefers-reduced-motion:reduce) {
   .typing span { animation: none; }
+}
+
+
+/* Full-bleed responsive conversation. The sidebar's host changes width from
+   expanded to collapsed, while the chat takes the remaining flex space. */
+:host, :host .app-shell, :host .app-shell > .main-content.advisor-main {
+  min-width: 0;
+  max-width: none;
+}
+:host .app-shell > .main-content.advisor-main {
+  flex: 1 1 0;
+  width: 0;
+  height: 100dvh;
+  max-height: 100dvh;
+  min-height: 0;
+  padding: 0;
+}
+:host .app-shell > .main-content.advisor-main .chat-layout {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+}
+:host .messages-wrapper {
+  width: 100%;
+  padding-inline: clamp(.85rem,3vw,2.25rem);
+}
+:host .chat-topbar { padding-inline: clamp(.85rem,2.3vw,2rem); }
+@media(max-width:768px) {
+  :host .app-shell { display:block; }
+  :host .app-shell > .main-content.advisor-main {
+    width: 100%;
+    height: 100dvh;
+    min-height: 0;
+    max-height: 100dvh;
+    padding: calc(4.65rem + env(safe-area-inset-top)) 0 env(safe-area-inset-bottom);
+  }
+  :host .app-shell > .main-content.advisor-main .chat-layout {
+    width: 100%;
+    height: 100%;
+  }
+  :host .messages-wrapper { padding-inline:clamp(.85rem,3.5vw,1.1rem); }
+  :host .chat-topbar { padding:.6rem clamp(.75rem,3.5vw,1rem); }
+  :host .composer-shell {
+    padding:.6rem clamp(.6rem,3vw,.9rem) .5rem;
+  }
+}
+@media(max-width:420px) {
+  :host .chat-topbar .identity-copy small { font-size:.73rem; }
+  :host .chat-topbar .btn-clear { width:44px; padding:0; font-size:0; }
+  :host .chat-topbar .btn-clear span { display:none; }
+  :host .chat-topbar .btn-clear svg { width:20px;height:20px; flex:none; }
+  :host .welcome-panel { padding: .8rem; }
+  :host .message-body { max-width:88%; }
 }
