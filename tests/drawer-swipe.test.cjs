@@ -77,7 +77,8 @@ test('the visible menu button also serves as a reliable swipe handle', () => {
   assert.equal(DrawerSwipe.canStart(18, 375, false, true), true);
   assert.equal(DrawerSwipe.canStart(85, 375, false), true);
   assert.equal(DrawerSwipe.canStart(125, 375, false), true);
-  assert.equal(DrawerSwipe.canStart(140, 375, false), false);
+  assert.equal(DrawerSwipe.canStart(140, 375, false), true);
+  assert.equal(DrawerSwipe.canStart(350, 375, false), true);
   assert.equal(DrawerSwipe.canStart(18, 1280, false, true), false);
 });
 test('short intentional drags settle at a reachable distance', () => {
