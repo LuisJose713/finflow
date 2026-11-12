@@ -1,4 +1,5 @@
 import { SelectReadabilityService } from './core/services/select-readability.service';
+import { DailyRemindersService } from './core/services/daily-reminders.service';
 import { Component, ElementRef, HostListener, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet, RouterLink } from '@angular/router';
 import { catchError, filter, forkJoin, of } from 'rxjs';
@@ -114,6 +115,7 @@ export class AppComponent {
   private readonly selectReadability = inject(SelectReadabilityService);
   readonly auth = inject(AuthService);
   private readonly privacy = inject(PrivacyService);
+  private readonly reminders = inject(DailyRemindersService);
   private readonly router = inject(Router);
   readonly currentRoute = signal(this.router.url);
   readonly privacyStatusLoaded = signal(false);
@@ -206,6 +208,10 @@ export class AppComponent {
 
   constructor() {
     this.auth.ensureSession().subscribe();
+    effect(() => {
+      const user = this.auth.currentUser();
+      this.reminders.start(this.auth.isAuthenticated() && user ? String(user.id || user.email) : null);
+    });
     this.router.events.pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe(event => this.currentRoute.set(event.urlAfterRedirects));
     effect(() => {
