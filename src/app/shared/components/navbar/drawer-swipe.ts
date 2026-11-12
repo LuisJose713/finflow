@@ -30,10 +30,10 @@ export class DrawerSwipe {
 
   static canStart(x: number, viewportWidth: number, open: boolean, fromMenuButton = false): boolean {
     if (viewportWidth > 768 || viewportWidth <= 0) return false;
-    // Preserve the system back gesture except where the visible menu button owns the touch.
+    // Permit rightward swipes from any horizontal position while preserving the OS back edge.
     if (open) return true;
     if (fromMenuButton && x >= 0 && x <= Math.min(88, viewportWidth * .36)) return true;
-    return x >= 24 && x <= Math.min(128, viewportWidth * .36);
+    return x >= 24 && x <= viewportWidth;
   }
 
   get active(): boolean { return this.axis === 'horizontal'; }
