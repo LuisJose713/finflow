@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal, output, effect, untracked } from '@angular/core';
+import { Component, DestroyRef, inject, signal, computed, output, effect, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -24,6 +24,10 @@ export class RecentTransactionsComponent {
   private loadSubscription?: Subscription;
 
   transactions = signal<Transaction[]>([]);
+  // These choices operate on the five newest records already retrieved.
+  // Switching does not refetch or alter any financial transaction.
+  readonly visibleCount = signal<2 | 3 | 5>(5);
+  readonly displayedTransactions = computed(() => this.transactions().slice(0, this.visibleCount()));
   loading      = signal(true);
   readonly loadError = signal(false);
   readonly deletingIds = signal<ReadonlySet<string>>(new Set());
