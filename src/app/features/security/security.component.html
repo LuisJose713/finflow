@@ -39,6 +39,32 @@
     </div>
    </section>
   </div>
+  <section class="security-panel security-danger-zone" aria-labelledby="delete-account-title">
+    <span class="security-kicker">CONTROL DE TU INFORMACIÓN</span>
+    <h2 id="delete-account-title">Eliminar mi cuenta</h2>
+    <p>Eliminaremos permanentemente tu perfil, movimientos, billeteras, presupuestos y metas.
+      Se cerrarán tus sesiones en todos los dispositivos. Esta acción no se puede deshacer.</p>
+    <form (ngSubmit)="deleteAccount()" novalidate>
+      <label for="delete-account-password">Confirma tu contraseña actual</label>
+      <div class="field-password">
+        <input id="delete-account-password" name="deletePassword"
+          [(ngModel)]="deletePassword" [type]="showDeletePassword()?'text':'password'"
+          autocomplete="current-password" required maxlength="128"/>
+        <button type="button" (click)="showDeletePassword.set(!showDeletePassword())"
+          [attr.aria-label]="showDeletePassword()?'Ocultar contraseña':'Mostrar contraseña'">
+          {{showDeletePassword()?'Ocultar':'Mostrar'}}
+        </button>
+      </div>
+      <label for="delete-account-confirm">Escribe ELIMINAR para confirmar</label>
+      <input id="delete-account-confirm" name="deletePhrase" [(ngModel)]="deletePhrase"
+        autocomplete="off" autocapitalize="characters" maxlength="8" required
+        placeholder="ELIMINAR" />
+      <button class="security-secondary security-delete" type="submit"
+        [disabled]="busy()||!deletePassword||deletePhrase!=='ELIMINAR'">
+        {{busy()?'Procesando…':'Eliminar mi cuenta definitivamente'}}
+      </button>
+    </form>
+  </section>
   <p class="security-disclaimer"><a routerLink="/privacy">Protección de datos personales y privacidad</a> · Recuperación por correo, verificación del email y MFA siguen pendientes de implementación y pruebas con un proveedor de correo.</p>
   <footer class="security-footer">FinFlow · Creado por <strong>AEVQOR</strong></footer>
  </main>

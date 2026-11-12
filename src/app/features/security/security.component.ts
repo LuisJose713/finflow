@@ -25,6 +25,9 @@ export class SecurityComponent {
  newPassword='';
  confirmPassword='';
  revokePassword='';
+ deletePassword='';
+ deletePhrase='';
+ readonly showDeletePassword=signal(false);
  readonly api=environment.apiUrl+'/auth';
 
  changePassword(){
@@ -51,6 +54,34 @@ export class SecurityComponent {
         :'No fue posible cambiar la contraseña.');}
    });
  }
+ deleteAccount(){
+   if(this.busy()) return;
+   this.error.set(''); this.message.set('');
+   if(!this.deletePassword || new TextEncoder().encode(this.deletePassword).length>72){
+     this.error.set('Introduce la contraseña actual (máximo 72 bytes UTF-8).');
+     return;
+   }
+   if(this.deletePhrase !== 'ELIMINAR'){
+     this.error.set('Escribe ELIMINAR para confirmar la operación.');
+     return;
+   }
+   if(!window.confirm('¿Eliminar definitivamente tu cuenta y tus datos financieros? Esta acción es irreversible.'))return;
+   this.busy.set(true);
+   this.http.request<void>('DELETE',this.api+'/account',{body:{password:this.deletePassword}}).subscribe({
+     next:()=>{
+       this.busy.set(false);this.deletePassword='';this.deletePhrase='';
+       this.auth.finishAccountDeletion();
+     },
+     error:(err:HttpErrorResponse)=>{
+       this.busy.set(false);
+       this.error.set(err.status===403?'Contraseña incorrecta.':
+          err.status===429?'Demasiados intentos. Inténtalo más tarde.':
+          err.status===400?'Revisa la contraseña indicada.':
+          'No fue posible confirmar la eliminación. Comprueba tu cuenta antes de reintentar.');
+     }
+   });
+ }
+
  revokeSessions(){
    if(this.busy()||!this.revokePassword)return;
    if(!window.confirm('¿Cerrar las sesiones de todos tus dispositivos? Tendrás que iniciar sesión otra vez.'))return;

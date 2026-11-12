@@ -29,3 +29,13 @@
 .security-footer strong{color:#b18a4f;letter-spacing:.14em}
 @media(max-width:900px){.security-grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:768px){.security-page{padding-top:5.25rem!important;padding-inline:clamp(.85rem,3.4vw,1.5rem)!important}.security-hero{padding:1.4rem}.security-emblem{display:none}.security-panel{padding:1.2rem}}
+
+/* Deliberately separate irreversible actions from routine session controls. */
+.security-danger-zone{border-color:color-mix(in srgb,#bf555a 45%,var(--ff-border));margin-top:.85rem}
+.security-danger-zone h2{color:var(--ff-text)}
+.security-danger-zone p{max-width:74ch}
+.security-danger-zone .security-delete{align-self:flex-start;margin-top:.8rem;
+  background:transparent;border-color:#b45858;color:#d45e63;max-width:100%}
+.security-danger-zone .security-delete:hover:not(:disabled){background:rgba(181,77,86,.09)}
+.security-danger-zone :is(input,button):focus-visible{outline:2px solid #c39a61;outline-offset:2px}
+@media(max-width:600px){.security-danger-zone .security-delete{width:100%;align-self:stretch}}

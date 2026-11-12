@@ -76,6 +76,14 @@ export class AuthService {
     );
   }
 
+  /** Only after HTTP 204 from the authenticated, password-checked deletion. */
+  finishAccountDeletion(): void {
+    this.session.clear();
+    this.clearLegacyStorage();
+    this.restoration = undefined;
+    void this.router.navigate(['/login']);
+  }
+
   logout() {
     const finish = () => {
       this.session.clear();
