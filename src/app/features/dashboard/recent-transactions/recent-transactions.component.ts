@@ -26,6 +26,7 @@ export class RecentTransactionsComponent {
   transactions = signal<Transaction[]>([]);
   // These choices operate on the five newest records already retrieved.
   // Switching does not refetch or alter any financial transaction.
+  readonly countOptions: readonly (2 | 3 | 5)[] = [2, 3, 5];
   readonly visibleCount = signal<2 | 3 | 5>(5);
   readonly displayedTransactions = computed(() => this.transactions().slice(0, this.visibleCount()));
   loading      = signal(true);
