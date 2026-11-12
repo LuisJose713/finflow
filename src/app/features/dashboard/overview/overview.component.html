@@ -45,24 +45,33 @@
   } @else {
     <div class="chart-surface">
       @if (chartType() === 'donut') {
-        <div class="donut-layout" role="img" [attr.aria-label]="'Distribución del periodo: ingresos ' + totalIncome() + ', gastos ' + totalExpenses()">
+        <div class="donut-layout" role="group" [attr.aria-label]="'Distribución del periodo: ingresos ' + totalIncome() + ', gastos ' + totalExpenses()">
           <svg viewBox="0 0 240 240" class="donut-chart" aria-hidden="true">
             <circle cx="120" cy="120" r="88" fill="none" stroke="var(--border)" stroke-width="24"/>
             @if (donutTotal() > 0) {
               @if (donutIncomePercent() > 0) {
-                <circle cx="120" cy="120" r="88" fill="none" stroke="#477cff" stroke-width="24" [attr.stroke-dasharray]="donutIncomePercent() + ' ' + (100 - donutIncomePercent())" pathLength="100" transform="rotate(-90 120 120)"/>
+                <circle cx="120" cy="120" r="88" fill="none" stroke="#477cff" stroke-width="24" class="donut-segment" [class.donut-muted]="highlightedDonutSegment() === 'expense'" tabindex="0" role="button" [attr.aria-label]="'Ingresos: ' + totalIncome() + ', ' + donutIncomePercent().toFixed(1) + ' por ciento'" (click)="selectDonutSegment('income')" (keydown.enter)="selectDonutSegment('income')" (keydown.space)="selectDonutSegment('income'); $event.preventDefault()" [attr.stroke-dasharray]="donutIncomePercent() + ' ' + (100 - donutIncomePercent())" pathLength="100" transform="rotate(-90 120 120)"/>
               }
               @if (donutExpensePercent() > 0) {
-                <circle cx="120" cy="120" r="88" fill="none" stroke="#d7a94d" stroke-width="24" [attr.stroke-dasharray]="donutExpensePercent() + ' ' + (100 - donutExpensePercent())" [attr.stroke-dashoffset]="-donutIncomePercent()" pathLength="100" transform="rotate(-90 120 120)"/>
+                <circle cx="120" cy="120" r="88" fill="none" stroke="#d7a94d" stroke-width="24" class="donut-segment" [class.donut-muted]="highlightedDonutSegment() === 'income'" tabindex="0" role="button" [attr.aria-label]="'Gastos: ' + totalExpenses() + ', ' + donutExpensePercent().toFixed(1) + ' por ciento'" (click)="selectDonutSegment('expense')" (keydown.enter)="selectDonutSegment('expense')" (keydown.space)="selectDonutSegment('expense'); $event.preventDefault()" [attr.stroke-dasharray]="donutExpensePercent() + ' ' + (100 - donutExpensePercent())" [attr.stroke-dashoffset]="-donutIncomePercent()" pathLength="100" transform="rotate(-90 120 120)"/>
               }
             }
           </svg>
           <div class="donut-center">
-            <span>Total del periodo</span>
-            <strong>{{ donutTotal() | appCurrency }}</strong>
+            <span>{{ highlightedDonutLabel() }}</span>
+            <strong>{{ highlightedDonutValue() | appCurrency }}</strong>
+            @if (highlightedDonutPercent() !== null) { <small>{{ highlightedDonutPercent() | number: '1.1-1' }}% del total</small> }
           </div>
         </div>
-        <p class="donut-description">Distribución de los importes del periodo seleccionado. Cambia entre ingresos, gastos o ambos para comparar.</p>
+        <div class="donut-legend" role="group" aria-label="Consultar valores del gráfico circular">
+          <button type="button" class="donut-legend-item" [class.active]="highlightedDonutSegment() === 'income'" (click)="setFilter('all'); selectDonutSegment('income')">
+            <span class="legend-dot income" aria-hidden="true"></span><span>Ingresos</span><strong>{{ totalIncome() | appCurrency }}</strong><small>{{ donutIncomePercent() | number: '1.1-1' }}%</small>
+          </button>
+          <button type="button" class="donut-legend-item" [class.active]="highlightedDonutSegment() === 'expense'" (click)="setFilter('all'); selectDonutSegment('expense')">
+            <span class="legend-dot expense" aria-hidden="true"></span><span>Gastos</span><strong>{{ totalExpenses() | appCurrency }}</strong><small>{{ donutExpensePercent() | number: '1.1-1' }}%</small>
+          </button>
+        </div>
+        <p class="donut-description">Toca un segmento o su valor para ver el importe exacto en el centro.</p>
       } @else {
       <svg viewBox="0 0 680 210" xmlns="http://www.w3.org/2000/svg"
            class="trend-chart" role="group" tabindex="0"
