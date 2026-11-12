@@ -116,3 +116,22 @@
   .quick-link { transition:none; }
 }
 
+
+/* FinFlow's quiet, menu-aligned daily reminder settings. */
+.daily-reminder-bar {
+  display:flex; align-items:center; gap:.8rem; flex-wrap:wrap; margin:-.45rem 0 1.6rem;
+  padding:.75rem 1rem; border:1px solid var(--border); border-radius:14px;
+  background:var(--bg-secondary); color:var(--text-primary);
+}
+.daily-reminder-bar img { flex:none; border-radius:9px; }
+.daily-reminder-copy { min-width:0; flex:1 1 240px; display:grid; gap:.15rem; }
+.daily-reminder-copy strong { font-size:.85rem; font-weight:730; }
+.daily-reminder-copy span { font-size:.76rem; color:var(--text-secondary); line-height:1.55; }
+.daily-reminder-bar button {
+  min-height:40px; border:1px solid var(--ff-gold); border-radius:11px;
+  padding:.45rem .85rem; background:transparent; color:var(--text-primary);
+  font-weight:700; cursor:pointer;
+}
+.daily-reminder-bar button:hover { background:rgba(215,169,77,.08); }
+.daily-reminder-bar small { color:var(--text-muted); max-width:200px; }
+@media(max-width:560px) { .daily-reminder-bar button { width:100%; } }
