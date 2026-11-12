@@ -89,3 +89,16 @@
   .recurring-primary { width: 100%; min-height: 46px; }
   .reminders { flex-wrap: wrap; }
 }
+
+/* FinFlow V5: bring recurring schedules in line with the mobile drawer. */
+.recurring-panel form { gap: .7rem; }
+.recurring-panel form label + :is(input,select) { margin-top: -.35rem; }
+.recurring-list li { padding-block: .95rem; }
+.recurring-item-money { font-variant-numeric: tabular-nums; line-height: 1.28; }
+.recurring-list small { line-height: 1.5; }
+.recurring-actions button { min-height: 44px; font-size: .86rem; }
+@media (max-width: 600px) {
+  .recurring-grid { margin-top: .85rem; }
+  .recurring-panel form { margin-top: 1rem; }
+  .recurring-item-title strong { line-height: 1.35; }
+}
