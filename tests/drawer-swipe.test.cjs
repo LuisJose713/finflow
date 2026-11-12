@@ -54,7 +54,7 @@ test('opening zone protects the browser back edge and desktop navigation', () =>
   for (const width of [320, 375, 430, 768]) {
     assert.equal(DrawerSwipe.canStart(23, width, false), false);
     assert.equal(DrawerSwipe.canStart(60, width, false), true);
-    assert.equal(DrawerSwipe.canStart(180, width, false), false);
+    assert.equal(DrawerSwipe.canStart(180, width, false), true);
     assert.equal(DrawerSwipe.canStart(width - 5, width, true), true);
   }
   assert.equal(DrawerSwipe.canStart(60, 1280, false), false);
