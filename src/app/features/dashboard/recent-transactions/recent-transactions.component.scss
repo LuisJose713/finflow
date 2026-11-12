@@ -179,3 +179,58 @@
 @media(prefers-reduced-motion:reduce) {
   .transaction-item { transition:none; }
 }
+
+
+/* Recent transaction count selector — one compact control, no extra activity filters. */
+.card-header { flex-wrap:wrap; }
+.recent-count-control {
+  display:inline-flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:3px;
+  min-width:0;
+  padding:4px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--bg-primary);
+}
+.recent-count-label {
+  margin:0 .4rem 0 .45rem;
+  color:var(--text-secondary);
+  font-size:.75rem;
+  font-weight:680;
+  line-height:1.35;
+  white-space:nowrap;
+}
+.recent-count-button {
+  display:grid;
+  place-items:center;
+  min-width:40px;
+  min-height:40px;
+  padding:.4rem;
+  border:1px solid transparent;
+  border-radius:9px;
+  background:transparent;
+  color:var(--text-secondary);
+  font:inherit;
+  font-size:.85rem;
+  font-weight:730;
+  font-variant-numeric:tabular-nums;
+  cursor:pointer;
+  touch-action:manipulation;
+}
+.recent-count-button.active {
+  background:rgba(195,154,97,.14);
+  border-color:rgba(195,154,97,.26);
+  color:var(--text-primary);
+}
+.recent-count-button:hover:not(.active) { background:var(--bg-secondary); color:var(--text-primary); }
+.recent-count-button:focus-visible { outline:2px solid #b38a4b; outline-offset:2px; }
+@container recent-movements (max-width:390px) {
+  .card-header { align-items:flex-start; gap:.55rem; }
+  .recent-count-control { width:100%; justify-content:space-between; }
+  .recent-count-button { flex:1; min-width:44px; min-height:44px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .recent-count-button { transition:none; }
+}
