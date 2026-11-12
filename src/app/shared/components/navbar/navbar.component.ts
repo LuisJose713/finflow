@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, HostListener, NgZone, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, HostListener, Input, NgZone, ViewChild, computed, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router'; 
 import { CommonModule } from '@angular/common'; 
 import { AuthService } from '../../../core/services/auth.service';
@@ -28,6 +28,7 @@ interface NavItem {
   styleUrls: ['./navbar.component.scss'],
 })
 export class NavbarComponent {
+  @Input() showTransactionShortcut = true;
 
   auth = inject(AuthService);
 

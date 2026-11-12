@@ -1,4 +1,4 @@
-:host { display: block; min-width: 0; --dash-gold: #d7a94d; --dash-night: #09162a; }
+:host { display: block; min-width: 0; --dash-gold: var(--ff-v4-gold); --dash-night: var(--ff-v4-navy); }
 .app-shell { display: flex; min-height: 100dvh; background: var(--bg-primary); }
 .main-content {
   flex: 1;
@@ -19,8 +19,8 @@
 .header-copy { min-width: 0; }
 .eyebrow { display: block; color: #a78553; font-size: .67rem; font-weight: 800; letter-spacing: .15em; margin-bottom: .52rem; }
 .page-header h1 { color: var(--text-primary); font-size: clamp(1.9rem, 3.7vw, 3.3rem); letter-spacing: -.06em; font-weight: 830; line-height: 1.12; margin: 0; }
-.gradient-word { background: linear-gradient(100deg,#376fb8,#7867cd); color: transparent; background-clip: text; -webkit-background-clip: text; }
-.dark .gradient-word { background: linear-gradient(100deg,#9fc8ff,#b8a3ee); background-clip: text; -webkit-background-clip: text; }
+.gradient-word { color: var(--primary); }
+
 .greeting { color: var(--text-secondary); margin: .65rem 0 0; font-size: .89rem; line-height: 1.6; }
 .header-actions { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; }
 .btn-export {
@@ -40,7 +40,7 @@
 .section-link:hover { color: var(--primary); }
 .quick-nav { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: .85rem; margin: 0 0 clamp(1.6rem,3vw,2.5rem); }
 .quick-link { display: flex; align-items: center; gap: .8rem; min-width: 0; min-height: 82px; padding: .85rem 1rem; border: 1px solid var(--border); border-radius: 16px; background: var(--bg-secondary); color: var(--text-primary); transition: border-color .16s, transform .16s; }
-.quick-link:hover { border-color: #b99767; transform: translateY(-2px); }
+.quick-link:hover { border-color: var(--ff-gold); }
 .quick-link-icon { display: grid; place-items: center; flex: 0 0 43px; height: 43px; border-radius: 13px; background: rgba(215,169,77,.12); color: #af844b; }
 .quick-link > span:nth-child(2) { flex: 1; min-width: 0; display: grid; gap: .16rem; }
 .quick-link strong { font-size: .83rem; font-weight: 760; }
@@ -115,3 +115,4 @@
 @media(prefers-reduced-motion:reduce) {
   .quick-link { transition:none; }
 }
+

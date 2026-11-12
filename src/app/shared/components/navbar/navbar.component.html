@@ -41,5 +41,5 @@
   </div>
 </aside>
 <!-- FinFlow V4: one floating transaction composer shared by all authenticated pages. -->
-<app-add-transaction *ngIf="auth.isAuthenticated()" [floating]="true"></app-add-transaction>
+<app-add-transaction *ngIf="auth.isAuthenticated() && showTransactionShortcut" [floating]="true"></app-add-transaction>
 

@@ -22,6 +22,11 @@
     max-height: min(860px, calc(100dvh - 32px));
     overflow: hidden;
     overscroll-behavior: contain;
+    background: var(--ff-v4-surface);
+    color: var(--ff-v4-ink);
+    border: 1px solid var(--ff-v4-stroke);
+    border-radius: 17px;
+    animation: ff-panel-reveal var(--ff-motion-panel, 300ms) var(--ff-ease-out, ease-out);
   }
 
   .modal > form {
@@ -45,7 +50,7 @@
     min-width: 0;
     gap: .75rem;
     padding: 1rem 1.4rem;
-    background: var(--bg-secondary);
+    background: var(--ff-v4-surface);
   }
 
   .modal-header h2,
@@ -85,6 +90,21 @@
     max-width: 100%;
     min-height: 44px;
     font-size: 1rem;
+    border-radius: 13px;
+  }
+
+  .modal :is(input, select, textarea):focus-visible {
+    outline: 2px solid var(--ff-gold);
+    outline-offset: 2px;
+  }
+
+  .modal :is(.btn-submit, .btn-primary) {
+    background: var(--ff-action-bg);
+    color: var(--ff-action-fg);
+    border-radius: 13px;
+  }
+  .modal :is(.btn-submit, .btn-primary):hover:not(:disabled) {
+    background: var(--ff-action-hover);
   }
 
   .modal textarea {
@@ -100,7 +120,7 @@
     padding: 1rem 1.4rem;
     margin-top: auto;
     border-top: 1px solid var(--border);
-    background: var(--bg-secondary);
+    background: var(--ff-v4-surface);
   }
 
   .modal-footer button {
@@ -228,3 +248,4 @@
     }
   }
 }
+

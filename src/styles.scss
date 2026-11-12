@@ -474,6 +474,9 @@ body { background:var(--ff-canvas); }
   --primary: #8a6837;
   --primary-dark: #6f5029;
   --ff-gold: #8a6837;
+  --ff-action-bg: #0e192b;
+  --ff-action-fg: #fffdf8;
+  --ff-action-hover: #1b2b43;
   --bg-primary: var(--ff-v4-surface);
   --bg-secondary: var(--ff-v4-canvas);
   --surface-raised: var(--ff-v4-surface);
@@ -496,6 +499,9 @@ body { background:var(--ff-canvas); }
   --primary: #dcc29a;
   --primary-dark: #c6a46c;
   --ff-gold: #dcc29a;
+  --ff-action-bg: #dcc29a;
+  --ff-action-fg: #0e192b;
+  --ff-action-hover: #e7d1ad;
   --text-muted: #a1afc0;
 }
 .app-shell > .main-content:not(.advisor-main) {
@@ -599,16 +605,16 @@ body { background:var(--ff-canvas); }
 }
 .app-shell > .main-content :is(.btn-primary,.btn-new,.account-primary,
   .budget-primary,.recurring-primary,.security-primary,.primary-action) {
-  background: #0e192b;
+  background: var(--ff-action-bg);
   border: 1px solid rgba(215,169,77,.22);
-  color: #fff;
+  color: var(--ff-action-fg);
   border-radius: 11px;
   box-shadow: 0 6px 17px rgba(9,22,42,.12);
   font-weight: 750;
 }
 .app-shell > .main-content :is(.btn-primary,.btn-new,.account-primary,
   .budget-primary,.recurring-primary,.security-primary,.primary-action):hover:not(:disabled) {
-  background: #1b2b43;
+  background: var(--ff-action-hover);
   border-color: #d7a94d;
 }
 .app-shell > .main-content :is(.btn-export,.btn-ghost,.btn-clear,

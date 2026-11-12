@@ -31,6 +31,8 @@ jobs:
         run: npm ci
       - name: Browser session proxy security tests
         run: node --test tests/web-session.test.mjs
+      - name: Shared design contrast checks
+        run: node --test tests/design-tokens.test.cjs
       - name: Interactive drawer gesture tests
         run: |
           npx tsc src/app/shared/components/navbar/drawer-swipe.ts --target es2022 --module commonjs --outDir "$RUNNER_TEMP/drawer-swipe"

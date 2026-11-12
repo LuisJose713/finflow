@@ -130,6 +130,20 @@ async function measureViewport(page, label, width) {
   }
   if (measurements.overflowing.length) {
     failures.push(`${width}px ${label}: internal overflow ${JSON.stringify(measurements.overflowing)}`);
+    const diagnostics = await page.evaluate(() => {
+      const main = document.querySelector('main');
+      if (!main) return [];
+      const bounds = main.getBoundingClientRect();
+      return Array.from(main.querySelectorAll('*')).flatMap(element => {
+        const rect = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        if (rect.right <= bounds.right + 2 && rect.left >= bounds.left - 2) return [];
+        return [{ tag: element.tagName, className: element.className, x: rect.x, width: rect.width,
+          right: rect.right, position: style.position, overflow: style.overflow, transform: style.transform }];
+      }).slice(0, 15);
+    });
+    fs.writeFileSync(path.join(output, `${width}-${label}-overflow.json`), JSON.stringify(diagnostics, null, 2));
+    failures.push(`${width}px ${label}: overflow descendants ${JSON.stringify(diagnostics)}`);
   }
 }
 
@@ -185,8 +199,40 @@ async function checkDialog(page, width, label, action, selector = '.modal') {
   }
 }
 
+async function checkDrawerGesture(page, width) {
+  const cdp = await page.context().newCDPSession(page);
+  try {
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 60, y: 190, id: 1 }] });
+    for (const x of [85, 115, 150]) {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: 191, id: 1 }] });
+      await page.waitForTimeout(20);
+    }
+    const tracking = await page.locator('#finflow-sidebar').evaluate(panel => ({
+      dragging: panel.classList.contains('dragging'),
+      offset: new DOMMatrix(getComputedStyle(panel).transform).m41,
+      width: panel.getBoundingClientRect().width,
+    }));
+    assert(tracking.dragging && tracking.offset < 0 && tracking.offset > -tracking.width,
+      `${width}px drawer must follow the finger before release: ${JSON.stringify(tracking)}`);
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await page.locator('#finflow-sidebar.open').waitFor({ state: 'visible' });
+    await page.screenshot({ path: path.join(output, `${width}-drawer-tracking.png`) });
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: width - 8, y: 190, id: 1 }] });
+    for (const dx of [25, 60, 100]) {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: width - 8 - dx, y: 191, id: 1 }] });
+      await page.waitForTimeout(20);
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await page.waitForFunction(() => !document.querySelector('#finflow-sidebar')?.classList.contains('open'));
+    await page.locator('#finflow-sidebar').waitFor({ state: 'hidden' });
+  } catch (error) {
+    failures.push(`${width}px drawer gesture: ${error.message}`);
+  } finally { await cdp.detach(); }
+}
+
 for (const width of widths) {
-  const context = await browser.newContext({ viewport: { width, height: 780 }, locale: 'es-CO' });
+  const context = await browser.newContext({ viewport: { width, height: 780 }, locale: 'es-CO', hasTouch: width <= 768 });
   await context.route('**/*', mockApi);
   const page = await context.newPage();
   page.on('pageerror', error => failures.push(`${width}px authenticated route: ${error.message.slice(0, 240)}`));
@@ -198,10 +244,15 @@ for (const width of widths) {
       await page.goto(base + route, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(200);
       await measureViewport(page, route, width);
-      // Global FAB is a shared authenticated control on all workspace routes.
+      // The conversation keeps its composer unobstructed; financial workspace
+      // routes retain the shared transaction shortcut.
       const fab = page.getByRole('button', { name: 'Nueva transacción', exact: true });
-      await fab.waitFor({ state: 'visible', timeout: 6000 });
-      assert(await fab.count() === 1, `${width}px ${route}: duplicate transaction buttons`);
+      if (route === '/advisor') {
+        assert(await fab.count() === 0, `${width}px /advisor: the floating transaction shortcut must not cover the composer`);
+      } else {
+        await fab.waitFor({ state: 'visible', timeout: 6000 });
+        assert(await fab.count() === 1, `${width}px ${route}: duplicate transaction buttons`);
+      }
       if (route === '/accounts' && [320, 768, 1440].includes(width)) {
         await fab.click();
         await page.getByRole('dialog', { name: 'Nueva transacción' }).waitFor({ state: 'visible' });
@@ -235,6 +286,10 @@ for (const width of widths) {
         if ([1024,1440].includes(width)) {
           const toggle = page.getByRole('button', { name: 'Contraer menú' });
           await toggle.click();
+          await page.waitForFunction(before => {
+            const main = document.querySelector('.advisor-main');
+            return main.getBoundingClientRect().width > before + 75;
+          }, sizing.mainWidth);
           const shrunk = await page.locator('.advisor-main').evaluate(main => ({
             main: main.getBoundingClientRect().width,
             chat: main.querySelector('.chat-layout').getBoundingClientRect().width,
@@ -242,6 +297,9 @@ for (const width of widths) {
           assert(shrunk.main > sizing.mainWidth + 75 && Math.abs(shrunk.chat - shrunk.main) <= 3,
             `${width}px /advisor: chat must expand when menu collapses`);
           await page.getByRole('button', { name: 'Expandir menú' }).click();
+          await page.waitForFunction(before =>
+            Math.abs(document.querySelector('.advisor-main').getBoundingClientRect().width - before) <= 3,
+            sizing.mainWidth);
         }
         if ([320, 768, 1440].includes(width)) {
           await page.locator('#finflow-advisor-input').fill('¿Cómo organizo mis gastos?');
@@ -285,6 +343,7 @@ for (const width of widths) {
       document.querySelector('button[aria-pressed="true"]')?.textContent?.includes('12 meses') ?? false
     );
     await measureViewport(page, 'dashboard-v4', width);
+    if ([375, 768].includes(width)) await checkDrawerGesture(page, width);
     await checkDialog(page, width, 'crear-transaccion', async () => {
       await page.getByRole('button', { name: 'Nueva transacción', exact: true }).click();
     });
@@ -356,3 +415,4 @@ if (failures.length) {
 } else {
   console.log('Responsive check PASSED: 6 widths, 6 inline-form pages, 5 dialog types.');
 }
+

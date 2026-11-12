@@ -16,7 +16,7 @@ import { DatePipe } from '@angular/common';
   imports: [FormsModule, NavbarComponent, ToastContainerComponent, DatePipe],
   template: `
     <div class="app-shell">
-      <app-navbar />
+      <app-navbar [showTransactionShortcut]="false" />
 
       <main class="main-content advisor-main">
         <section class="chat-layout" aria-label="Conversación con FinFlow AI">
@@ -219,3 +219,4 @@ export class AdvisorComponent {
   }
 
 }
+
