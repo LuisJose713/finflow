@@ -92,5 +92,24 @@ export class RecentTransactionsComponent {
     });
   }
 
+  dateLabel(value: string | undefined): string {
+    const match = /^(\\d{4})-(\\d{2})-(\\d{2})/.exec(value ?? '');
+    if (!match) return 'Sin fecha';
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+    const date = new Date(year, month - 1, day);
+    if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return 'Sin fecha';
+    const now = new Date();
+    const diff = (Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) -
+      Date.UTC(year, month - 1, day)) / 86_400_000;
+    if (diff === 0) return 'Hoy';
+    if (diff === 1) return 'Ayer';
+    return new Intl.DateTimeFormat('es-CO', {
+      day: 'numeric', month: 'short',
+      ...(year !== now.getFullYear() ? { year: '2-digit' as const } : {}),
+    }).format(date);
+  }
+
   trackById(_: number, item: Transaction) { return item.id; }
 }
