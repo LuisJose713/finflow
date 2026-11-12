@@ -59,3 +59,29 @@ test('opening zone protects the browser back edge and desktop navigation', () =>
   }
   assert.equal(DrawerSwipe.canStart(60, 1280, false), false);
 });
+
+test('a small diagonal wobble does not prematurely discard a horizontal swipe', () => {
+  const drag = swipe();
+  assert.equal(drag.move(59, 211, 15), null);
+  assert.equal(drag.move(86, 213, 35), -284);
+  assert.equal(drag.finish(40), true);
+});
+test('a clear vertical pan stays with the page even after a horizontal turn', () => {
+  const drag = swipe();
+  assert.equal(drag.move(59, 223, 20), null);
+  assert.equal(drag.move(150, 230, 40), null);
+  assert.equal(drag.finish(50), false);
+});
+test('the visible menu button also serves as a reliable swipe handle', () => {
+  assert.equal(DrawerSwipe.canStart(18, 375, false), false);
+  assert.equal(DrawerSwipe.canStart(18, 375, false, true), true);
+  assert.equal(DrawerSwipe.canStart(85, 375, false), true);
+  assert.equal(DrawerSwipe.canStart(125, 375, false), true);
+  assert.equal(DrawerSwipe.canStart(140, 375, false), false);
+  assert.equal(DrawerSwipe.canStart(18, 1280, false, true), false);
+});
+test('short intentional drags settle at a reachable distance', () => {
+  const drag = swipe();
+  drag.move(125, 201, 200);
+  assert.equal(drag.finish(300), true);
+});
