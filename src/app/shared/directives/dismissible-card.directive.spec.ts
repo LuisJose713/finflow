@@ -32,7 +32,7 @@ describe('dismissible presentation cards', () => {
     expect(goals.style.display).toBe('none');
     expect(planned.style.display).not.toBe('none');
     const show = Array.from(fixture.nativeElement.querySelectorAll('button'))
-      .find((button: any) => button.textContent === 'Mostrar presentación') as HTMLButtonElement;
+      .find((button: any) => button.getAttribute('aria-label') === 'Mostrar presentación') as HTMLButtonElement;
     show.click(); fixture.detectChanges();
     const save = requests.expectOne(endpoint + '/goals.intro');
     expect(save.request.body).toEqual({ hidden: false });
