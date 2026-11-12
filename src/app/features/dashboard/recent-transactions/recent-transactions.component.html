@@ -3,12 +3,12 @@
     <div><span class="panel-kicker">ÚLTIMOS MOVIMIENTOS</span><h2>Transacciones recientes</h2></div>
     <div class="recent-count-control" role="group" aria-label="Cantidad de transacciones recientes">
       <span class="recent-count-label">Mostrar</span>
-      <button *ngFor="let count of [2, 3, 5]" type="button"
+      <button *ngFor="let count of countOptions" type="button"
         class="recent-count-button"
         [class.active]="visibleCount() === count"
         [attr.aria-pressed]="visibleCount() === count"
         [attr.aria-label]="'Mostrar las últimas ' + count + ' transacciones'"
-        (click)="visibleCount.set($any(count))">{{ count }}</button>
+        (click)="visibleCount.set(count)">{{ count }}</button>
     </div>
   </div>
   <ng-container *ngIf="loading()">
