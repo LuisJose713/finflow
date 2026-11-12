@@ -219,6 +219,30 @@ for (const width of widths) {
         const input = await page.locator('#finflow-advisor-input').boundingBox();
         assert(layout && header && input && input.y > header.y + header.height,
           `${width}px /advisor: composer must stay below a compact chat header`);
+        const sizing = await page.locator('.advisor-main').evaluate(main => {
+          const mainRect = main.getBoundingClientRect();
+          const chatRect = main.querySelector('.chat-layout').getBoundingClientRect();
+          return {
+            mainWidth: mainRect.width, chatWidth: chatRect.width,
+            mainHeight: mainRect.height, chatHeight: chatRect.height,
+            chatRight: chatRect.right, viewport: innerWidth,
+          };
+        });
+        assert(Math.abs(sizing.chatWidth - sizing.mainWidth) <= 3,
+          `${width}px /advisor: chat must fill all available workspace width: ${JSON.stringify(sizing)}`);
+        assert(sizing.chatRight <= width + 2,
+          `${width}px /advisor: chat must not overflow the viewport`);
+        if ([1024,1440].includes(width)) {
+          const toggle = page.getByRole('button', { name: 'Contraer menú' });
+          await toggle.click();
+          const shrunk = await page.locator('.advisor-main').evaluate(main => ({
+            main: main.getBoundingClientRect().width,
+            chat: main.querySelector('.chat-layout').getBoundingClientRect().width,
+          }));
+          assert(shrunk.main > sizing.mainWidth + 75 && Math.abs(shrunk.chat - shrunk.main) <= 3,
+            `${width}px /advisor: chat must expand when menu collapses`);
+          await page.getByRole('button', { name: 'Expandir menú' }).click();
+        }
         if ([320, 768, 1440].includes(width)) {
           await page.locator('#finflow-advisor-input').fill('¿Cómo organizo mis gastos?');
           await page.getByRole('button', { name: 'Enviar mensaje' }).click();
