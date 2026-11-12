@@ -1,3 +1,4 @@
+import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -7,7 +8,7 @@ import { CurrencyInputDirective } from '../../shared/directives/currency-input.d
 import { AccountService, AccountType, FinancialAccount, AccountTransfer } from '../../core/services/account.service';
 
 @Component({
-  selector:'app-accounts',standalone:true,imports:[CommonModule,FormsModule,NavbarComponent,CurrencyInputDirective],
+  selector:'app-accounts',standalone:true,imports: [DismissibleCardDirective, CommonModule,FormsModule,NavbarComponent,CurrencyInputDirective],
   templateUrl:'./accounts.component.html',styleUrl:'./accounts.component.scss'
 })
 export class AccountsComponent implements OnInit {

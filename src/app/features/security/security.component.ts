@@ -1,3 +1,4 @@
+import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -8,7 +9,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { environment } from '@environments/environment';
 
 @Component({
- selector:'app-security',standalone:true,imports:[CommonModule,FormsModule,NavbarComponent,RouterLink],
+ selector:'app-security',standalone:true,imports: [DismissibleCardDirective, CommonModule,FormsModule,NavbarComponent,RouterLink],
  templateUrl:'./security.component.html',styleUrl:'./security.component.scss'
 })
 export class SecurityComponent {

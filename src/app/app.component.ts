@@ -201,6 +201,7 @@ export class AppComponent {
   }
 
   constructor() {
+    this.auth.ensureSession().subscribe();
     this.router.events.pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe(event => this.currentRoute.set(event.urlAfterRedirects));
     effect(() => {
@@ -215,7 +216,7 @@ export class AppComponent {
       }
     });
     effect(onCleanup => {
-      const token = this.auth.token();
+      const token = this.auth.isAuthenticated();
       this.needsConsent.set(false);
       this.privacyStatusLoaded.set(false);
       this.accepted.set(false);

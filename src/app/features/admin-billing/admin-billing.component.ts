@@ -1,3 +1,4 @@
+import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -7,7 +8,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 
 @Component({
   selector: 'app-admin-billing', standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, NavbarComponent],
+  imports: [DismissibleCardDirective, CommonModule, FormsModule, RouterLink, NavbarComponent],
   templateUrl: './admin-billing.component.html', styleUrl: './admin-billing.component.scss'
 })
 export class AdminBillingComponent implements OnInit {

@@ -1,3 +1,4 @@
+import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
@@ -13,7 +14,7 @@ import { AppCurrencyPipe } from '@shared/pipes/currency.pipe';
 @Component({
   selector: 'app-planned-expenses',
   standalone: true,
-  imports: [
+  imports: [DismissibleCardDirective, 
     CommonModule, FormsModule, ReactiveFormsModule,
     ToastContainerComponent,
     NavbarComponent,

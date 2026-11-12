@@ -1,3 +1,4 @@
+import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { CommonModule } from '@angular/common';
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -10,7 +11,7 @@ import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, RouterLink],
+  imports: [DismissibleCardDirective, CommonModule, NavbarComponent, RouterLink],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss'
 })

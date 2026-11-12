@@ -10,7 +10,7 @@
       <button class="btn-new" (click)="goalForm.open()">+ Nueva meta</button>
     </header>
 
-    <section class="premium-page-intro" aria-label="Objetivos de ahorro"><span class="premium-overline">TU FUTURO FINANCIERO</span><h2>Los grandes planes empiezan hoy.</h2><p>Haz seguimiento a cada objetivo y celebra tus avances.</p></section>
+    <section class="premium-page-intro" appDismissibleCard="goals.intro" aria-label="Objetivos de ahorro"><span class="premium-overline">TU FUTURO FINANCIERO</span><h2>Los grandes planes empiezan hoy.</h2><p>Haz seguimiento a cada objetivo y celebra tus avances.</p></section>
 
     <div *ngIf="loading()">
       <div class="goals-grid">

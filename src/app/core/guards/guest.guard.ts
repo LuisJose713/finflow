@@ -1,13 +1,10 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { hasUnexpiredSession } from './session-token';
+import { map } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 
 export const guestGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
   const router = inject(Router);
-  const token  = localStorage.getItem('token');
-
-  if (hasUnexpiredSession(token)) return router.createUrlTree(['/dashboard']);
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  return true;
+  return auth.ensureSession().pipe(map(user => user ? router.createUrlTree(['/dashboard']) : true));
 };

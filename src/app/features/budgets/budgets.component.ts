@@ -1,3 +1,4 @@
+import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -9,7 +10,7 @@ import { BudgetService, MonthlyBudget } from '../../core/services/budget.service
 import { Category } from '../../core/models';
 
 @Component({
- selector:'app-budgets', standalone:true, imports:[CommonModule,FormsModule,NavbarComponent,CurrencyInputDirective],
+ selector:'app-budgets', standalone:true, imports: [DismissibleCardDirective, CommonModule,FormsModule,NavbarComponent,CurrencyInputDirective],
  templateUrl:'./budgets.component.html', styleUrl:'./budgets.component.scss'
 })
 export class BudgetsComponent implements OnInit {

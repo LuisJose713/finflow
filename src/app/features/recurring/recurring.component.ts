@@ -1,3 +1,4 @@
+import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -10,7 +11,7 @@ import { CategoryService } from '../../core/services/category.service';
 import { Category } from '../../core/models';
 
 @Component({
- selector:'app-recurring',standalone:true,imports:[CommonModule,FormsModule,NavbarComponent,CurrencyInputDirective],
+ selector:'app-recurring',standalone:true,imports: [DismissibleCardDirective, CommonModule,FormsModule,NavbarComponent,CurrencyInputDirective],
  templateUrl:'./recurring.component.html',styleUrl:'./recurring.component.scss'
 })
 export class RecurringComponent implements OnInit {

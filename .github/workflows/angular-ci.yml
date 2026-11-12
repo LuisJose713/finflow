@@ -29,6 +29,8 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci
+      - name: Browser session proxy security tests
+        run: node --test tests/web-session.test.mjs
       - name: TypeScript typecheck
         run: npx tsc --noEmit --project tsconfig.app.json
       - name: Verify FinFlow brand
@@ -36,10 +38,10 @@ jobs:
       - name: Production build
         run: npm run build:prod
       - name: Authentication regression tests (Chrome Headless)
-        run: npm test -- --watch=false --browsers=ChromeHeadless --include=src/app/core/interceptors/auth.interceptor.spec.ts
+        run: npm test -- --watch=false --browsers=ChromeHeadless --include='src/app/core/interceptors/**/*.spec.ts'
       - name: Dashboard and currency regression tests (Chrome Headless)
-        run: npm test -- --watch=false --browsers=ChromeHeadless --include='src/app/features/dashboard/**/*.spec.ts' --include=src/app/shared/pipes/currency.pipe.spec.ts
+        run: npm test -- --watch=false --browsers=ChromeHeadless --include='src/app/features/dashboard/**/*.spec.ts' --include=src/app/shared/pipes/currency.pipe.spec.ts --include=src/app/shared/directives/currency-input.directive.spec.ts --include=src/app/shared/directives/dismissible-card.directive.spec.ts
       - name: Session guard regression tests (Chrome Headless)
-        run: npm test -- --watch=false --browsers=ChromeHeadless --include=src/app/core/guards/session-token.spec.ts --include=src/app/core/services/auth.service.spec.ts
+        run: npm test -- --watch=false --browsers=ChromeHeadless --include=src/app/core/guards/session-token.spec.ts --include=src/app/core/services/auth.service.spec.ts --include=src/app/core/services/cookie-session.spec.ts
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high

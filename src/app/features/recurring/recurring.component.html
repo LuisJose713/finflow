@@ -1,7 +1,7 @@
 <div class="app-shell">
  <app-navbar></app-navbar>
  <main class="main-content recurring-page">
-  <header class="recurring-hero"><div><span class="recurring-kicker">FINFLOW · AUTOMATIZA TU DINERO</span>
+  <header class="recurring-hero" appDismissibleCard="recurring.intro"><div><span class="recurring-kicker">FINFLOW · AUTOMATIZA TU DINERO</span>
    <h1>Movimientos recurrentes</h1><p>Programa ingresos y gastos mensuales y consulta tus próximos vencimientos.</p></div>
    <img class="recurring-mark" src="/finflow-icon-classic.svg" width="120" height="120" alt="" aria-hidden="true" /></header>
   <p *ngIf="error()" class="recurring-feedback error" role="alert">{{error()}}</p>

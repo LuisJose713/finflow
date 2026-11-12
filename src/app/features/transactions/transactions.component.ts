@@ -1,3 +1,4 @@
+import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,7 +15,7 @@ import { AddTransactionComponent } from '@shared/components/add-transaction/add-
 @Component({
   selector: 'app-transactions',
   standalone: true,
-  imports: [
+  imports: [DismissibleCardDirective, 
     CommonModule, DatePipe, FormsModule,
     AppCurrencyPipe, NavbarComponent, ToastContainerComponent
 ],

@@ -1,3 +1,4 @@
+import { DismissibleCardDirective } from '../../../shared/directives/dismissible-card.directive';
 import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { GoalService } from '../../../core/services/goal.service';
@@ -14,7 +15,7 @@ import { GoalHistoryComponent } from '../goal-history/goal-history.component';
 @Component({
   selector: 'app-goals-list',
   standalone: true,
-  imports: [
+  imports: [DismissibleCardDirective, 
     CommonModule,
     DecimalPipe,
     NavbarComponent,
