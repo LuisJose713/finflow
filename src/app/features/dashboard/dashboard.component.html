@@ -24,6 +24,23 @@
       </div>
     </header>
 
+    @if (reminders.supported) {
+      <section class="daily-reminder-bar" aria-label="Recordatorios de FinFlow">
+        <img src="/finflow-icon-classic.svg" width="32" height="32" alt="" aria-hidden="true" />
+        <div class="daily-reminder-copy">
+          <strong>Recordatorios diarios</strong>
+          <span>Registrar movimientos · 10:00 a. m. &nbsp; | &nbsp; Revisar gastos · 4:00 p. m.</span>
+        </div>
+        @if (reminders.enabled()) {
+          <button type="button" (click)="deactivateReminders()">Desactivar</button>
+        } @else if (reminders.permission() !== 'denied') {
+          <button type="button" (click)="activateReminders()">Activar avisos</button>
+        } @else {
+          <small>Permite notificaciones desde los ajustes del navegador</small>
+        }
+      </section>
+    }
+
     <section class="section stats-section" aria-labelledby="balances-heading">
       <div class="section-heading">
         <div>
