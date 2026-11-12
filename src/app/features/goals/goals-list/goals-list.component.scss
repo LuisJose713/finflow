@@ -234,3 +234,45 @@
   .goal-actions { flex: 1 1 100%; justify-content: space-between; gap: .5rem; }
   .goal-actions .btn-icon { flex: 1; min-height: 44px; border: 1px solid var(--border); }
 }
+
+
+/* Unified FinFlow navigation language: crisp vector actions and calm cards. */
+.goal-card {
+  border-radius: 18px;
+  gap: .9rem;
+  box-shadow: 0 8px 25px rgba(9,22,42,.055);
+}
+.goal-header h3 { font-size: 1.05rem; line-height: 1.4; }
+.goal-desc { font-size: .86rem; line-height: 1.55; }
+.goal-footer { flex-wrap:wrap; align-items:center; gap:.75rem; }
+.deadline { display:inline-flex; align-items:center; gap:.4rem; color:var(--text-secondary); line-height:1.4; }
+.deadline svg { width:17px; height:17px; flex:0 0 17px; color:#b38a4b; }
+.goal-actions { align-items:center; gap:.4rem; }
+.goal-actions .btn-icon {
+  display:inline-grid;
+  place-items:center;
+  min-width:44px;
+  min-height:44px;
+  padding:.6rem;
+  color:var(--text-secondary);
+  border:1px solid var(--border);
+  background:var(--bg-primary);
+  border-radius:11px;
+  transition:border-color .16s ease,background .16s ease,color .16s ease;
+}
+.goal-actions .btn-icon svg { width:20px; height:20px; }
+.goal-actions .btn-icon:hover { border-color:#b38a4b; color:var(--text-primary); }
+.goal-actions .btn-icon.danger:hover { color:var(--danger); border-color:var(--danger); }
+.goal-actions .btn-icon:focus-visible { outline:2px solid #b38a4b; outline-offset:2px; }
+.empty-icon svg { display:block; width:42px; height:42px; color:#b38a4b; }
+.amounts { font-variant-numeric:tabular-nums; }
+@media(max-width:600px) {
+  .goal-card { min-height:0; padding:1.1rem; gap:.85rem; }
+  .goal-footer { flex-direction:column; align-items:stretch; }
+  .goal-actions { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); width:100%; }
+  .goal-actions .btn-icon { width:100%; min-width:0; }
+  .goal-header h3 { font-size:1rem; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .goal-actions .btn-icon { transition:none; }
+}
