@@ -210,7 +210,7 @@ export class AppComponent {
     this.auth.ensureSession().subscribe();
     effect(() => {
       const user = this.auth.currentUser();
-      this.reminders.start(this.auth.isAuthenticated() && user ? String(user.id || user.email) : null);
+      this.reminders.start(this.auth.isAuthenticated() && user?.email ? String(user.email).toLowerCase() : null);
     });
     this.router.events.pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe(event => this.currentRoute.set(event.urlAfterRedirects));
