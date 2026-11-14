@@ -32,10 +32,25 @@ export class DashboardComponent {
   private toast = inject(ToastService);
   readonly reminders = inject(DailyRemindersService);
 
+  readonly activatingReminders = signal(false);
+
   async activateReminders(): Promise<void> {
-    const ok = await this.reminders.enable();
-    if (ok) this.toast.success('Recordatorios diarios activados: 10:00 y 16:00');
-    else this.toast.error('Permite las notificaciones de FinFlow en tu navegador.');
+    if (this.activatingReminders()) return;
+    this.activatingReminders.set(true);
+    try {
+      const ok = await this.reminders.enable();
+      if (ok) {
+        this.toast.success('Recordatorios diarios activados: 10:00 y 16:00');
+      } else if (this.reminders.permission() === 'denied') {
+        this.toast.warning('Permite las notificaciones desde los ajustes de tu navegador.');
+      } else {
+        this.toast.warning('No pudimos activar los recordatorios. Revisa la conexión e inténtalo de nuevo.');
+      }
+    } catch {
+      this.toast.error('No pudimos activar los recordatorios. Inténtalo nuevamente.');
+    } finally {
+      this.activatingReminders.set(false);
+    }
   }
 
   deactivateReminders(): void {

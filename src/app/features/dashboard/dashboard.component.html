@@ -34,7 +34,7 @@
         @if (reminders.enabled()) {
           <button type="button" (click)="deactivateReminders()">Desactivar</button>
         } @else if (reminders.permission() !== 'denied') {
-          <button type="button" (click)="activateReminders()">Activar avisos</button>
+          <button type="button" (click)="activateReminders()" [disabled]="activatingReminders()">{{ activatingReminders() ? 'Activando…' : 'Activar avisos' }}</button>
         } @else {
           <small>Permite notificaciones desde los ajustes del navegador</small>
         }

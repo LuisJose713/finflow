@@ -11,31 +11,49 @@ export interface Toast {
 
 @Injectable({ providedIn: 'root' })
 export class ToastService {
-  private _toasts = signal<Toast[]>([]);
+  private readonly defaultDurationMs = 4000;
+  private readonly maxVisibleToasts = 2;
+  private readonly lastShown = new Map<string, number>();
+  private readonly timers = new Map<string, ReturnType<typeof setTimeout>>();
+  private readonly _toasts = signal<Toast[]>([]);
   readonly toasts = this._toasts.asReadonly();
 
-  show(message: string, type: ToastType = 'info', duration = type === 'error' ? 0 : 4000) {
-    const id = crypto.randomUUID();
-    const toast: Toast = { id, message, type, duration };
+  show(message: string, type: ToastType = 'info', duration = 4000): void {
+    const cleanMessage = message.trim();
+    if (!cleanMessage) return;
 
-    this._toasts.update((current) => [...current, toast]);
+    const now = Date.now();
+    // Ignore repetitions for four seconds, even if the user closes one early.
+    for (const [key, timestamp] of this.lastShown) {
+      if (now - timestamp >= this.defaultDurationMs) this.lastShown.delete(key);
+    }
+    const key = type + ':' + cleanMessage;
+    if (this.lastShown.has(key)) return;
+    this.lastShown.set(key, now);
 
-    if (duration > 0) setTimeout(() => this.dismiss(id), duration);
+    // No toast can remain pinned indefinitely, including errors (duration 0).
+    const visibleFor = Number.isFinite(duration) && duration > 0
+      ? Math.min(duration, this.defaultDurationMs) : this.defaultDurationMs;
+    const toast: Toast = {
+      id: crypto.randomUUID(),
+      message: cleanMessage,
+      type,
+      duration: visibleFor,
+    };
+    const current = this._toasts();
+    if (current.length >= this.maxVisibleToasts) this.dismiss(current[0].id);
+    this._toasts.update(items => [...items, toast]);
+    this.timers.set(toast.id, setTimeout(() => this.dismiss(toast.id), visibleFor));
   }
 
-  success(message: string) {
-    this.show(message, 'success');
-  }
+  success(message: string): void { this.show(message, 'success'); }
+  error(message: string): void { this.show(message, 'error'); }
+  warning(message: string): void { this.show(message, 'warning'); }
 
-  error(message: string) {
-    this.show(message, 'error');
-  }
-
-  warning(message: string) {
-    this.show(message, 'warning');
-  }
-
-  dismiss(id: string) {
-    this._toasts.update((current) => current.filter((t) => t.id !== id));
+  dismiss(id: string): void {
+    const timer = this.timers.get(id);
+    if (timer !== undefined) clearTimeout(timer);
+    this.timers.delete(id);
+    this._toasts.update(items => items.filter(toast => toast.id !== id));
   }
 }
