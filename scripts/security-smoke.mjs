@@ -9,7 +9,7 @@ const root = path.resolve('dist/finance-app-angular/browser');
 const config = JSON.parse(await fs.readFile('vercel.json', 'utf8'));
 const headers = Object.fromEntries(config.headers.find(rule => rule.source === '/(.*)').headers
   .map(header => [header.key, header.value]));
-assert.match(headers['Content-Security-Policy'], /script-src 'self';/);
+assert.match(headers['Content-Security-Policy'], /(?:^|; )script-src 'self'(?: https:\/\/accounts\\.google\\.com\/gsi\/client)?;/);
 assert.ok(!headers['Content-Security-Policy'].includes("script-src 'self' 'unsafe-inline'"));
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.json': 'application/json' };
 const server = http.createServer(async (request, response) => {
