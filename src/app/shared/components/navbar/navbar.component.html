@@ -53,5 +53,13 @@
   </div>
 </aside>
 <!-- FinFlow V4: one floating transaction composer shared by all authenticated pages. -->
-<app-add-transaction *ngIf="auth.isAuthenticated() && showTransactionShortcut" [floating]="true"></app-add-transaction>
+<app-add-transaction *ngIf="auth.isAuthenticated() && showTransactionShortcut && showMovementAction()" [floating]="true"></app-add-transaction>
+<button *ngIf="auth.isAuthenticated() && showTransactionShortcut && createAction(); else noQuickAction"
+        type="button" class="quick-create-floating"
+        [attr.aria-label]="createAction()?.label"
+        (click)="openContextCreate()">
+  <span class="quick-create-icon" aria-hidden="true">+</span>
+  <span>{{ createAction()?.label }}</span>
+</button>
+<ng-template #noQuickAction></ng-template>
 
