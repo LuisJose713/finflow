@@ -277,17 +277,33 @@ form {
 .voice-draft button:disabled{opacity:.6;cursor:not-allowed}
 .voice-draft .voice-notice{font-weight:600}
 
-/* Contextual onboarding follows the actual transaction controls without covering them. */
-.walkthrough-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 14px;
-  color:#b89558;font-size:11px;font-weight:800;letter-spacing:.12em}
-.walkthrough-header button{border:1px solid currentColor;background:transparent;color:inherit;border-radius:9px;
-  font:inherit;letter-spacing:normal;padding:7px 9px;cursor:pointer}
-.walkthrough-tip{display:block;position:relative;background:#153554;color:#fff;border:1px solid #b89558;
-  border-radius:12px;padding:10px 13px;margin:8px 0 10px;font-size:13px;line-height:1.55;
-  box-shadow:0 5px 22px #0002;font-weight:500}
-.walkthrough-tip strong{color:#e8c78c}
-.floating-tip{position:absolute;right:0;bottom:calc(100% + 12px);width:235px;max-width:75vw;
-  pointer-events:none;text-align:left;white-space:normal;z-index:10}
-.walkthrough-next{border:1px solid #b89558;border-radius:8px;color:inherit;background:transparent;
-  padding:7px 12px;margin:8px 0;cursor:pointer;font-size:12px;font-weight:700}
-.walkthrough-header button:focus-visible,.walkthrough-next:focus-visible{outline:3px solid #b89558;outline-offset:3px}
+
+/* Optional dictation never dominates the primary financial form. */
+.voice-disclosure {
+  margin-top: 16px;
+  border: 1px solid var(--border, #dce3eb);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-primary, #fff);
+}
+.voice-disclosure summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 12px 14px;
+  color: var(--text-secondary, #546780);
+  font-weight: 650;
+  font-size: .83rem;
+  list-style-position: inside;
+}
+.voice-disclosure summary span { font-size: .75rem; opacity: .8; font-weight: 450; }
+.voice-disclosure[open] .voice-draft {
+  border: 0;
+  border-top: 1px solid var(--border, #dce3eb);
+  border-radius: 0;
+}
+.voice-disclosure summary:focus-visible {
+  outline: 2px solid #b89558;
+  outline-offset: -3px;
+}
