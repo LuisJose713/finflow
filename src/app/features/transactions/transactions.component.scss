@@ -554,3 +554,41 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Escritorio: seis controles en una sola línea.
+   Se conservan los grupos y la lógica Angular; únicamente cambia el layout. */
+@container transactions-workspace (min-width: 960px) {
+  .app-shell .main-content .filters-card {
+    display: grid;
+    grid-template-columns: minmax(180px, 1.3fr) minmax(0, 4fr) minmax(150px, .9fr);
+    align-items: end;
+    gap: 12px;
+  }
+
+  /* El contenedor visual desaparece del grid, no del DOM. */
+  .app-shell .main-content .filters-toolbar {
+    display: contents;
+  }
+
+  .app-shell .main-content .filters-toolbar .search-wrap {
+    grid-column: 1;
+    grid-row: 1;
+    max-width: none;
+    align-self: end;
+  }
+
+  .app-shell .main-content .filters-row {
+    grid-column: 2;
+    grid-row: 1;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-self: end;
+  }
+
+  .app-shell .main-content .filters-toolbar .btn-clear {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: end;
+    width: 100%;
+    min-width: 0;
+  }
+}
