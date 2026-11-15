@@ -4,6 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { AuthService } from '../../core/services/auth.service';
 import { DismissibleCardDirective } from './dismissible-card.directive';
+import { UiPreferencesService } from '../../core/services/ui-preferences.service';
 import { environment } from '../../../environments/environment';
 
 @Component({ standalone: true, imports: [DismissibleCardDirective], template: `
@@ -31,9 +32,10 @@ describe('dismissible presentation cards', () => {
     const planned: HTMLElement = fixture.nativeElement.querySelector('#planned');
     expect(goals.style.display).toBe('none');
     expect(planned.style.display).not.toBe('none');
-    const show = Array.from(fixture.nativeElement.querySelectorAll('button'))
-      .find((button: any) => button.getAttribute('aria-label') === 'Mostrar presentación') as HTMLButtonElement;
-    show.click(); fixture.detectChanges();
+    // Hidden cards have no embedded restore control. The preferences service
+    // restores the presentation through the account's UI customization.
+    TestBed.inject(UiPreferencesService).setHidden('goals.intro', false);
+    fixture.detectChanges();
     const save = requests.expectOne(endpoint + '/goals.intro');
     expect(save.request.body).toEqual({ hidden: false });
     save.flush({ cardId: 'goals.intro', hidden: false }); fixture.detectChanges();
