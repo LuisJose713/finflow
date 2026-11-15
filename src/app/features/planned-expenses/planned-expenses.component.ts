@@ -1,6 +1,6 @@
 import { CurrencyInputDirective } from '../../shared/directives/currency-input.directive';
 import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
-import { Component, inject, signal, computed, effect } from '@angular/core';
+import { Component, DestroyRef, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { PlannedExpenseService } from '@core/services/planned-expense.service';
@@ -9,6 +9,8 @@ import { ToastService } from '@core/services/toast.service';
 import { DashboardRefreshService } from '@core/services/dashboard-refresh.service';
 import { PlannedExpense, Category } from '@core/models/index';
 import { NavbarComponent } from '@shared/components/navbar/navbar.component';
+import { QuickCreateService } from '@core/services/quick-create.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastContainerComponent } from '@shared/components/toast-container/toast-container.component';
 import { AppCurrencyPipe } from '@shared/pipes/currency.pipe';
 
@@ -30,6 +32,8 @@ export class PlannedExpensesComponent {
   private toast          = inject(ToastService);
   private refresh        = inject(DashboardRefreshService);
   private fb             = inject(FormBuilder);
+  private readonly quickCreate = inject(QuickCreateService);
+  private readonly destroyRef = inject(DestroyRef);
 
   expenses   = signal<PlannedExpense[]>([]);
   categories = signal<Category[]>([]);
@@ -72,6 +76,9 @@ export class PlannedExpensesComponent {
   get f() { return this.form.controls; }
 
   constructor() {
+    this.quickCreate.requested$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(route => {
+      if (route === '/planned-expenses') this.openCreate();
+    });
     this.peService.getAll().subscribe({
       next:  data => { this.expenses.set(data); this.loading.set(false); },
       error: ()   => this.loading.set(false),
