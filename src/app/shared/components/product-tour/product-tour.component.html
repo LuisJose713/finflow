@@ -1,0 +1,42 @@
+@if (auth.isAuthenticated()) {
+      <button class="tour-launcher" type="button" (click)="openGuide()"
+              aria-label="Abrir guía de FinFlow" title="Guía de FinFlow">
+        <span aria-hidden="true">?</span><span>Guía</span>
+      </button>
+      @if (opened() && !blocked) {
+        <div class="tour-backdrop" (click)="closeGuide()">
+          <section class="tour-panel" role="dialog" aria-modal="true"
+                   aria-labelledby="tour-title" aria-describedby="tour-desc"
+                   (click)="$event.stopPropagation()" (keydown.escape)="closeGuide()">
+            <div class="tour-topline">
+              <span>FINFLOW <span class="tour-dot">●</span> EMPIEZA AQUÍ</span>
+              <button class="tour-close" type="button" aria-label="Cerrar guía" (click)="closeGuide()">✕</button>
+            </div>
+            <div class="tour-progress" role="progressbar" [attr.aria-valuemin]="1"
+                 [attr.aria-valuemax]="steps.length" [attr.aria-valuenow]="index() + 1"
+                 [attr.aria-label]="'Paso ' + (index() + 1) + ' de ' + steps.length">
+              <span [style.width.%]="((index() + 1) / steps.length) * 100"></span>
+            </div>
+            <p class="tour-counter">PASO {{ index() + 1 }} DE {{ steps.length }}</p>
+            <div class="tour-icon" aria-hidden="true">{{ current().icon }}</div>
+            <h2 id="tour-title">{{ current().title }}</h2>
+            <p id="tour-desc">{{ current().description }}</p>
+            <button class="tour-practice" type="button" (click)="startTransactionGuide()">
+              <span aria-hidden="true">☝</span> Guíame para crear un movimiento
+            </button>
+            <button class="tour-visit" type="button" (click)="visit()">
+              {{ current().action }} <span aria-hidden="true">↗</span>
+            </button>
+            <div class="tour-actions">
+              <button class="tour-skip" type="button" (click)="closeGuide()">Omitir</button>
+              <div class="tour-nav">
+                <button type="button" class="tour-previous" (click)="previous()" [disabled]="index() === 0">Anterior</button>
+                <button type="button" class="tour-next" (click)="next()">
+                  {{ index() === steps.length - 1 ? 'Finalizar' : 'Siguiente' }}
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      }
+    }
