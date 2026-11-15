@@ -9,7 +9,7 @@ self.addEventListener('push', event => {
   const url = payload.url === '/transactions' ? '/transactions' : '/dashboard';
   event.waitUntil(self.registration.showNotification(title, {
     body, icon: '/icons/finflow-192.png', badge: '/icons/finflow-192.png',
-    tag: 'finflow-daily-reminder', data: { url }
+    tag: payload.tag === 'finflow-daily-16' ? 'finflow-daily-16' : 'finflow-daily-10', data: { url }
   }));
 });
 self.addEventListener('notificationclick', event => {

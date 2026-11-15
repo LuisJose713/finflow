@@ -333,6 +333,24 @@ for (const width of widths) {
     }
   }
 
+  // Navigation must not jump back to the top when clicking Administration.
+  if (width === 1440) {
+    try {
+      await page.goto(base + '/dashboard', { waitUntil: 'domcontentloaded' });
+      await page.locator('#finflow-sidebar .nav').evaluate(element => element.scrollTop = 170);
+      await page.locator('#finflow-sidebar .nav-item[href="/admin"]').click();
+      await page.waitForURL('**/admin');
+      const keptPosition = await page.locator('#finflow-sidebar .nav').evaluate(element => element.scrollTop);
+      assert(keptPosition > 40, 'Admin navigation must preserve the scrolled menu position');
+      assert(await page.locator('#finflow-sidebar .nav-item[href="/admin"]').evaluate(element => element.classList.contains('active')),
+        'Administration must remain selected after routing');
+      assert(await page.getByRole('link', { name: /Editar perfil y seguridad de la cuenta/ }).count() === 1,
+        'Desktop menu must expose the authenticated account');
+    } catch (error) {
+      failures.push(`${width}px persistent admin menu: ${error.message.slice(0, 240)}`);
+    }
+  }
+
   // Genuine page-by-page coaching: a user can follow and skip without saving.
   if ([375, 1024].includes(width)) {
     try {
