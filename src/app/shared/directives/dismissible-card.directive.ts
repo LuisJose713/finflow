@@ -11,8 +11,6 @@ export class DismissibleCardDirective implements AfterViewInit {
   private readonly destroy = inject(DestroyRef);
   private initialized = signal(false);
   private close?: HTMLButtonElement;
-  private restore?: HTMLElement;
-  private restoreButton?: HTMLButtonElement;
 
   constructor() {
     effect(() => {
@@ -21,12 +19,9 @@ export class DismissibleCardDirective implements AfterViewInit {
       const enabled = this.preferences.canCustomize();
       const busy = this.preferences.isSaving(this.cardId());
       if (this.close) { this.close.hidden = !enabled; this.close.disabled = busy; }
-      if (this.restore && this.restoreButton) {
-        this.restoreButton.disabled = busy;
-        this.renderer.setStyle(this.restore, 'display', hidden ? 'flex' : 'none');
-        if (hidden) this.renderer.setStyle(this.host, 'display', 'none', RendererStyleFlags2.Important);
-        else this.renderer.removeStyle(this.host, 'display', RendererStyleFlags2.Important);
-      }
+      // A hidden presentation is entirely absent, with no residual restore icon.
+      if (hidden) this.renderer.setStyle(this.host, 'display', 'none', RendererStyleFlags2.Important);
+      else this.renderer.removeStyle(this.host, 'display', RendererStyleFlags2.Important);
     });
   }
 
@@ -42,40 +37,9 @@ export class DismissibleCardDirective implements AfterViewInit {
     this.renderer.setStyle(this.host, 'padding-right', '64px');
     this.renderer.appendChild(this.host, this.close);
 
-    this.restore = this.renderer.createElement('div');
-    // Keep the restore control as a compact toolbar element, not a second hero.
-    this.style(this.restore!, { display: 'none', alignItems: 'center', justifyContent: 'flex-end',
-      gap: '8px', flexWrap: 'nowrap', minWidth: '0', maxWidth: '100%',
-      margin: '0 0 .65rem' });
-    const pageHeader = this.host.parentElement?.querySelector<HTMLElement>(':scope > .page-header');
-    const inlineTarget = pageHeader && pageHeader !== this.host ? pageHeader.querySelector('.header-actions') || pageHeader : null;
-    const heading = inlineTarget ? null : this.host.querySelector('h1');
-    if (heading) {
-      const compact = this.renderer.createElement('h1');
-      this.renderer.setProperty(compact, 'textContent', heading.textContent);
-      this.style(compact, { margin: '0 auto 0 0', fontSize: 'clamp(1rem, 2.7vw, 1.16rem)',
-        fontWeight: '720', minWidth: '0', overflow: 'hidden', textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap', color: 'var(--text-primary)' });
-      this.renderer.appendChild(this.restore, compact);
-    }
-    this.restoreButton = this.renderer.createElement('button');
-    this.restoreButton!.type = 'button';
-    this.restoreButton!.textContent = '↗';
-    this.renderer.setAttribute(this.restoreButton!, 'aria-label', 'Mostrar presentación');
-    this.renderer.setAttribute(this.restoreButton!, 'title', 'Mostrar presentación');
-    this.style(this.restoreButton!, { flex: '0 0 40px', width: '40px', height: '40px',
-      minWidth: '40px', minHeight: '40px', border: '1px solid var(--border, #ccd5df)',
-      borderRadius: '11px', padding: '0', color: 'var(--text-primary)',
-      background: 'var(--bg-secondary, transparent)', cursor: 'pointer',
-      font: 'inherit', fontSize: '1.15rem', fontWeight: '650', lineHeight: '1',
-      display: 'inline-grid', placeItems: 'center' });
-    this.renderer.appendChild(this.restore, this.restoreButton);
-    if (inlineTarget) this.renderer.appendChild(inlineTarget, this.restore);
-    else this.renderer.insertBefore(this.host.parentNode, this.restore, this.host);
     const removeClose = this.renderer.listen(this.close, 'click', (event: Event) => { event.stopPropagation(); this.preferences.setHidden(this.cardId(), true); });
-    const removeRestore = this.renderer.listen(this.restoreButton, 'click', () => this.preferences.setHidden(this.cardId(), false));
     this.initialized.set(true);
-    this.destroy.onDestroy(() => { removeClose(); removeRestore(); this.restore?.remove(); this.close?.remove(); });
+    this.destroy.onDestroy(() => { removeClose(); this.close?.remove(); });
   }
 
   private style(element: HTMLElement, styles: Record<string, string>) {
