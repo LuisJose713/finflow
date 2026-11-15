@@ -1,8 +1,10 @@
 import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { QuickCreateService } from '../../core/services/quick-create.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { CategoryService } from '../../core/services/category.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -18,6 +20,8 @@ type CategoryType = 'Income' | 'Expense';
   styleUrl: './categories.component.scss',
 })
 export class CategoriesComponent implements OnInit {
+  private readonly quickCreate = inject(QuickCreateService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly categoriesApi = inject(CategoryService);
   readonly auth = inject(AuthService);
 
@@ -38,7 +42,15 @@ export class CategoriesComponent implements OnInit {
     this.categories().filter(c => c.userId == null)
   );
 
-  ngOnInit() { this.refresh(); }
+  ngOnInit() {
+    this.refresh();
+    this.quickCreate.requested$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(route => {
+      if (route !== '/categories') return;
+      this.reset();
+      document.getElementById('category-name')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      (document.getElementById('category-name') as HTMLInputElement | null)?.focus({ preventScroll: true });
+    });
+  }
 
   refresh() {
     this.loading.set(true);
