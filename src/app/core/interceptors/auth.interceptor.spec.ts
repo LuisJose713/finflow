@@ -42,11 +42,33 @@ describe('authInterceptor session safety', () => {
     localStorage.setItem('finflow-theme-test', 'dark');
     http.get(endpoint).subscribe({ error: () => undefined });
     requests.expectOne(endpoint).flush({}, { status: 401, statusText: 'Unauthorized' });
+    // Recheck current session before interpreting a stale API 401 as logout.
+    requests.expectOne(endpoint).flush({}, { status: 401, statusText: 'Unauthorized' });
     expect(session.user()).toBeNull();
     expect(session.bearer()).toBeNull();
     expect(localStorage.getItem('finflow-theme-test')).toBe('dark');
     expect(router.navigate).toHaveBeenCalledWith(['/login']);
     localStorage.removeItem('finflow-theme-test');
+  });
+
+  it('keeps the current account when a stale endpoint returned 401 but revalidation succeeds', () => {
+    session.establish(user, 'current-session');
+    http.get(environment.apiUrl + '/transactions').subscribe({ error: () => undefined });
+    requests.expectOne(environment.apiUrl + '/transactions')
+      .flush({}, { status: 401, statusText: 'Unauthorized' });
+    requests.expectOne(endpoint).flush(user);
+    expect(session.authenticated()).toBeTrue();
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('does not sign out a user when the revalidation service is temporarily offline', () => {
+    session.establish(user, 'current-session');
+    http.get(environment.apiUrl + '/transactions').subscribe({ error: () => undefined });
+    requests.expectOne(environment.apiUrl + '/transactions')
+      .flush({}, { status: 401, statusText: 'Unauthorized' });
+    requests.expectOne(endpoint).flush({}, { status: 503, statusText: 'Unavailable' });
+    expect(session.authenticated()).toBeTrue();
+    expect(router.navigate).not.toHaveBeenCalled();
   });
 
   it('never sends a stale bearer to login or a third-party origin', () => {
