@@ -476,3 +476,76 @@
   .btn-export { min-width: 0; }
   .app-shell .ledger-list .tx-item { column-gap: .5rem; padding: .55rem .65rem; }
 }
+
+
+/* Stable finance filters: category changes must never rearrange the toolbar. */
+.app-shell .main-content .filters-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.filters-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.filters-toolbar .search-wrap {
+  min-width: 0;
+  width: 100%;
+}
+.filters-toolbar .search-input {
+  box-sizing: border-box;
+  width: 100%;
+}
+.filters-toolbar .btn-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  min-width: 150px;
+  padding: 10px 16px;
+  white-space: nowrap;
+  border-radius: 11px;
+}
+.filters-toolbar .btn-clear:disabled {
+  opacity: .48;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.app-shell .main-content .filters-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: end;
+  gap: 12px;
+  min-width: 0;
+}
+.app-shell .main-content .filters-row .filter-control {
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 5px;
+  min-width: 0;
+  width: 100%;
+}
+.app-shell .main-content .filters-row .filter-select {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+@container transactions-workspace (max-width: 760px) {
+  .app-shell .main-content .filters-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container transactions-workspace (max-width: 450px) {
+  .filters-toolbar { grid-template-columns: minmax(0, 1fr); }
+  .filters-toolbar .btn-clear { width: 100%; justify-self: stretch; }
+  .app-shell .main-content .filters-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
