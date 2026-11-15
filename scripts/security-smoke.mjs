@@ -14,7 +14,14 @@ assert.ok(!headers['Content-Security-Policy'].includes("script-src 'self' 'unsaf
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.json': 'application/json' };
 const server = http.createServer(async (request, response) => {
   try {
-    let file = path.resolve(root, '.' + decodeURIComponent(new URL(request.url, 'http://localhost').pathname));
+    const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
+    // The fixture runs without a BFF. An unauthenticated API read must
+    // behave like production (401), not return index.html as a fake 200 JSON.
+    if (pathname.startsWith('/api/')) {
+      response.writeHead(401, { ...headers, 'Content-Type': 'application/json' });
+      response.end(JSON.stringify({ error: 'Sesión requerida.' })); return;
+    }
+    let file = path.resolve(root, '.' + pathname);
     if (!file.startsWith(root + path.sep) && file !== root) {
       response.writeHead(404).end(); return;
     }
