@@ -107,15 +107,25 @@ export class TransactionSpotlightComponent {
 
     // Prefer showing the instruction ABOVE the highlighted field; that leaves
     // the next input visible for the very next interaction.
+    const compact = vw <= 600;
     const tooltipWidth = Math.min(328, vw - 24);
-    const tooltipHeight = Math.min(198, vh * 0.38);
+    const tooltipHeight = Math.min(compact ? 158 : 188, vh * 0.38);
     const spaceAbove = top - 12;
     const spaceBelow = vh - bottom - 12;
-    const above = spaceAbove >= tooltipHeight + 12 ||
-      (spaceAbove > spaceBelow && spaceAbove >= 130);
-    let tooltipTop = above ? top - tooltipHeight - 12 : bottom + 12;
 
-    // Never place the explanation over the active target, even near screen edges.
+    // Phones: use a compact top/bottom instruction dock, so successive form
+    // controls are never hidden behind the explanation card.
+    let above: boolean;
+    let tooltipTop: number;
+    if (compact && vh >= 430) {
+      above = top > tooltipHeight + 34;
+      tooltipTop = above ? 10 : vh - tooltipHeight - 10;
+    } else {
+      above = spaceAbove >= tooltipHeight + 12 ||
+        (spaceAbove > spaceBelow && spaceAbove >= 130);
+      tooltipTop = above ? top - tooltipHeight - 12 : bottom + 12;
+    }
+
     tooltipTop = Math.max(10, Math.min(tooltipTop, vh - tooltipHeight - 10));
     const tooltipLeft = Math.max(12, Math.min(vw - tooltipWidth - 12, left));
     this.bounds.set({
