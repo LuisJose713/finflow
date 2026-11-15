@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, DestroyRef, ElementRef, HostListener, Input, NgZone, ViewChild, computed, effect, inject, signal } from '@angular/core';
-import { Router, RouterModule, NavigationEnd } from '@angular/router'; 
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'; 
 import { CommonModule } from '@angular/common'; 
 import { AuthService } from '../../../core/services/auth.service';
 import { LogoutButtonComponent } from '../logout-button/logout-button.component';
@@ -95,7 +96,7 @@ export class NavbarComponent implements AfterViewInit {
 
   constructor() {
     effect(() => this.currencies.load(this.auth.currentUser()?.id ?? null));
-    this.router.events.subscribe(event => {
+    this.router.events.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(event => {
       if (event instanceof NavigationEnd) this.currentPath.set(event.urlAfterRedirects.split(/[?#]/)[0]);
     });
     if (typeof document === 'undefined') return;

@@ -39,13 +39,18 @@ export class DailyRemindersService {
   }
 
   private async restorePushState(user: string): Promise<void> {
+    if (this.userId !== user || Notification.permission !== 'granted') return;
     try {
-      const registration = await this.ensureWorker();
-      const subscription = await registration?.pushManager?.getSubscription();
-      if (!subscription || this.userId !== user) return;
-      const config = await firstValueFrom(this.http.get<{enabled:boolean;publicKey:string}>(this.pushApi + '/config'));
-      if (this.userId === user && config.enabled && config.publicKey) this.enabled.set(true);
-    } catch { /* Do not report stale browser permission as delivered push. */ }
+      // Reconcile the stored browser subscription with the server on each login.
+      // A saved permission or an orphaned PushSubscription is not delivery.
+      await this.subscribePush();
+      if (this.userId === user) this.enabled.set(true);
+    } catch {
+      if (this.userId === user) {
+        this.enabled.set(false);
+        this.write(this.preferenceKey(user), 'false');
+      }
+    }
   }
 
   async enable(): Promise<boolean> {
@@ -84,7 +89,19 @@ export class DailyRemindersService {
     const config = await firstValueFrom(this.http.get<{ enabled: boolean; publicKey: string }>(this.pushApi + '/config'));
     if (!config.enabled || !config.publicKey) throw new Error('Servidor Web Push no configurado');
     const key = this.decodeKey(config.publicKey);
-    const subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
+    let subscription = await registration.pushManager.getSubscription();
+    if (subscription) {
+      // A subscription belongs to the VAPID key used when it was created.
+      const oldKey = subscription.options.applicationServerKey;
+      const original = oldKey ? new Uint8Array(oldKey) : null;
+      if (!original || original.length !== key.length || original.some((value, index) => value !== key[index])) {
+        await subscription.unsubscribe();
+        subscription = null;
+      }
+    }
+    if (!subscription) {
+      subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
+    }
     await firstValueFrom(this.http.post(this.pushApi + '/subscriptions', subscription.toJSON()));
   }
 
