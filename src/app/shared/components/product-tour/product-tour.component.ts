@@ -42,6 +42,9 @@ interface TourStep {
             <div class="tour-icon" aria-hidden="true">{{ current().icon }}</div>
             <h2 id="tour-title">{{ current().title }}</h2>
             <p id="tour-desc">{{ current().description }}</p>
+            <button class="tour-practice" type="button" (click)="startTransactionGuide()">
+              <span aria-hidden="true">☝</span> Guíame para crear un movimiento
+            </button>
             <button class="tour-visit" type="button" (click)="visit()">
               {{ current().action }} <span aria-hidden="true">↗</span>
             </button>
@@ -83,6 +86,9 @@ interface TourStep {
       color:#e0b76e;font-size:27px;margin:15px 0}
     h2{font-size:clamp(21px,5vw,26px);line-height:1.2;margin:0 0 12px;font-weight:800}
     #tour-desc{font-size:14px;line-height:1.7;color:var(--text-secondary,#58697d);margin:0 0 20px}
+    .tour-practice{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;
+      border-radius:12px;padding:13px;margin-bottom:10px;background:#b59052;color:#142d4c;
+      font-weight:800;cursor:pointer;font-size:13px}
     .tour-visit{width:100%;border:1px solid var(--border,#cdd5df);color:var(--text-primary,#192e48);
       background:transparent;border-radius:12px;padding:12px;font-weight:750;cursor:pointer}
     .tour-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:24px}
@@ -140,11 +146,14 @@ export class ProductTourComponent {
     if (this.index() === this.steps.length - 1) { this.closeGuide(); return; }
     this.index.update(i => i + 1);
   }
+  startTransactionGuide(): void {
+    this.closeGuide();
+    void this.router.navigateByUrl('/transactions').then(() => this.transactionWalkthrough.start());
+  }
   visit(): void {
+    if (this.current().route === '/transactions') { this.startTransactionGuide(); return; }
     const destination = this.current().route;
     this.closeGuide();
-    void this.router.navigateByUrl(destination).then(navigated => {
-      if (navigated && destination === '/transactions') this.transactionWalkthrough.start();
-    });
+    void this.router.navigateByUrl(destination);
   }
 }
