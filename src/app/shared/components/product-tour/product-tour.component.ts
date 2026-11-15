@@ -67,15 +67,25 @@ export class ProductTourComponent {
   startTransactionGuide(): void {
     this.closeGuide();
     this.pageGuide.finish();
-    void this.router.navigateByUrl('/transactions').then(ok => { if (ok) this.transactionWalkthrough.start(); });
+    if (this.router.url.split(/[?#]/)[0] === '/transactions') {
+      this.transactionWalkthrough.start();
+      return;
+    }
+    void this.router.navigateByUrl('/transactions').then(() => {
+      if (this.router.url.split(/[?#]/)[0] === '/transactions') this.transactionWalkthrough.start();
+    });
   }
   startSectionGuide(): void {
     const route = this.current().route;
     if (route === '/transactions') { this.startTransactionGuide(); return; }
     this.closeGuide();
     this.transactionWalkthrough.finish();
-    void this.router.navigateByUrl(route).then(ok => {
-      if (ok && this.pageGuide.has(route)) this.pageGuide.start(route);
+    if (this.router.url.split(/[?#]/)[0] === route) {
+      this.pageGuide.start(route);
+      return;
+    }
+    void this.router.navigateByUrl(route).then(() => {
+      if (this.router.url.split(/[?#]/)[0] === route) this.pageGuide.start(route);
     });
   }
 
