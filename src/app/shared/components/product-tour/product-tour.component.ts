@@ -123,14 +123,9 @@ export class ProductTourComponent {
   private readonly keyPrefix = 'finflow-tour-v1-';
 
   constructor() {
+    // A tutorial must be user-initiated: never block the dashboard after login.
     effect(() => {
-      const user = this.auth.currentUser();
-      const signedIn = this.auth.isAuthenticated();
-      if (!signedIn || !user) { this.opened.set(false); return; }
-      const key = this.keyPrefix + String(user.id || user.email);
-      try {
-        if (!localStorage.getItem(key)) this.opened.set(true);
-      } catch { /* Private browsing: manual launch is still available. */ }
+      if (!this.auth.isAuthenticated()) this.opened.set(false);
     });
   }
 
