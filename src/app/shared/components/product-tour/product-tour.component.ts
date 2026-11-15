@@ -2,6 +2,7 @@ import { Component, Input, computed, effect, inject, signal } from '@angular/cor
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { TransactionWalkthroughService } from '../../../core/services/transaction-walkthrough.service';
+import { PageGuideService } from '../../../core/services/page-guide.service';
 
 interface TourStep {
   title: string;
@@ -25,6 +26,7 @@ export class ProductTourComponent {
   @Input() blocked = false;
   readonly auth = inject(AuthService);
   private readonly transactionWalkthrough = inject(TransactionWalkthroughService);
+  readonly pageGuide = inject(PageGuideService);
   private readonly router = inject(Router);
   readonly index = signal(0);
   readonly opened = signal(false);
@@ -35,6 +37,9 @@ export class ProductTourComponent {
     { title: 'Controla tu presupuesto', description: 'Establece límites mensuales y revisa cuánto has gastado frente al presupuesto que planeaste.', route: '/budgets', action: 'Ver presupuestos', icon: '◉' },
     { title: 'Construye tus metas', description: 'Crea objetivos de ahorro, registra aportes y observa tu avance hacia lo que quieres conseguir.', route: '/goals', action: 'Ver mis metas', icon: '☆' },
     { title: 'Conoce a tu asesor IA', description: 'Consulta al asesor financiero para explorar tus hábitos y organizar mejor tus decisiones. Sus respuestas son orientativas.', route: '/advisor', action: 'Abrir asesor IA', icon: '✧' },
+    { title: 'Programa tus gastos', description: 'Aprende a registrar pagos futuros y sus fechas de vencimiento.', route: '/planned-expenses', action: 'Ver gastos planeados', icon: '▤' },
+    { title: 'Organiza tus recurrentes', description: 'Programa movimientos que se repiten mensualmente.', route: '/recurring', action: 'Ver recurrentes', icon: '↻' },
+    { title: 'Personaliza categorías', description: 'Crea categorías propias para organizar tus finanzas.', route: '/categories', action: 'Ver categorías', icon: '▦' },
     { title: 'Protege tu cuenta', description: 'En Seguridad puedes administrar tu contraseña, tus sesiones y vincular Google para acceder con más facilidad.', route: '/security', action: 'Ir a Seguridad', icon: '◇' }
   ];
   readonly current = computed(() => this.steps[this.index()]);
@@ -61,12 +66,19 @@ export class ProductTourComponent {
   }
   startTransactionGuide(): void {
     this.closeGuide();
-    void this.router.navigateByUrl('/transactions').then(() => this.transactionWalkthrough.start());
+    this.pageGuide.finish();
+    void this.router.navigateByUrl('/transactions').then(ok => { if (ok) this.transactionWalkthrough.start(); });
   }
-  visit(): void {
-    if (this.current().route === '/transactions') { this.startTransactionGuide(); return; }
-    const destination = this.current().route;
+  startSectionGuide(): void {
+    const route = this.current().route;
+    if (route === '/transactions') { this.startTransactionGuide(); return; }
     this.closeGuide();
-    void this.router.navigateByUrl(destination);
+    this.transactionWalkthrough.finish();
+    void this.router.navigateByUrl(route).then(ok => {
+      if (ok && this.pageGuide.has(route)) this.pageGuide.start(route);
+    });
   }
+
+  visit(): void { this.startSectionGuide(); }
+
 }
