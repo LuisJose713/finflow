@@ -38,10 +38,19 @@ export class AuthService {
     }
     const revision = this.session.revision;
     const legacy = this.legacyToken;
-    const request = this.cookieSession && legacy
-      ? this.http.post<{ user: User }>(this.apiUrl + '/session', { token: legacy }).pipe(map(res => res.user))
-      : this.http.get<User>(this.apiUrl + '/me', !this.cookieSession && legacy
-        ? { headers: { Authorization: 'Bearer ' + legacy } } : {});
+    // First restore the HttpOnly cookie session, including its transparent
+    // refresh. A stale pre-cookie legacy JWT must never override a valid cookie.
+    const request = this.http.get<User>(this.apiUrl + '/me', !this.cookieSession && legacy
+      ? { headers: { Authorization: 'Bearer ' + legacy } } : {}).pipe(
+        catchError((error: HttpErrorResponse) => {
+          if (this.cookieSession && legacy && error.status === 401) {
+            // One-time fallback ONLY if the protected cookie session is gone.
+            return this.http.post<{ user: User }>(this.apiUrl + '/session', { token: legacy })
+              .pipe(map(res => res.user));
+          }
+          return throwError(() => error);
+        }),
+      );
     this.restoration = request.pipe(
       map(user => {
         if (this.session.revision !== revision) return this.session.user();
@@ -50,16 +59,31 @@ export class AuthService {
         return user;
       }),
       catchError((error: HttpErrorResponse) => {
+        // A deploy, cold start or offline device is not a logout. Let route
+        // guards open the session-recovery screen instead of login.
+        if (error.status !== 401) {
+          if (this.session.revision === revision) this.restoration = undefined;
+          return throwError(() => error);
+        }
         if (this.session.revision === revision) {
           this.session.clear();
-          // A temporary outage must not destroy the user's only migration credential.
-          if (error.status === 401 || error.status === 403) this.clearLegacyStorage();
+          this.clearLegacyStorage();
+          this.restoration = undefined;
         }
         return of(null);
       }),
       shareReplay({ bufferSize: 1, refCount: false }),
     );
     return this.restoration;
+  }
+
+  /** Explicit retry after transient outages. Never changes a verified login. */
+  retrySession(): Observable<User | null> {
+    if (!this.session.authenticated()) {
+      this.restoration = undefined;
+      this.session.ready.set(false);
+    }
+    return this.ensureSession();
   }
 
   login(credentials: LoginRequest) {

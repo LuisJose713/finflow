@@ -45,11 +45,38 @@ describe('production cookie sessions', () => {
     const auth = TestBed.inject(AuthService);
     expect(localStorage.getItem('user')).toBeNull();
     auth.ensureSession().subscribe();
+    // A pre-existing cookie has priority over the legacy browser token.
+    TestBed.inject(HttpTestingController).expectOne('/api/auth/me')
+      .flush({}, { status: 401, statusText: 'Unauthorized' });
     const request = TestBed.inject(HttpTestingController).expectOne('/api/auth/session');
     expect(request.request.body).toEqual({ token: 'legacy-token' });
     request.flush({ user });
     expect(localStorage.getItem('token')).toBeNull();
     expect(auth.isAuthenticated()).toBeTrue();
+  });
+
+  it('does not ask for login when the API is temporarily unavailable, and can retry', () => {
+    const auth = TestBed.inject(AuthService);
+    let outage: unknown;
+    auth.ensureSession().subscribe({ error: value => outage = value });
+    TestBed.inject(HttpTestingController).expectOne('/api/auth/me')
+      .flush({}, { status: 503, statusText: 'Service unavailable' });
+    expect(outage).toBeTruthy();
+    expect(auth.isAuthenticated()).toBeFalse();
+    // The session remains unconfirmed, not invalidated as a deliberate logout.
+    auth.retrySession().subscribe();
+    TestBed.inject(HttpTestingController).expectOne('/api/auth/me').flush(user);
+    expect(auth.isAuthenticated()).toBeTrue();
+  });
+
+  it('does not let a stale legacy token override an existing HttpOnly cookie', () => {
+    localStorage.setItem('token', 'stale-legacy-value');
+    const auth = TestBed.inject(AuthService);
+    auth.ensureSession().subscribe();
+    TestBed.inject(HttpTestingController).expectOne('/api/auth/me').flush(user);
+    TestBed.inject(HttpTestingController).expectNone('/api/auth/session');
+    expect(auth.currentUser()?.id).toBe(user.id);
+    expect(localStorage.getItem('token')).toBeNull();
   });
 
   it('ignores profile restoration that arrives after another login', () => {

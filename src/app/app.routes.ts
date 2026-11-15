@@ -21,6 +21,11 @@ export const routes: Routes = [
     canActivate: [guestGuard],
   },
   {
+    path: "session-recovery",
+    loadComponent: () => import("./features/auth/session-recovery/session-recovery.component")
+      .then(m => m.SessionRecoveryComponent),
+  },
+  {
     path: "privacy",
     loadComponent: () => import("./features/privacy/privacy-info.component").then(m => m.PrivacyInfoComponent),
   },
