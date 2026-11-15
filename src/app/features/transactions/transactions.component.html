@@ -33,6 +33,7 @@
 
     <!-- Filtros -->
     <div class="filters-card">
+      <div class="filters-toolbar">
       <!-- Búsqueda -->
       <div class="search-wrap">
         <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -47,8 +48,13 @@
           (ngModelChange)="filterSearch.set($event)"
         />
       </div>
+        <button class="btn-clear" type="button" [disabled]="!hasFilters"
+                (click)="clearFilters()" aria-label="Limpiar todos los filtros">
+          Limpiar filtros
+        </button>
+      </div>
 
-      <div class="filters-row">
+      <div class="filters-row" role="group" aria-label="Filtros por tipo, mes, año y categoría">
         <!-- Tipo -->
         <label class="filter-control"><span>Tipo</span><select class="filter-select"
           [ngModel]="filterType()"
@@ -82,10 +88,6 @@
           <option *ngFor="let c of categories()" [value]="c.id">{{ c.name }}</option>
         </select></label>
 
-        <!-- Limpiar -->
-        <button class="btn-clear" *ngIf="hasFilters" (click)="clearFilters()">
-          Limpiar filtros
-        </button>
       </div>
     </div>
 
