@@ -11,6 +11,7 @@ import { CategoryService } from '../../../core/services/category.service';
 import { AccountService, FinancialAccount } from '../../../core/services/account.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { DashboardRefreshService } from '../../../core/services/dashboard-refresh.service';
+import { TransactionWalkthroughService } from '../../../core/services/transaction-walkthrough.service';
 import { CreateTransactionRequest, TransactionType, Category, Transaction } from '../../../core/models';
 
 interface VoiceDraft {
@@ -122,6 +123,7 @@ export class AddTransactionComponent implements OnInit {
       currency: transaction?.currency ?? 'COP', status: transaction?.status ?? 'completed',
     }, { emitEvent: false });
     this.isOpen.set(true);
+    if (!transaction) this.walkthrough.advance(0);
     this.categoryService.getAll()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -141,6 +143,7 @@ export class AddTransactionComponent implements OnInit {
 
   close() {
     if (this.loading()) return;
+    if (this.walkthrough.step() >= 1) this.walkthrough.finish();
     this.speech?.stop();
     this.speech = null;
     this.voiceOperation++;
