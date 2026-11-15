@@ -1,9 +1,11 @@
 import { AppCurrencyPipe } from '../../shared/pipes/currency.pipe';
 import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { QuickCreateService } from '../../core/services/quick-create.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { CurrencyInputDirective } from '../../shared/directives/currency-input.directive';
 import { RecurringRule, RecurringService } from '../../core/services/recurring.service';
@@ -16,6 +18,8 @@ import { Category } from '../../core/models';
  templateUrl:'./recurring.component.html',styleUrl:'./recurring.component.scss'
 })
 export class RecurringComponent implements OnInit {
+  private readonly quickCreate = inject(QuickCreateService);
+  private readonly destroyRef = inject(DestroyRef);
  private readonly api=inject(RecurringService);
  private readonly accountsApi=inject(AccountService);
  private readonly categoriesApi=inject(CategoryService);
@@ -41,7 +45,14 @@ export class RecurringComponent implements OnInit {
    const now=new Date(this.today+'T12:00:00Z').getTime();
    return due<=now+7*86400000;
  }));
- ngOnInit(){this.refresh();}
+ ngOnInit() {
+   this.refresh();
+   this.quickCreate.requested$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(route => {
+     if (route !== '/recurring') return;
+     document.getElementById('recurring-title')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+     (document.getElementById('recurring-title') as HTMLInputElement | null)?.focus({ preventScroll: true });
+   });
+ }
  refresh(){
    this.loading.set(true);this.error.set('');
    forkJoin({rules:this.api.list(),accounts:this.accountsApi.list(),categories:this.categoriesApi.getAll()}).subscribe({
