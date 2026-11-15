@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { of, Subject } from 'rxjs';
 import { AddTransactionComponent } from './add-transaction.component';
 import { TransactionService } from '../../../core/services/transaction.service';
@@ -20,6 +22,7 @@ describe('Movement form monetary contract', () => {
     api = jasmine.createSpyObj('Transactions', ['create', 'update']);
     api.create.and.returnValue(writes); api.update.and.returnValue(writes);
     TestBed.configureTestingModule({ imports: [AddTransactionComponent], providers: [
+      provideHttpClient(), provideHttpClientTesting(),
       { provide: TransactionService, useValue: api },
       { provide: CategoryService, useValue: { getAll: () => of([{ id: 10, name: 'Compras', type: 'Expense' }]) } },
       { provide: AccountService, useValue: { list: () => of([]) } },
