@@ -326,6 +326,31 @@ for (const width of widths) {
     }
   }
 
+  // Genuine page-by-page coaching: a user can follow and skip without saving.
+  if ([375, 1024].includes(width)) {
+    try {
+      await page.goto(base + '/accounts', { waitUntil: 'domcontentloaded' });
+      await page.locator('#acc-name').waitFor({ state: 'visible' });
+      await page.getByRole('button', { name: 'Abrir guía de FinFlow' }).click();
+      await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
+      await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
+      await page.getByRole('button', { name: /Practicar: Ver mis billeteras/ }).click();
+      await page.getByRole('heading', { name: 'Nombra tu billetera' }).waitFor({ state: 'visible' });
+      const highlighted = await page.locator('.focus-ring').boundingBox();
+      const realInput = await page.locator('#acc-name').boundingBox();
+      assert(Boolean(highlighted && realInput && Math.abs(highlighted.y - realInput.y) <= 12),
+        `${width}px account guide: real input must be highlighted`);
+      await page.locator('#acc-name').fill('Billetera QA');
+      await page.locator('#acc-name').press('Tab');
+      await page.getByRole('heading', { name: 'Selecciona el tipo' }).waitFor({ state: 'visible' });
+      await page.getByRole('button', { name: 'Omitir tutorial' }).click();
+      assert(await page.locator('.spotlight-layer').count() === 0,
+        `${width}px account guide: skip must remove spotlight`);
+    } catch (error) {
+      failures.push(`${width}px interactive accounts guide: ${error.message.slice(0, 500)}`);
+    }
+  }
+
   if ([320, 375, 768, 1024].includes(width)) {
     await page.goto(base + '/dashboard', { waitUntil: 'domcontentloaded' });
     // An existing authenticated user does not necessarily have a queued
