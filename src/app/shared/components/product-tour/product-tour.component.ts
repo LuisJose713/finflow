@@ -43,6 +43,18 @@ export class ProductTourComponent {
     { title: 'Protege tu cuenta', description: 'En Seguridad puedes administrar tu contraseña, tus sesiones y vincular Google para acceder con más facilidad.', route: '/security', action: 'Ir a Seguridad', icon: '◇' }
   ];
   readonly current = computed(() => this.steps[this.index()]);
+  readonly practiceAction = computed(() => ({
+    '/dashboard': 'Recorre tu panel principal',
+    '/transactions': 'Guíame para crear un movimiento',
+    '/accounts': 'Guíame para crear una billetera',
+    '/budgets': 'Guíame para crear un presupuesto',
+    '/goals': 'Guíame para crear una meta',
+    '/advisor': 'Guíame para usar el asesor IA',
+    '/planned-expenses': 'Guíame para programar un gasto',
+    '/recurring': 'Guíame para crear un recurrente',
+    '/categories': 'Guíame para crear una categoría',
+    '/security': 'Guíame por la seguridad de mi cuenta'
+  } as Record<string, string>)[this.current().route] ?? 'Comenzar guía');
   private readonly keyPrefix = 'finflow-tour-v1-';
 
   constructor() {
@@ -89,6 +101,12 @@ export class ProductTourComponent {
     });
   }
 
-  visit(): void { this.startSectionGuide(); }
+  visit(): void {
+    const route = this.current().route;
+    this.closeGuide();
+    this.transactionWalkthrough.finish();
+    this.pageGuide.finish();
+    void this.router.navigateByUrl(route);
+  }
 
 }
