@@ -1,0 +1,14 @@
+    <main class="recovery">
+      <section class="panel" aria-labelledby="recovery-title">
+        <img src="/finflow-logo-light.svg" alt="FinFlow" width="190" height="48"/>
+        <p class="eyebrow">CONEXIÓN SEGURA</p>
+        <h1 id="recovery-title">Estamos recuperando tu sesión.</h1>
+        <p>Tu cuenta no se cerró. No pudimos confirmar la conexión con el servidor.
+           Reintentaremos automáticamente, sin pedirte la contraseña ni exponer tus datos.</p>
+        <button type="button" (click)="retry()" [disabled]="loading()">
+          {{ loading() ? 'Comprobando conexión…' : 'Reintentar ahora' }}
+        </button>
+        <p class="hint" role="status">{{ loading() ? 'Restableciendo conexión segura…' :
+            'Si no tienes internet, vuelve a conectarte. Tus datos no se modificarán.' }}</p>
+      </section>
+    </main>

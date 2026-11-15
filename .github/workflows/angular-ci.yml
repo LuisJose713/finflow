@@ -37,6 +37,8 @@ jobs:
         run: |
           npx tsc src/app/shared/components/navbar/drawer-swipe.ts --target es2022 --module commonjs --outDir "$RUNNER_TEMP/drawer-swipe"
           DRAWER_SWIPE_MODULE="$RUNNER_TEMP/drawer-swipe/drawer-swipe.js" node --test tests/drawer-swipe.test.cjs
+      - name: Enforce separate Angular HTML CSS and TypeScript
+        run: node scripts/check-component-boundaries.mjs
       - name: TypeScript typecheck
         run: npx tsc --noEmit --project tsconfig.app.json
       - name: Verify FinFlow brand

@@ -1,0 +1,17 @@
+    @if (available()) {
+      <section class="google-auth" aria-label="Acceso seguro con Google">
+        @if (linked()) {
+          <p class="linked">Google vinculado · {{ linkedEmail() }}</p>
+          <button type="button" class="unlink" [disabled]="busy()" (click)="unlink()">
+            Desvincular Google
+          </button>
+        } @else {
+          <div #googleButton class="google-button" aria-label="Continuar con Google"></div>
+          @if (mode === 'link') {
+            <p>Confirma en Google el mismo correo de tu cuenta FinFlow.</p>
+          }
+        }
+        @if (busy()) { <p role="status">Verificando con Google…</p> }
+        @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+      </section>
+    }

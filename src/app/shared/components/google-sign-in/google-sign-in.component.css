@@ -1,0 +1,7 @@
+    .google-auth{display:grid;justify-items:center;gap:.55rem;margin:1.1rem 0;text-align:center}
+    .google-button{min-height:42px;width:min(100%,340px);display:flex;justify-content:center}
+    .google-auth p{font-size:.8rem;color:var(--text-secondary,#657087);line-height:1.5;margin:0}
+    .google-auth .error{color:#ba3030;font-weight:600}
+    .google-auth .linked{color:#2f8b67;font-weight:700}
+    .unlink{border:1px solid #b8c4d5;border-radius:10px;background:transparent;padding:.65rem 1rem;
+      color:inherit;font:inherit;font-weight:700;cursor:pointer}

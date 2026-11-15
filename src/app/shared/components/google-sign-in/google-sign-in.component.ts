@@ -6,34 +6,8 @@ import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-google-sign-in',
   standalone: true,
-  template: `
-    @if (available()) {
-      <section class="google-auth" aria-label="Acceso seguro con Google">
-        @if (linked()) {
-          <p class="linked">Google vinculado · {{ linkedEmail() }}</p>
-          <button type="button" class="unlink" [disabled]="busy()" (click)="unlink()">
-            Desvincular Google
-          </button>
-        } @else {
-          <div #googleButton class="google-button" aria-label="Continuar con Google"></div>
-          @if (mode === 'link') {
-            <p>Confirma en Google el mismo correo de tu cuenta FinFlow.</p>
-          }
-        }
-        @if (busy()) { <p role="status">Verificando con Google…</p> }
-        @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
-      </section>
-    }
-  `,
-  styles: [`
-    .google-auth{display:grid;justify-items:center;gap:.55rem;margin:1.1rem 0;text-align:center}
-    .google-button{min-height:42px;width:min(100%,340px);display:flex;justify-content:center}
-    .google-auth p{font-size:.8rem;color:var(--text-secondary,#657087);line-height:1.5;margin:0}
-    .google-auth .error{color:#ba3030;font-weight:600}
-    .google-auth .linked{color:#2f8b67;font-weight:700}
-    .unlink{border:1px solid #b8c4d5;border-radius:10px;background:transparent;padding:.65rem 1rem;
-      color:inherit;font:inherit;font-weight:700;cursor:pointer}
-  `],
+  templateUrl: './google-sign-in.component.html',
+  styleUrl: './google-sign-in.component.css',
 })
 export class GoogleSignInComponent implements AfterViewInit, OnDestroy {
   @Input() mode: 'login' | 'link' = 'login';

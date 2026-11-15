@@ -1,0 +1,16 @@
+    <div class="toast-container" aria-label="Notificaciones de FinFlow">
+      @for (toast of toastService.toasts(); track toast.id) {
+        <div class="toast" [class]="toast.type" [attr.role]="toast.type === 'error' ? 'alert' : 'status'">
+          <span class="toast-icon">
+            @switch (toast.type) {
+              @case ('success') { ✓ }
+              @case ('error') { ✕ }
+              @case ('warning') { ⚠ }
+              @default { ℹ }
+            }
+          </span>
+          <span class="toast-msg">{{ toast.message }}</span>
+          <button type="button" class="toast-close" [attr.aria-label]="'Cerrar notificación: ' + toast.message" (click)="toastService.dismiss(toast.id)">✕</button>
+        </div>
+      }
+    </div>

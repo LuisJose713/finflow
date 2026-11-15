@@ -1,0 +1,8 @@
+@if (updates.available()) {
+    <aside role="status" aria-live="polite" aria-label="Actualización de FinFlow">
+      <strong>Hay una nueva versión de FinFlow</strong>
+      <p>Guarda lo que estés editando antes de actualizar.</p>
+      <div><button type="button" (click)="updates.reload()">Actualizar</button>
+      <button type="button" class="later" (click)="updates.dismiss()">Más tarde</button></div>
+    </aside>
+  }
