@@ -24,8 +24,8 @@
             <button class="tour-practice" type="button" (click)="startTransactionGuide()">
               <span aria-hidden="true">☝</span> Guíame para crear un movimiento
             </button>
-            <button class="tour-visit" type="button" (click)="visit()">
-              {{ current().action }} <span aria-hidden="true">↗</span>
+            <button class="tour-visit" type="button" (click)="startSectionGuide()">
+              ☝ Practicar: {{ current().action }} <span aria-hidden="true">↗</span>
             </button>
             <div class="tour-actions">
               <button class="tour-skip" type="button" (click)="closeGuide()">Omitir</button>
