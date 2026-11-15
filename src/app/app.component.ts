@@ -7,16 +7,18 @@ import { AuthService } from './core/services/auth.service';
 import { PrivacyPolicy, PrivacyService } from './core/services/privacy.service';
 import { UpdateNoticeComponent } from './shared/components/update-notice.component';
 import { ProductTourComponent } from './shared/components/product-tour/product-tour.component';
+import { TransactionSpotlightComponent } from './shared/components/transaction-spotlight.component';
 import { PrivacyPolicyComponent } from './shared/components/privacy-policy.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, PrivacyPolicyComponent, UpdateNoticeComponent, ProductTourComponent],
+  imports: [RouterOutlet, RouterLink, PrivacyPolicyComponent, UpdateNoticeComponent, ProductTourComponent, TransactionSpotlightComponent],
   template: `
     <router-outlet/>
     <app-update-notice/>
     <app-product-tour [blocked]="needsConsent() || showSignupNotice()"/>
+    <app-transaction-spotlight [blocked]="needsConsent() || showSignupNotice()"/>
     @if (needsConsent()) {
       <div class="privacy-shield">
         <section class="privacy-dialog" role="dialog" aria-modal="true"
