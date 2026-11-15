@@ -4,10 +4,10 @@
         <span aria-hidden="true">?</span><span>Guía</span>
       </button>
       @if (opened() && !blocked) {
-        <div class="tour-backdrop" (click)="closeGuide()">
+        <div class="tour-backdrop">
           <section class="tour-panel" role="dialog" aria-modal="true"
                    aria-labelledby="tour-title" aria-describedby="tour-desc"
-                   (click)="$event.stopPropagation()" (keydown.escape)="closeGuide()">
+                   (click)="$event.stopPropagation()">
             <div class="tour-topline">
               <span>FINFLOW <span class="tour-dot">●</span> EMPIEZA AQUÍ</span>
               <button class="tour-close" type="button" aria-label="Cerrar guía" (click)="closeGuide()">✕</button>
@@ -21,11 +21,11 @@
             <div class="tour-icon" aria-hidden="true">{{ current().icon }}</div>
             <h2 id="tour-title">{{ current().title }}</h2>
             <p id="tour-desc">{{ current().description }}</p>
-            <button class="tour-practice" type="button" (click)="startTransactionGuide()">
-              <span aria-hidden="true">☝</span> Guíame para crear un movimiento
+            <button class="tour-practice" type="button" (click)="startSectionGuide()">
+              <span aria-hidden="true">☝</span> {{ practiceAction() }}
             </button>
-            <button class="tour-visit" type="button" (click)="startSectionGuide()">
-              ☝ Practicar: {{ current().action }} <span aria-hidden="true">↗</span>
+            <button class="tour-visit" type="button" (click)="visit()">
+              {{ current().action }} <span aria-hidden="true">↗</span>
             </button>
             <div class="tour-actions">
               <button class="tour-skip" type="button" (click)="closeGuide()">Omitir</button>
