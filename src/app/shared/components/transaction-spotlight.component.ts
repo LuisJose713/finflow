@@ -1,5 +1,5 @@
 import { Component, DestroyRef, HostListener, Input, computed, effect, inject, signal } from '@angular/core';
-import { TransactionWalkthroughService } from '../../../core/services/transaction-walkthrough.service';
+import { TransactionWalkthroughService } from '../../core/services/transaction-walkthrough.service';
 
 interface SpotlightBounds {
   top: number;
@@ -139,7 +139,7 @@ export class TransactionSpotlightComponent {
     }
     let rect = target.getBoundingClientRect();
     if (allowScroll && (rect.top < 12 || rect.bottom > window.innerHeight - 12)) {
-      target.scrollIntoView({ behavior: 'instant', block: 'center' });
+      target.scrollIntoView({ behavior: 'auto', block: 'center' });
       rect = target.getBoundingClientRect();
     }
     const vw = window.innerWidth, vh = window.innerHeight, gap = 7;
