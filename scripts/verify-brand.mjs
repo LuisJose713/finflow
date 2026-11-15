@@ -13,7 +13,7 @@ for (const svg of [logo, light, icon, read('public/favicon.svg')]) {
 assert.equal(icon, read('public/favicon.svg'));
 assert.match(logo, /<circle cx="161\.5" cy="27"/);
 assert.match(light, /#10213A/);
-for (const file of ['src/app/features/auth/login/login.component.html', 'src/app/features/auth/register/register.component.ts']) {
+for (const file of ['src/app/features/auth/login/login.component.html', 'src/app/features/auth/register/register.component.html']) {
  assert.match(read(file), /finflow-logo-light\.svg/);
 }
 assert.match(read('src/app/shared/components/navbar/navbar.component.html'), /finflow-logo\.svg/);
