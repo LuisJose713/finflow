@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, HostListener, Input, NgZone, ViewChild, computed, effect, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, ElementRef, HostListener, Input, NgZone, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { Router, RouterModule, NavigationEnd } from '@angular/router'; 
 import { CommonModule } from '@angular/common'; 
 import { AuthService } from '../../../core/services/auth.service';
@@ -29,7 +29,7 @@ interface NavItem {
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
 })
-export class NavbarComponent {
+export class NavbarComponent implements AfterViewInit {
   @Input() showTransactionShortcut = true;
 
   auth = inject(AuthService);
@@ -59,11 +59,39 @@ export class NavbarComponent {
     return offset === null ? Number(this.mobileOpen()) : 1 + offset / this.drawerWidth;
   });
   @ViewChild('sidebar') private sidebar?: ElementRef<HTMLElement>;
+  @ViewChild('navigationList') private navigationList?: ElementRef<HTMLElement>;
   private readonly zone = inject(NgZone);
   private readonly destroyRef = inject(DestroyRef);
   private drawerWidth = 320;
   private swipe: DrawerSwipe | null = null;
   private suppressClickUntil = 0;
+  private static readonly NAV_SCROLL_KEY = 'finflow.nav.scroll-position';
+
+  ngAfterViewInit(): void { this.restoreNavScroll(); }
+
+  rememberNavScroll(): void {
+    const list = this.navigationList?.nativeElement;
+    if (!list) return;
+    try { sessionStorage.setItem(NavbarComponent.NAV_SCROLL_KEY, String(list.scrollTop)); }
+    catch { /* Private browsing may restrict storage. */ }
+  }
+
+  private restoreNavScroll(): void {
+    if (typeof window === 'undefined') return;
+    requestAnimationFrame(() => {
+      const list = this.navigationList?.nativeElement;
+      if (!list) return;
+      try {
+        const position = Number(sessionStorage.getItem(NavbarComponent.NAV_SCROLL_KEY));
+        if (Number.isFinite(position) && position > 0) list.scrollTop = position;
+      } catch { /* Restricted storage. */ }
+    });
+  }
+
+  onNavigateFromMenu(): void {
+    this.rememberNavScroll();
+    this.closeMobile();
+  }
 
   constructor() {
     effect(() => this.currencies.load(this.auth.currentUser()?.id ?? null));
@@ -112,6 +140,7 @@ export class NavbarComponent {
   ];
 
   toggleCollapse() {
+    this.rememberNavScroll();
     const next = !this.collapsed();
     this.collapsed.set(next);
     try {
@@ -204,6 +233,7 @@ export class NavbarComponent {
   }
 
   closeMobile() {
+    this.rememberNavScroll();
     this.cancelSwipe();
     this.mobileOpen.set(false);
   }

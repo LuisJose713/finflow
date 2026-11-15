@@ -423,3 +423,20 @@
   .quick-create-floating { min-height: 54px; padding: .65rem 1rem; font-size: .8rem; }
   .quick-create-icon { width: 30px; height: 30px; flex-basis: 30px; }
 }
+
+/* Persistent account entry, without a mobile-only display rule. */
+.sidebar .sidebar-account {
+  display:flex; align-items:center; gap:.65rem; flex:0 0 auto; min-width:0;
+  padding:.7rem; margin:0 .15rem .7rem;
+  border:1px solid rgba(220,194,154,.18); border-radius:12px;
+  background:rgba(255,255,255,.035); color:#f8fafc; text-decoration:none;
+}
+.sidebar .sidebar-account:hover { background:rgba(220,194,154,.1); border-color:rgba(220,194,154,.44); }
+.sidebar .sidebar-account:focus-visible { outline:2px solid #dcc29a; outline-offset:2px; }
+.sidebar .sidebar-account-copy { min-width:0; display:flex; flex-direction:column; gap:2px; }
+.sidebar .sidebar-account-copy strong,
+.sidebar .sidebar-account-copy small {
+  display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.sidebar .sidebar-account-copy .account-edit-label { color:#dcc29a; font-size:.68rem; font-weight:700; }
+@media(max-width:768px){ .sidebar .sidebar-account { padding:.65rem; margin-bottom:.5rem; } }
