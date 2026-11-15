@@ -359,6 +359,52 @@ for (const width of widths) {
     }
   }
 
+  // Regression: selecting a category must NEVER relocate filters or search.
+  // All data below is synthetic; no production financial records are accessed.
+  try {
+    await page.goto(base + '/transactions', { waitUntil: 'domcontentloaded' });
+    const category = page.locator('.filters-row .filter-control select').nth(3);
+    await category.locator('option[value="10"]').waitFor({ state: 'attached' });
+    const clear = page.getByRole('button', { name: 'Limpiar todos los filtros' });
+    assert(await clear.isDisabled(),
+      `${width}px transactions: clear action should be disabled before filtering`);
+    const selectors = [
+      '.filters-toolbar .search-wrap',
+      '.filters-toolbar .btn-clear',
+      '.filters-row .filter-control:nth-child(1)',
+      '.filters-row .filter-control:nth-child(2)',
+      '.filters-row .filter-control:nth-child(3)',
+      '.filters-row .filter-control:nth-child(4)'
+    ];
+    const geometry = async () => page.evaluate(selectors => selectors.map(selector => {
+      const rect = document.querySelector(selector)?.getBoundingClientRect();
+      return rect ? { x: rect.x, y: rect.y, w: rect.width, h: rect.height } : null;
+    }), selectors);
+    const before = await geometry();
+    await category.selectOption('10');
+    await page.waitForFunction(() => {
+      const button = document.querySelector('.filters-toolbar .btn-clear');
+      return button && !button.disabled;
+    });
+    const after = await geometry();
+    assert(before.length === after.length && before.every((start, index) => {
+      const end = after[index];
+      return Boolean(start && end && Math.abs(start.x - end.x) <= 2 &&
+        Math.abs(start.y - end.y) <= 2 && Math.abs(start.w - end.w) <= 2);
+    }), `${width}px transactions: category filter shifted controls: ${JSON.stringify({before,after})}`);
+    await measureViewport(page, 'transactions-filtered', width);
+    await page.screenshot({ path: path.join(output, `${width}-transactions-filtered.png`) });
+    await clear.click();
+    assert(await clear.isDisabled(),
+      `${width}px transactions: clear action must stay in place and become disabled`);
+    const reset = await geometry();
+    assert(before.every((start, index) => Boolean(start && reset[index] &&
+      Math.abs(start.x - reset[index].x) <= 2 && Math.abs(start.y - reset[index].y) <= 2)),
+      `${width}px transactions: clearing filters changed control positions`);
+  } catch (error) {
+    failures.push(`${width}px transactions filter layout regression: ${error.message.slice(0, 400)}`);
+  }
+
   if ([320, 375, 768, 1024].includes(width)) {
     await page.goto(base + '/dashboard', { waitUntil: 'domcontentloaded' });
     // An existing authenticated user does not necessarily have a queued
