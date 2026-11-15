@@ -1,5 +1,6 @@
 import { Component, DestroyRef, HostListener, Input, computed, effect, inject, signal } from '@angular/core';
 import { TransactionWalkthroughService } from '../../core/services/transaction-walkthrough.service';
+import { PageGuideService } from '../../core/services/page-guide.service';
 
 interface SpotlightBounds {
   top: number;
@@ -20,21 +21,32 @@ interface SpotlightBounds {
 })
 export class TransactionSpotlightComponent {
   readonly walkthrough = inject(TransactionWalkthroughService);
+  readonly pageGuide = inject(PageGuideService);
   private readonly destroyRef = inject(DestroyRef);
   readonly isBlocked = signal(false);
   @Input() set blocked(value: boolean) { this.isBlocked.set(Boolean(value)); }
 
   readonly bounds = signal<SpotlightBounds | null>(null);
+  readonly isTransaction = computed(() => this.walkthrough.step() >= 0);
+  readonly activeStep = computed(() => this.isTransaction() ? this.walkthrough.step() : this.pageGuide.index());
+  readonly totalSteps = computed(() => this.isTransaction() ? 7 : this.pageGuide.total());
+  readonly isLastPageStep = computed(() => !this.isTransaction() && this.pageGuide.index() === this.pageGuide.total() - 1);
   private readonly selectors = ['new', 'type', 'title', 'amount', 'category', 'date', 'save'];
-  readonly current = computed(() => [
-    { title: 'Pulsa Nueva transacción', description: 'Toca el botón resaltado para comenzar a registrar un movimiento.' },
-    { title: 'Selecciona Gasto o Ingreso', description: 'Toca la opción correspondiente. FinFlow mostrará las categorías correctas.' },
-    { title: 'Escribe el título', description: 'Cuenta qué pasó: por ejemplo, «Almuerzo». Luego toca el campo de monto.' },
-    { title: 'Introduce el monto', description: 'Escribe el valor del movimiento. Luego toca Categoría para continuar.' },
-    { title: 'Selecciona una categoría', description: 'Elige una categoría de la lista para organizar este movimiento.' },
-    { title: 'Comprueba la fecha', description: 'Puedes cambiarla o confirmar que la fecha propuesta es correcta.' },
-    { title: 'Guarda solo si lo deseas', description: 'Comprueba los datos y toca Guardar para registrar el movimiento real. También puedes omitir el tutorial sin guardarlo.' },
-  ][Math.max(0, Math.min(6, this.walkthrough.step()))]);
+  readonly current = computed(() => {
+    if (!this.isTransaction()) return this.pageGuide.step() ?? { title: '', description: '' };
+    return [
+      { title: 'Pulsa Nueva transacción', description: 'Toca el botón resaltado para comenzar a registrar un movimiento.' },
+      { title: 'Selecciona Gasto o Ingreso', description: 'Toca una opción para ver las categorías correspondientes.' },
+      { title: 'Escribe el título', description: 'Cuenta qué pasó, por ejemplo «Almuerzo». Luego toca Monto.' },
+      { title: 'Introduce el monto', description: 'Escribe cuánto ingresaste o gastaste. Luego pasa a Categoría.' },
+      { title: 'Selecciona una categoría', description: 'Elige la categoría que mejor describe el movimiento.' },
+      { title: 'Comprueba la fecha', description: 'Puedes cambiarla o confirmar que la propuesta es correcta.' },
+      { title: 'Revisa antes de guardar', description: 'Solo guarda si quieres registrar este movimiento real. Puedes cerrar la guía sin guardar.' }
+    ][Math.max(0, Math.min(6, this.walkthrough.step()))];
+  });
+  readonly canAdvanceManually = computed(() => !this.isTransaction() && this.pageGuide.step()?.advanceOn === 'manual');
+  finish(): void { this.walkthrough.finish(); this.pageGuide.finish(); }
+  nextManual(): void { if (this.canAdvanceManually()) this.pageGuide.next(); }
 
   private attempt = 0;
   private pending: ReturnType<typeof setTimeout> | undefined;
@@ -51,7 +63,7 @@ export class TransactionSpotlightComponent {
       });
     }
     effect(() => {
-      const step = this.walkthrough.step();
+      const step = this.activeStep();
       const blocked = this.isBlocked();
       clearTimeout(this.pending);
       if (step < 0 || blocked) {
@@ -66,13 +78,26 @@ export class TransactionSpotlightComponent {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
-    if (this.walkthrough.step() >= 0) this.walkthrough.finish();
+    if (this.activeStep() >= 0) this.finish();
   }
 
+  @HostListener('document:click', ['$event'])
+  onGuideClick(event: MouseEvent): void { this.pageGuide.handleInteraction(event); }
+
+  @HostListener('document:change', ['$event'])
+  onGuideChange(event: Event): void { this.pageGuide.handleInteraction(event); }
+
+  @HostListener('document:focusout', ['$event'])
+  onGuideFocusout(event: FocusEvent): void { this.pageGuide.handleInteraction(event); }
+
   private locate(allowScroll: boolean): void {
-    const step = this.walkthrough.step();
+    const step = this.activeStep();
     if (step < 0 || this.isBlocked() || typeof document === 'undefined') return;
-    const target = document.querySelector<HTMLElement>('[data-finflow-tour="' + this.selectors[step] + '"]');
+    const selector = this.isTransaction()
+      ? '[data-finflow-tour="' + this.selectors[step] + '"]'
+      : this.pageGuide.step()?.selector;
+    if (!selector) return;
+    const target = document.querySelector<HTMLElement>(selector);
     if (!target || !target.getClientRects().length) {
       if (this.attempt++ < 25) this.pending = setTimeout(() => this.locate(true), 100);
       else this.bounds.set(null);
@@ -87,7 +112,7 @@ export class TransactionSpotlightComponent {
 
     // "Gasto / Ingreso" is a two-button choice. Highlight the buttons, not
     // their layout wrapper (which includes padding and can bleed into Título).
-    if (step === 1) {
+    if (this.isTransaction() && step === 1) {
       const choices = Array.from(target.querySelectorAll<HTMLElement>('.type-btn'))
         .filter(button => button.getClientRects().length > 0)
         .map(button => button.getBoundingClientRect());
