@@ -27,6 +27,12 @@ export class TransactionSpotlightComponent {
   @Input() set blocked(value: boolean) { this.isBlocked.set(Boolean(value)); }
 
   readonly bounds = signal<SpotlightBounds | null>(null);
+  // Keep the page blocked even while a control is loading or a step changes.
+  // Without a fallback the overlay briefly disappears, making unrelated buttons clickable.
+  readonly visibleBounds = computed<SpotlightBounds>(() => this.bounds() ?? {
+    top: 0, left: 0, width: 0, height: 0,
+    tooltipTop: 16, tooltipLeft: 12, above: false
+  });
   readonly isTransaction = computed(() => this.walkthrough.step() >= 0);
   readonly activeStep = computed(() => this.isTransaction() ? this.walkthrough.step() : this.pageGuide.index());
   readonly totalSteps = computed(() => this.isTransaction() ? 7 : this.pageGuide.total());
