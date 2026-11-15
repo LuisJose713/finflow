@@ -1,6 +1,6 @@
 import { CurrencyInputDirective } from '../../shared/directives/currency-input.directive';
 import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
-import { Component, DestroyRef, inject, signal, computed, effect } from '@angular/core';
+import { Component, DestroyRef, inject, signal, computed, effect, untracked } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { PlannedExpenseService } from '@core/services/planned-expense.service';
@@ -76,6 +76,14 @@ export class PlannedExpensesComponent {
   get f() { return this.form.controls; }
 
   constructor() {
+    let first = true;
+    effect(() => {
+      this.refresh.version();
+      if (first) { first = false; return; }
+      untracked(() => {
+        if (!this.showModal() && !this.modalLoading()) this.reloadRemote();
+      });
+    });
     this.quickCreate.requested$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(route => {
       if (route === '/planned-expenses') this.openCreate();
     });
@@ -86,6 +94,16 @@ export class PlannedExpensesComponent {
 
     this.categoryService.getAll().subscribe({
       next: cats => this.categories.set(cats.filter(c => c.type === 'Expense')),
+    });
+  }
+
+  private reloadRemote() {
+    this.peService.getAll().subscribe({
+      next: rows => this.expenses.set(rows),
+      error: () => { /* Keep the last confirmed data. */ },
+    });
+    this.categoryService.getAll().subscribe({
+      next: rows => this.categories.set(rows.filter(c => c.type === 'Expense')),
     });
   }
 

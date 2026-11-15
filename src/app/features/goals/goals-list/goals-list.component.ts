@@ -1,10 +1,11 @@
 import { DismissibleCardDirective } from '../../../shared/directives/dismissible-card.directive';
-import { Component, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, effect, untracked, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { GoalService } from '../../../core/services/goal.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Goal } from '../../../core/models';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DashboardRefreshService } from '../../../core/services/dashboard-refresh.service';
 import { QuickCreateService } from '../../../core/services/quick-create.service';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { ToastContainerComponent } from '../../../shared/components/toast-container/toast-container.component';
@@ -31,6 +32,15 @@ import { GoalHistoryComponent } from '../goal-history/goal-history.component';
   styleUrls: ['./goals-list.component.scss'],
 })
 export class GoalsListComponent implements OnInit {
+  private readonly liveSync = inject(DashboardRefreshService);
+  constructor() {
+    let first = true;
+    effect(() => {
+      this.liveSync.version();
+      if (first) { first = false; return; }
+      untracked(() => { if (true) this.load(true); });
+    });
+  }
   private readonly quickCreate = inject(QuickCreateService);
   private readonly destroyRef = inject(DestroyRef);
   private goalService = inject(GoalService);
@@ -51,8 +61,8 @@ export class GoalsListComponent implements OnInit {
     });
   }
 
-  load() {
-    this.loading.set(true);
+  load(silent = false) {
+    if (!silent) this.loading.set(true);
     this.goalService.getAll().subscribe({
       next:  (data) => { this.goals.set(data); this.loading.set(false); },
       error: ()     => this.loading.set(false),

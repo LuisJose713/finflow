@@ -75,7 +75,7 @@ export class TransactionsComponent implements OnInit {
       this.refresh.version();
       // A data refresh must not subscribe to the active filter signals.
       // Filter changes already call load() explicitly in their handlers.
-      untracked(() => this.load());
+      untracked(() => { this.load(this.allTransactions().length > 0); this.loadCategories(); });
     }, { allowSignalWrites: true });
     this.destroyRef.onDestroy(() => this.activeLoad?.unsubscribe());
   }
@@ -98,11 +98,11 @@ export class TransactionsComponent implements OnInit {
   }
 
   // Solo llama al backend con filtros de tipo/mes/año/categoría
-  load() {
+  load(silent = false) {
     // Cancel the older request when users change filters quickly. Otherwise
     // an earlier response can overwrite the last selected category's results.
     this.activeLoad?.unsubscribe();
-    this.loading.set(true);
+    if (!silent) this.loading.set(true);
     this.activeLoad = this.txService.getAll(
       this.filterType()       || undefined,
       this.filterMonth()      ?? undefined,

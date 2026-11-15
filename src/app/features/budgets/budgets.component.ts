@@ -1,10 +1,11 @@
 import { AppCurrencyPipe } from '../../shared/pipes/currency.pipe';
 import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, effect, untracked, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DashboardRefreshService } from '../../core/services/dashboard-refresh.service';
 import { QuickCreateService } from '../../core/services/quick-create.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { CurrencyInputDirective } from '../../shared/directives/currency-input.directive';
@@ -17,6 +18,15 @@ import { Category } from '../../core/models';
  templateUrl:'./budgets.component.html', styleUrl:'./budgets.component.scss'
 })
 export class BudgetsComponent implements OnInit {
+  private readonly liveSync = inject(DashboardRefreshService);
+  constructor() {
+    let first = true;
+    effect(() => {
+      this.liveSync.version();
+      if (first) { first = false; return; }
+      untracked(() => { if (!this.busy()) this.refresh(true); });
+    });
+  }
   private readonly quickCreate = inject(QuickCreateService);
   private readonly destroyRef = inject(DestroyRef);
  private readonly api=inject(BudgetService);
@@ -47,8 +57,8 @@ export class BudgetsComponent implements OnInit {
      (document.getElementById('budget-category') as HTMLSelectElement | null)?.focus({ preventScroll: true });
    });
  }
- refresh() {
-   this.loading.set(true);this.error.set('');
+ refresh(silent = false) {
+    if (!silent) { this.loading.set(true); this.error.set(''); }
    forkJoin({budgets:this.api.list(this.year(),this.month()),categories:this.categoryApi.getAll()}).subscribe({
      next:data=>{this.budgets.set(data.budgets);this.categories.set(data.categories);this.loading.set(false);},
      error:()=>{this.error.set('No pudimos consultar tus presupuestos.');this.loading.set(false);}

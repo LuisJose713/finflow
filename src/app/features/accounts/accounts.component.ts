@@ -1,10 +1,11 @@
 import { AppCurrencyPipe } from '../../shared/pipes/currency.pipe';
 import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, effect, untracked, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DashboardRefreshService } from '../../core/services/dashboard-refresh.service';
 import { QuickCreateService } from '../../core/services/quick-create.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { CurrencyInputDirective } from '../../shared/directives/currency-input.directive';
@@ -15,6 +16,15 @@ import { AccountService, AccountType, FinancialAccount, AccountTransfer } from '
   templateUrl:'./accounts.component.html',styleUrl:'./accounts.component.scss'
 })
 export class AccountsComponent implements OnInit {
+  private readonly liveSync = inject(DashboardRefreshService);
+  constructor() {
+    let first = true;
+    effect(() => {
+      this.liveSync.version();
+      if (first) { first = false; return; }
+      untracked(() => { if (!this.saving()) this.load(true); });
+    });
+  }
   private readonly quickCreate = inject(QuickCreateService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly api=inject(AccountService);
@@ -47,11 +57,11 @@ export class AccountsComponent implements OnInit {
       (document.getElementById('acc-name') as HTMLInputElement | null)?.focus({ preventScroll: true });
     });
   }
-  load(){
-    this.loading.set(true);this.error.set('');
+  load(silent = false) {
+    if (!silent) { this.loading.set(true); this.error.set(''); }
     forkJoin({accounts:this.api.list(),transfers:this.api.transfers()}).subscribe({
       next:data=>{this.accounts.set(data.accounts);this.transfers.set(data.transfers);this.loading.set(false);},
-      error:()=>{this.error.set('No pudimos cargar tus billeteras.');this.loading.set(false);}
+      error:()=>{if (!silent) this.error.set('No pudimos cargar tus billeteras.');this.loading.set(false);}
     });
   }
   private validAmount(value:number|null,zeroAllowed=false):boolean {

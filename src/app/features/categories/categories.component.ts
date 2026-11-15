@@ -1,9 +1,10 @@
 import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, effect, untracked, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DashboardRefreshService } from '../../core/services/dashboard-refresh.service';
 import { QuickCreateService } from '../../core/services/quick-create.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { CategoryService } from '../../core/services/category.service';
@@ -20,6 +21,15 @@ type CategoryType = 'Income' | 'Expense';
   styleUrl: './categories.component.scss',
 })
 export class CategoriesComponent implements OnInit {
+  private readonly liveSync = inject(DashboardRefreshService);
+  constructor() {
+    let first = true;
+    effect(() => {
+      this.liveSync.version();
+      if (first) { first = false; return; }
+      untracked(() => { if (!this.saving()) this.refresh(true); });
+    });
+  }
   private readonly quickCreate = inject(QuickCreateService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly categoriesApi = inject(CategoryService);
@@ -52,8 +62,8 @@ export class CategoriesComponent implements OnInit {
     });
   }
 
-  refresh() {
-    this.loading.set(true);
+  refresh(silent = false) {
+    if (!silent) this.loading.set(true);
     this.error.set('');
     this.categoriesApi.getAll().subscribe({
       next: categories => {
