@@ -461,6 +461,8 @@ for (const width of widths) {
     // Test the real hand-guided tutorial, not just its explanatory dialog.
     if ([375, 1024].includes(width)) {
       await page.getByRole('button', { name: 'Abrir guía de FinFlow' }).click();
+      // The tour begins with the dashboard overview; movement creation is step two.
+      await page.getByRole('button', { name: 'Siguiente' }).click();
       await page.getByRole('button', { name: /Guíame para crear un movimiento/ }).click();
       await page.getByRole('heading', { name: 'Pulsa Nueva transacción' }).waitFor({ state: 'visible' });
       const tourTrigger = page.locator('[data-finflow-tour="new"]');
