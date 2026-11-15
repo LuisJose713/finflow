@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, HostListener, Input, NgZone, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, HostListener, Input, NgZone, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router'; 
 import { CommonModule } from '@angular/common'; 
 import { AuthService } from '../../../core/services/auth.service';

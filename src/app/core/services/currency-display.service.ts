@@ -43,10 +43,10 @@ export class CurrencyDisplayService {
     try {
       const saved = JSON.parse(localStorage.getItem(this.storageKey(key)) || 'null');
       if (saved && CURRENCIES.some(v => v.code === saved.code) && saved.code !== 'COP') {
-        if (this.valid(saved) && Date.now() - saved.fetchedAt < 72 * 60 * 60 * 1000) {
-          activeCurrencyQuote.set({ code: saved.code, rate: saved.rate, date: saved.date });
+        if (this.valid(saved) && typeof saved.fetchedAt === 'number' && Date.now() - saved.fetchedAt < 72 * 60 * 60 * 1000) {
+          activeCurrencyQuote.set({ code: saved.code as DisplayCurrency, rate: saved.rate, date: saved.date });
         }
-        void this.select(saved.code);
+        void this.select(saved.code as DisplayCurrency);
       }
     } catch { /* Browsers can deny local storage. COP remains safe. */ }
   }
