@@ -266,3 +266,13 @@ form {
   .btn-add.floating { transition: none; }
 }
 
+
+.voice-draft{display:grid;gap:.65rem;padding:1rem;border:1px solid var(--border,#dce3eb);border-radius:14px;background:var(--bg-secondary,#f8fafc)}
+.voice-draft strong{font-size:.95rem;color:var(--text-primary,#192b44)}
+.voice-draft p{margin:0;font-size:.8rem;line-height:1.5;color:var(--text-secondary,#57677e)}
+.voice-draft .voice-button{justify-self:start;border:1px solid #b58c50;border-radius:10px;padding:.65rem .85rem;background:#152c4c;color:#fff;font-weight:700}
+.voice-manual{display:flex;gap:.45rem;flex-wrap:wrap}
+.voice-manual input{flex:1 1 185px;min-width:0;border:1px solid var(--border,#dce3eb);border-radius:10px;padding:.6rem;font:inherit}
+.voice-manual button{border-radius:10px;padding:.6rem .9rem;background:#b58c50;color:#111f34;font-weight:700}
+.voice-draft button:disabled{opacity:.6;cursor:not-allowed}
+.voice-draft .voice-notice{font-weight:600}
