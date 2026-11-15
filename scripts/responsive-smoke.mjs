@@ -341,8 +341,17 @@ for (const width of widths) {
       await page.getByRole('button', { name: 'Abrir guía de FinFlow' }).click();
       await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
       await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
-      await page.getByRole('button', { name: /Practicar: Ver mis billeteras/ }).click();
+      // The primary CTA must start the wallet tutorial, not the transaction tutorial.
+      await page.getByRole('button', { name: 'Guíame para crear una billetera' }).click();
       await page.getByRole('heading', { name: 'Nombra tu billetera' }).waitFor({ state: 'visible' });
+      await page.mouse.click(3, 3); // outside the highlighted input and tutorial card
+      assert(await page.getByRole('heading', { name: 'Nombra tu billetera' }).isVisible(),
+        `${width}px wallet guide: tapping the dimmed page must not close the tutorial`);
+      assert(new URL(page.url()).pathname === '/accounts',
+        `${width}px wallet guide: background interaction must not navigate away`);
+      await page.keyboard.press('Escape');
+      assert(await page.getByRole('heading', { name: 'Nombra tu billetera' }).isVisible(),
+        `${width}px wallet guide: Escape cannot dismiss an unfinished tutorial`);
       const highlighted = await page.locator('.focus-ring').boundingBox();
       const realInput = await page.locator('#acc-name').boundingBox();
       assert(Boolean(highlighted && realInput && Math.abs(highlighted.y - realInput.y) <= 12),
@@ -444,6 +453,9 @@ for (const width of widths) {
         `${width}px guide: spotlight must point to the real add-transaction button`);
       await tourTrigger.click();
       await page.getByRole('heading', { name: 'Selecciona Gasto o Ingreso' }).waitFor({ state: 'visible' });
+      await page.mouse.click(3, 3);
+      assert(await page.getByRole('heading', { name: 'Selecciona Gasto o Ingreso' }).isVisible(),
+        `${width}px transaction guide: an outside click must not close the tutorial`);
       await page.locator('[data-finflow-tour="type"] .type-btn.expense').click();
       await page.getByRole('heading', { name: 'Escribe el título' }).waitFor({ state: 'visible' });
       await page.locator('[data-finflow-tour="title"]').fill('Almuerzo QA');
