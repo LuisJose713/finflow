@@ -446,9 +446,7 @@
   .tx-menu {grid-column:6;grid-row:1;}
   .meta-separator {display:none;}
 }
-@container transactions-workspace (min-width:1000px) {
-  .filters-card {display:grid;grid-template-columns:minmax(220px,1.1fr) minmax(0,2.9fr);align-items:end;gap:12px;}
-}
+
 @container transactions-workspace (max-width:540px) {
   .filters-row {grid-template-columns:repeat(2,minmax(0,1fr));}
 }
@@ -477,24 +475,28 @@
   .app-shell .ledger-list .tx-item { column-gap: .5rem; padding: .55rem .65rem; }
 }
 
-
-/* Stable finance filters: category changes must never rearrange the toolbar. */
+/* Layout exclusivo de filtros de Transacciones: dos filas sin columna vacía. */
 .app-shell .main-content .filters-card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  align-items: stretch;
+  width: 100%;
   min-width: 0;
+  gap: 12px;
 }
 .filters-toolbar {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  width: 100%;
   min-width: 0;
+  gap: 12px;
 }
 .filters-toolbar .search-wrap {
-  min-width: 0;
+  flex: 1 1 320px;
+  max-width: 480px;
   width: 100%;
+  min-width: 0;
 }
 .filters-toolbar .search-input {
   box-sizing: border-box;
@@ -502,6 +504,7 @@
 }
 .filters-toolbar .btn-clear {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   min-height: 46px;
@@ -520,6 +523,7 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: end;
   gap: 12px;
+  width: 100%;
   min-width: 0;
 }
 .app-shell .main-content .filters-row .filter-control {
@@ -543,8 +547,9 @@
   }
 }
 @container transactions-workspace (max-width: 450px) {
-  .filters-toolbar { grid-template-columns: minmax(0, 1fr); }
-  .filters-toolbar .btn-clear { width: 100%; justify-self: stretch; }
+  .filters-toolbar { flex-direction: column; align-items: stretch; }
+  .filters-toolbar .search-wrap { max-width: none; flex: 0 0 auto; }
+  .filters-toolbar .btn-clear { width: 100%; }
   .app-shell .main-content .filters-row {
     grid-template-columns: minmax(0, 1fr);
   }
