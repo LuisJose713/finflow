@@ -276,3 +276,21 @@
   .goal-actions .btn-icon { transition:none; }
 }
 
+
+
+/* Keep the title and primary action aligned to opposite header edges. */
+.page-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: none;
+  gap: 16px;
+}
+.page-header > div { min-width: 0; }
+.page-header > .btn-new { justify-self: end; white-space: nowrap; }
+@media (max-width: 600px) {
+  .page-header { grid-template-columns: minmax(0, 1fr); align-items: stretch; }
+  .page-header > .btn-new { width: 100%; justify-self: stretch; }
+}
