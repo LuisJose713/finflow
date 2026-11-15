@@ -244,9 +244,28 @@ for (const width of widths) {
       await page.goto(base + route, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(200);
       await measureViewport(page, route, width);
-      // The conversation keeps its composer unobstructed; financial workspace
-      // routes retain the shared transaction shortcut.
-      const fab = page.getByRole('button', { name: 'Nueva transacción', exact: true });
+      // Every section has its own real creation action, never a misleading
+      // transaction button pasted onto unrelated forms.
+      const expectedQuickCreate = {
+        '/accounts': 'Nueva billetera',
+        '/recurring': 'Nuevo recurrente',
+        '/categories': 'Nueva categoría',
+        '/budgets': 'Nuevo presupuesto'
+      };
+      const label = expectedQuickCreate[route];
+      const fab = page.locator('.quick-create-floating, app-add-transaction > .btn-add.floating');
+      if (label) {
+        await page.getByRole('button', { name: label, exact: true }).waitFor({ state: 'visible' });
+        assert(await fab.count() === 1, `${width}px ${route}: expected one contextual action`);
+        if (route === '/accounts' && [320, 768, 1440].includes(width)) {
+          await page.getByRole('button', { name: label, exact: true }).click();
+          assert(await page.locator('#acc-name').evaluate(el => document.activeElement === el),
+            `${width}px /accounts: quick create should focus wallet name, not a transaction dialog`);
+        }
+      } else {
+        assert(await fab.count() === 0,
+          `${width}px ${route}: no financial create action should overlay this screen`);
+      }
       if (route === '/advisor') {
         assert(await fab.count() === 0, `${width}px /advisor: the floating transaction shortcut must not cover the composer`);
       } else {
@@ -344,6 +363,7 @@ for (const width of widths) {
       await page.locator('#acc-name').press('Tab');
       await page.getByRole('heading', { name: 'Selecciona el tipo' }).waitFor({ state: 'visible' });
       await page.getByRole('button', { name: 'Omitir tutorial' }).click();
+      await page.locator('.spotlight-layer').waitFor({ state: 'hidden' });
       assert(await page.locator('.spotlight-layer').count() === 0,
         `${width}px account guide: skip must remove spotlight`);
     } catch (error) {
