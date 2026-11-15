@@ -395,6 +395,10 @@ for (const width of widths) {
     await measureViewport(page, 'transactions-filtered', width);
     await page.screenshot({ path: path.join(output, `${width}-transactions-filtered.png`) });
     await clear.click();
+    await page.waitForFunction(() => {
+      const button = document.querySelector('.filters-toolbar .btn-clear');
+      return Boolean(button?.disabled);
+    });
     assert(await clear.isDisabled(),
       `${width}px transactions: clear action must stay in place and become disabled`);
     const reset = await geometry();
