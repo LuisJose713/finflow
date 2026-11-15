@@ -1,3 +1,4 @@
+import { AppCurrencyPipe } from '../../../shared/pipes/currency.pipe';
 import { CurrencyInputDirective } from '../../../shared/directives/currency-input.directive';
 import { Component, inject, signal, output } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
@@ -9,7 +10,7 @@ import { Goal } from '../../../core/models';
 @Component({
   selector: 'app-goal-abono',
   standalone: true,
-  imports: [CurrencyInputDirective, CommonModule, ReactiveFormsModule, DecimalPipe],
+  imports: [AppCurrencyPipe, CurrencyInputDirective, CommonModule, ReactiveFormsModule, DecimalPipe],
   templateUrl: './goal-abono.component.html',
   styleUrls: ['./goal-abono.component.scss'],
 })

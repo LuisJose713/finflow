@@ -7,6 +7,7 @@ import { ThemeSwitcherComponent } from '../theme-switcher/theme-switcher.compone
 import { AddTransactionComponent } from '../add-transaction/add-transaction.component';
 import { environment } from '../../../../environments/environment';
 import { DrawerSwipe } from './drawer-swipe';
+import { CurrencyDisplayService, DisplayCurrency } from '../../../core/services/currency-display.service';
 
 interface NavItem {
   path: string;
@@ -31,6 +32,11 @@ export class NavbarComponent {
   @Input() showTransactionShortcut = true;
 
   auth = inject(AuthService);
+  readonly currencies = inject(CurrencyDisplayService);
+  readonly currencyOptions = this.currencies.options;
+  setDisplayCurrency(value: string): void {
+    if (this.currencyOptions.some(item => item.code === value)) void this.currencies.select(value as DisplayCurrency);
+  }
 
   collapsed = signal(this.readCollapsedPreference());
   mobileOpen = signal(false);
@@ -49,6 +55,7 @@ export class NavbarComponent {
   private suppressClickUntil = 0;
 
   constructor() {
+    effect(() => this.currencies.load(this.auth.currentUser()?.id ?? null));
     if (typeof document === 'undefined') return;
     // Only an accepted horizontal drag cancels the browser's default action.
     // A non-passive listener is necessary on Safari and Chrome document touches.

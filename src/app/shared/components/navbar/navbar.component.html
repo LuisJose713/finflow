@@ -36,6 +36,18 @@
   </nav>
   <div class="sidebar-brand-credit" *ngIf="!collapsed() || mobileVisible()">Creado por <strong>AEVQOR</strong><small>Precision. Architecture. Innovation.</small></div>
   <div class="sidebar-footer">
+    <div class="currency-control" *ngIf="!collapsed() || mobileVisible()">
+      <label for="finflow-display-currency">Moneda de visualización</label>
+      <select id="finflow-display-currency" [value]="currencies.quote().code"
+              (change)="setDisplayCurrency($any($event.target).value)" [disabled]="currencies.loading()"
+              data-no-drawer-swipe aria-label="Moneda para visualizar importes">
+        <option *ngFor="let option of currencyOptions" [value]="option.code">{{option.label}}</option>
+      </select>
+      <small *ngIf="currencies.quote().code !== 'COP'">Tasa de referencia: {{currencies.quote().date}} · Valores originales COP</small>
+      <small *ngIf="currencies.loading()" role="status">Consultando tasa…</small>
+      <small *ngIf="currencies.error()" role="alert">{{currencies.error()}}</small>
+      <small *ngIf="currencies.quote().code !== 'COP'"><a href="https://frankfurter.dev/" target="_blank" rel="noopener noreferrer">Frankfurter · tasas de referencia</a></small>
+    </div>
     <app-theme-switcher [compact]="collapsed() && !mobileVisible()"></app-theme-switcher>
     <app-logout-button [compact]="collapsed() && !mobileVisible()"></app-logout-button>
   </div>

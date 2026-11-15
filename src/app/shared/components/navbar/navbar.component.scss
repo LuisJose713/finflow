@@ -379,3 +379,9 @@
   border-color: #3c4d61;
 }
 .mobile-menu-btn.dragging { opacity: 0; pointer-events: none; }
+
+.currency-control{display:flex;flex-direction:column;gap:.3rem;padding:.6rem .8rem;font-size:.75rem;color:var(--text-secondary,#9bafc1)}
+.currency-control select{width:100%;max-width:100%;background:var(--bg-primary,#142b44);color:inherit;border:1px solid var(--border,#496078);border-radius:.6rem;padding:.55rem .45rem;font:inherit}
+.currency-control label{font-weight:700}
+.currency-control small{font-size:.68rem;line-height:1.4;overflow-wrap:anywhere}
+.currency-control a{color:inherit;text-decoration:underline}
