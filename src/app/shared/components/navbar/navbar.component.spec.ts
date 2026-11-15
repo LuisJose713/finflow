@@ -4,6 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { NavbarComponent } from './navbar.component';
+import { CurrencyDisplayService } from '../../../core/services/currency-display.service';
 
 describe('Mobile drawer interaction', () => {
   let fixture: ComponentFixture<NavbarComponent>;
@@ -28,7 +29,11 @@ describe('Mobile drawer interaction', () => {
     Object.defineProperty(window, 'innerWidth', { configurable: true, value: 375 });
     await TestBed.configureTestingModule({
       imports: [NavbarComponent],
-      providers: [provideRouter([]), { provide: AuthService, useValue: {
+      providers: [provideRouter([]), { provide: CurrencyDisplayService, useValue: {
+        quote: signal({ code: 'COP', rate: 1, date: null }), loading: signal(false), error: signal(''),
+        options: [{ code: 'COP', label: 'COP · Peso colombiano' }],
+        load: () => undefined, select: async () => undefined,
+      } }, { provide: AuthService, useValue: {
         currentUser: signal({ name: 'Test', role: 'USER' }), isAuthenticated: () => false,
       } }],
     }).overrideComponent(NavbarComponent, { set: {
