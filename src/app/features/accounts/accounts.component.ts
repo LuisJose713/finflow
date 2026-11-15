@@ -1,9 +1,11 @@
 import { AppCurrencyPipe } from '../../shared/pipes/currency.pipe';
 import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { QuickCreateService } from '../../core/services/quick-create.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { CurrencyInputDirective } from '../../shared/directives/currency-input.directive';
 import { AccountService, AccountType, FinancialAccount, AccountTransfer } from '../../core/services/account.service';
@@ -13,6 +15,8 @@ import { AccountService, AccountType, FinancialAccount, AccountTransfer } from '
   templateUrl:'./accounts.component.html',styleUrl:'./accounts.component.scss'
 })
 export class AccountsComponent implements OnInit {
+  private readonly quickCreate = inject(QuickCreateService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly api=inject(AccountService);
   readonly accounts=signal<FinancialAccount[]>([]);
   readonly transfers=signal<AccountTransfer[]>([]);
@@ -35,7 +39,14 @@ export class AccountsComponent implements OnInit {
   ];
   readonly date=new Date().toLocaleDateString('en-CA',{timeZone:'America/Bogota'});
 
-  ngOnInit(){this.load();}
+  ngOnInit() {
+    this.load();
+    this.quickCreate.requested$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(route => {
+      if (route !== '/accounts') return;
+      document.getElementById('acc-name')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      (document.getElementById('acc-name') as HTMLInputElement | null)?.focus({ preventScroll: true });
+    });
+  }
   load(){
     this.loading.set(true);this.error.set('');
     forkJoin({accounts:this.api.list(),transfers:this.api.transfers()}).subscribe({
