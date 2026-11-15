@@ -1,0 +1,74 @@
+<router-outlet/>
+    <app-update-notice/>
+    <app-product-tour [blocked]="needsConsent() || showSignupNotice()"/>
+    <app-transaction-spotlight [blocked]="needsConsent() || showSignupNotice()"/>
+    @if (needsConsent()) {
+      <div class="privacy-shield">
+        <section class="privacy-dialog" role="dialog" aria-modal="true"
+                 aria-labelledby="privacy-consent-heading">
+          <header>
+            <span>FINFLOW · DECIDE SOBRE TUS DATOS</span>
+            <h2 id="privacy-consent-heading">Autorización de tratamiento de datos</h2>
+            <p>Ya tienes una cuenta. Antes de seguir utilizando tus funciones financieras, necesitamos tu decisión expresa sobre la política vigente. El permiso comercial es independiente.</p>
+          </header>
+          <div class="privacy-scroll" tabindex="0" aria-label="Política completa">
+            <app-privacy-policy [policy]="policy()"/>
+          </div>
+          <footer>
+            <label class="privacy-check">
+              <input type="checkbox" [checked]="accepted()" (change)="accepted.set(!accepted())"/>
+              <span>He leído y acepto expresamente el tratamiento necesario para usar FinFlow.</span>
+            </label>
+            <label class="privacy-check">
+              <input type="checkbox" [checked]="marketing()" (change)="marketing.set(!marketing())"/>
+              <span>Opcional: quiero recibir promociones o novedades. Puedo revocarlo después.</span>
+            </label>
+            @if (privacyError()) {
+              <p class="privacy-error" role="alert">{{privacyError()}}</p>
+            }
+            <button type="button" (click)="confirmConsent()" [disabled]="!accepted() || saving()">
+              {{saving() ? 'Guardando tu decisión…' : 'Aceptar y continuar'}}
+            </button>
+            <div class="privacy-footer-links">
+              <a routerLink="/privacy">Información y derechos</a>
+              <button type="button" class="privacy-leave" (click)="auth.logout()">No acepto · Cerrar sesión</button>
+            </div>
+          </footer>
+        </section>
+      </div>
+    }
+    @if (showSignupNotice() && !needsConsent()) {
+      <div class="privacy-shield" (click)="dismissSignupNotice()">
+        <section #signupDialog class="privacy-dialog signup-privacy-dialog"
+                 role="dialog" aria-modal="true"
+                 aria-labelledby="signup-privacy-title"
+                 aria-describedby="signup-privacy-desc"
+                 tabindex="-1"
+                 (click)="$event.stopPropagation()">
+          <header>
+            <span>FINFLOW · TU PRIVACIDAD</span>
+            <h2 id="signup-privacy-title">Tu información, bajo tu control</h2>
+            <p id="signup-privacy-desc">Queremos que conozcas cómo FinFlow trata tus datos personales, tanto si acabas de registrarte como si ya utilizabas la aplicación.</p>
+          </header>
+          <div class="privacy-scroll" tabindex="0" aria-label="Información de tratamiento de datos">
+            <app-privacy-policy [policy]="policy()"/>
+          </div>
+          <footer>
+            @if (policy()?.ready) {
+              <p class="signup-privacy-status">Puedes consultar el comprobante de tu autorización
+                y cambiar el permiso comercial desde el centro de privacidad.</p>
+            } @else {
+              <p class="signup-privacy-status">La política formal continúa en revisión.
+                Esta ventana es informativa: cerrarla no registra ninguna autorización
+                ni supone que hayas aceptado una política pendiente.</p>
+            }
+            <button data-signup-dismiss type="button" (click)="dismissSignupNotice()">
+              Entendido, continuar a mi inicio
+            </button>
+            <a routerLink="/privacy" (click)="dismissSignupNotice()">
+              Consultar el tratamiento de datos y mis derechos
+            </a>
+          </footer>
+        </section>
+      </div>
+    }
