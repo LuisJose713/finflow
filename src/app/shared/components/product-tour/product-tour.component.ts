@@ -1,6 +1,7 @@
 import { Component, Input, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { TransactionWalkthroughService } from '../../../core/services/transaction-walkthrough.service';
 
 interface TourStep {
   title: string;
@@ -99,6 +100,7 @@ interface TourStep {
 export class ProductTourComponent {
   @Input() blocked = false;
   readonly auth = inject(AuthService);
+  private readonly transactionWalkthrough = inject(TransactionWalkthroughService);
   private readonly router = inject(Router);
   readonly index = signal(0);
   readonly opened = signal(false);
@@ -141,6 +143,8 @@ export class ProductTourComponent {
   visit(): void {
     const destination = this.current().route;
     this.closeGuide();
-    void this.router.navigateByUrl(destination);
+    void this.router.navigateByUrl(destination).then(navigated => {
+      if (navigated && destination === '/transactions') this.transactionWalkthrough.start();
+    });
   }
 }
