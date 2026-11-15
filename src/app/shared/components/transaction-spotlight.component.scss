@@ -1,6 +1,6 @@
 :host { display:contents }
     .spotlight-layer { position:fixed; inset:0; z-index:3600; pointer-events:none }
-    .shade { position:fixed; background:rgba(4,13,31,.75); pointer-events:none }
+    .shade { position:fixed; background:rgba(4,13,31,.75); pointer-events:auto; touch-action:none; overscroll-behavior:contain }
     .focus-ring { position:fixed; border:3px solid #e5b967; border-radius:12px; box-sizing:border-box;
       box-shadow:0 0 0 2px #fff9,0 0 28px #e5b967aa; pointer-events:none; animation:tour-glow 1.8s ease-in-out infinite }
     @keyframes tour-glow {
