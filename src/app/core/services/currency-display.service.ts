@@ -81,7 +81,7 @@ export class CurrencyDisplayService {
     }
   }
 
-  private valid(value: any): value is { rate: number; date: string; fetchedAt?: number } {
+  private valid(value: any): value is { code?: DisplayCurrency; rate: number; date: string; fetchedAt?: number } {
     return value && typeof value.rate === 'number' && Number.isFinite(value.rate)
       && value.rate > 0 && value.rate < 1000 && typeof value.date === 'string'
       && /^\d{4}-\d{2}-\d{2}$/.test(value.date)
