@@ -1,9 +1,8 @@
 <!-- Trigger button -->
-<button *ngIf="showTrigger" class="btn-add" [class.floating]="floating" type="button" (click)="open()"
+<button *ngIf="showTrigger" class="btn-add" data-finflow-tour="new" [class.floating]="floating" type="button" (click)="open()"
         aria-label="Nueva transacción" [attr.aria-expanded]="isOpen()">
   <span class="btn-add-icon" aria-hidden="true">+</span>
   <span class="btn-add-label">Nueva transacción</span>
-  <span *ngIf="walkthrough.step() === 0 && floating" class="walkthrough-tip floating-tip" role="status">👆 Pulsa aquí para crear tu primer movimiento.</span>
 </button>
 
 <!-- Modal backdrop -->
@@ -32,14 +31,8 @@
         <p *ngIf="voiceNotice()" role="status" class="voice-notice">{{voiceNotice()}}</p>
       </section>
 
-      <div *ngIf="walkthrough.step() >= 1" class="walkthrough-header" role="status">
-        <span>FINFLOW · GUÍA INTERACTIVA</span>
-        <button type="button" (click)="walkthrough.finish()" aria-label="Salir del tutorial">Salir de la guía ✕</button>
-      </div>
-
       <!-- Type toggle -->
-      <p *ngIf="walkthrough.step() === 1" class="walkthrough-tip" role="status">Paso 1 · Elige si tu movimiento es un <strong>Ingreso</strong> o un <strong>Gasto</strong>. Toca una opción.</p>
-      <div class="type-toggle">
+      <div class="type-toggle" data-finflow-tour="type">
         <button
           type="button"
           class="type-btn"
@@ -61,10 +54,9 @@
       <div class="form-grid">
         <div class="form-group">
           <label>Título</label>
-          <p *ngIf="walkthrough.step() === 2" class="walkthrough-tip" role="status">Paso 2 · Escribe qué ocurrió, por ejemplo «Almuerzo».</p>
           <input
             type="text"
-            formControlName="description" maxlength="255"
+            formControlName="description" maxlength="255" data-finflow-tour="title"
             (blur)="f['description'].valid && walkthrough.advance(2)"
             placeholder="Ej: Compra del supermercado"
             [class.error]="f['description'].invalid && f['description'].touched"
@@ -74,12 +66,11 @@
         <!-- Monto con formato de miles -->
         <div class="form-group">
           <label>Monto</label>
-          <p *ngIf="walkthrough.step() === 3" class="walkthrough-tip" role="status">Paso 3 · Introduce el valor del movimiento en pesos.</p>
           <input
             type="text"
             inputmode="decimal"
             placeholder="0,00"
-            appCurrencyInput formControlName="amount"
+            appCurrencyInput formControlName="amount" data-finflow-tour="amount"
             (blur)="f['amount'].valid && walkthrough.advance(3)"
             [class.error]="f['amount'].invalid && f['amount'].touched"
           />
@@ -87,9 +78,8 @@
 
         <div class="form-group">
           <label>Categoría</label>
-          <p *ngIf="walkthrough.step() === 4" class="walkthrough-tip" role="status">Paso 4 · Selecciona la categoría que mejor describe este movimiento.</p>
           <select
-            formControlName="categoryId"
+            formControlName="categoryId" data-finflow-tour="category"
             (change)="f['categoryId'].valid && walkthrough.advance(4)"
             [class.error]="f['categoryId'].invalid && f['categoryId'].touched"
           >
@@ -110,16 +100,13 @@
 
         <div class="form-group">
           <label>Fecha</label>
-          <p *ngIf="walkthrough.step() === 5" class="walkthrough-tip" role="status">Paso 5 · Comprueba la fecha. Puedes usar la de hoy o modificarla.</p>
-          <input type="date" formControlName="date" (change)="walkthrough.advance(5)" />
-          <button *ngIf="walkthrough.step() === 5" type="button" class="walkthrough-next" (click)="walkthrough.advance(5)">La fecha está bien →</button>
+          <input type="date" formControlName="date" data-finflow-tour="date" (change)="walkthrough.advance(5)" />
         </div>
       </div>
 
-      <p *ngIf="walkthrough.step() === 6" class="walkthrough-tip" role="status">Paso final · Revisa tus datos y pulsa <strong>Guardar</strong> cuando estén correctos. Solo se registrará si tú lo confirmas.</p>
       <div class="modal-footer">
         <button type="button" class="btn-cancel" (click)="close()">Cancelar</button>
-        <button type="submit" class="btn-submit" [disabled]="loading()">
+        <button type="submit" class="btn-submit" data-finflow-tour="save" [disabled]="loading()">
           {{ loading() ? "Guardando..." : "Guardar" }}
         </button>
       </div>
