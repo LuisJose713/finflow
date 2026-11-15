@@ -1,5 +1,5 @@
 import { Component, DestroyRef, ElementRef, HostListener, Input, NgZone, ViewChild, computed, effect, inject, signal } from '@angular/core';
-import { RouterModule } from '@angular/router'; 
+import { Router, RouterModule, NavigationEnd } from '@angular/router'; 
 import { CommonModule } from '@angular/common'; 
 import { AuthService } from '../../../core/services/auth.service';
 import { LogoutButtonComponent } from '../logout-button/logout-button.component';
@@ -8,6 +8,7 @@ import { AddTransactionComponent } from '../add-transaction/add-transaction.comp
 import { environment } from '../../../../environments/environment';
 import { DrawerSwipe } from './drawer-swipe';
 import { CurrencyDisplayService, DisplayCurrency } from '../../../core/services/currency-display.service';
+import { QuickCreateService, QUICK_CREATE, QuickCreateConfig } from '../../../core/services/quick-create.service';
 
 interface NavItem {
   path: string;
@@ -32,6 +33,16 @@ export class NavbarComponent {
   @Input() showTransactionShortcut = true;
 
   auth = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly quickCreateService = inject(QuickCreateService);
+  readonly currentPath = signal(this.router.url.split(/[?#]/)[0]);
+  readonly createAction = computed<QuickCreateConfig | null>(() =>
+    QUICK_CREATE[this.currentPath() as keyof typeof QUICK_CREATE] ?? null);
+  readonly showMovementAction = computed(() => ['/dashboard', '/transactions'].includes(this.currentPath()));
+  openContextCreate(): void {
+    const action = this.createAction();
+    if (action) this.quickCreateService.request(action.route);
+  }
   readonly currencies = inject(CurrencyDisplayService);
   readonly currencyOptions = this.currencies.options;
   setDisplayCurrency(value: string): void {
@@ -56,6 +67,9 @@ export class NavbarComponent {
 
   constructor() {
     effect(() => this.currencies.load(this.auth.currentUser()?.id ?? null));
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) this.currentPath.set(event.urlAfterRedirects.split(/[?#]/)[0]);
+    });
     if (typeof document === 'undefined') return;
     // Only an accepted horizontal drag cancels the browser's default action.
     // A non-passive listener is necessary on Safari and Chrome document touches.
