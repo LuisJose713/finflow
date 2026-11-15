@@ -47,16 +47,61 @@ export class AccountsComponent implements OnInit {
     return value!==null&&Number.isFinite(value)&&(zeroAllowed?value>=0:value>0)
       &&value<=9999999999999.99&&Math.round(value*100)/100===value;
   }
-  create(){
-    if(this.saving())return;
-    const name=this.name.trim().replace(/\s+/g,' ');
-    if(name.length<2||name.length>80||!this.validAmount(this.opening,true)) {
-      this.error.set('Revisa el nombre y el saldo inicial (máximo dos decimales).');return;
+  create() {
+    if (this.saving()) return;
+    const name = this.name.trim().replace(/\s+/g, ' ');
+    if (name.length < 2 || name.length > 80 || !this.validAmount(this.opening, true)) {
+      this.error.set('Revisa el nombre y el saldo inicial (máximo dos decimales).');
+      return;
     }
-    this.saving.set(true);this.error.set('');this.message.set('');
-    this.api.create({name,type:this.type,currency:'COP',openingBalance:Number(this.opening)}).subscribe({
-      next:()=>{this.name='';this.opening=0;this.saving.set(false);this.message.set('Billetera creada.');this.load();},
-      error:e=>{this.saving.set(false);this.error.set(e.status===409?'Ya tienes una cuenta con ese nombre.':'No fue posible crear la billetera.');}
+
+    const existingIds = new Set(this.accounts().map(account => account.id));
+    const initial = Number(this.opening);
+    const type = this.type;
+    this.saving.set(true);
+    this.error.set('');
+    this.message.set('');
+
+    this.api.create({ name, type, currency: 'COP', openingBalance: initial }).subscribe({
+      next: created => {
+        // The successful POST is already authoritative; do not depend on a
+        // second GET that could fail and falsely report the creation as failed.
+        this.accounts.update(current => current.some(a => a.id === created.id)
+          ? current : [...current, created]);
+        this.name = '';
+        this.opening = 0;
+        this.saving.set(false);
+        this.message.set('Billetera creada correctamente.');
+      },
+      error: error => {
+        // A lost response or expired proxy request can occur AFTER the server
+        // committed the account. Check for a genuinely NEW matching account.
+        // Never retry a financial write automatically.
+        this.api.list().subscribe({
+          next: accounts => {
+            this.accounts.set(accounts);
+            const saved = accounts.some(account =>
+              !existingIds.has(account.id) &&
+              account.name.trim().toLocaleLowerCase('es-CO') === name.toLocaleLowerCase('es-CO') &&
+              account.type === type &&
+              Number(account.openingBalance) === initial);
+            if (saved) {
+              this.name = '';
+              this.opening = 0;
+              this.message.set('Billetera creada correctamente. Confirmamos el registro al actualizar tus cuentas.');
+            } else if (error.status === 409) {
+              this.error.set('Ya existe una billetera con ese nombre. Revisa tus cuentas.');
+            } else {
+              this.error.set('No pudimos confirmar la creación. Revisa la lista antes de volver a intentar.');
+            }
+            this.saving.set(false);
+          },
+          error: () => {
+            this.saving.set(false);
+            this.error.set('No pudimos confirmar si la billetera se creó. Vuelve a consultar tus cuentas antes de reintentar.');
+          }
+        });
+      }
     });
   }
   transfer(){
