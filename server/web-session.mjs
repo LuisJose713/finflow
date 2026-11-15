@@ -1,7 +1,7 @@
 const UPSTREAM = 'https://finflow-backend-production.up.railway.app';
 const ACCESS_COOKIE = '__Host-finflow_session';
 const REFRESH_COOKIE = '__Host-finflow_refresh';
-const FAMILIES = new Set(['auth', 'transactions', 'goals', 'planned-expenses', 'accounts', 'budgets', 'categories', 'recurring', 'privacy', 'billing', 'admin', 'ai', 'preferences']);
+const FAMILIES = new Set(['auth', 'transactions', 'goals', 'planned-expenses', 'accounts', 'budgets', 'categories', 'recurring', 'privacy', 'billing', 'admin', 'ai', 'preferences', 'notifications']);
 const NO_STORE = { 'Cache-Control': 'private, no-store, max-age=0', 'Vary': 'Cookie', 'X-Content-Type-Options': 'nosniff' };
 
 function json(body, status = 200, cookies = []) {

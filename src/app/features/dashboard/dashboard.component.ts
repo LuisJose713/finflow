@@ -40,11 +40,11 @@ export class DashboardComponent {
     try {
       const ok = await this.reminders.enable();
       if (ok) {
-        this.toast.success('Recordatorios diarios activados: 10:00 y 16:00');
+        this.toast.success('Suscripción Web Push activada. Avisos programados a las 10:00 y 16:00.');
       } else if (this.reminders.permission() === 'denied') {
         this.toast.warning('Permite las notificaciones desde los ajustes de tu navegador.');
       } else {
-        this.toast.warning('No pudimos activar los recordatorios. Revisa la conexión e inténtalo de nuevo.');
+        this.toast.warning('No se pudo registrar Web Push. Comprueba el servidor y vuelve a intentarlo.');
       }
     } catch {
       this.toast.error('No pudimos activar los recordatorios. Inténtalo nuevamente.');

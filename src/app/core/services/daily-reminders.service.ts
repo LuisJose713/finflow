@@ -4,19 +4,9 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Injectable, signal } from '@angular/core';
 
-type ReminderSlot = { hour: number; title: string; body: string; url: string };
-const DAILY: ReminderSlot[] = [
-  {
-    hour: 10,
-    title: 'Es hora de registrar tus movimientos',
-    body: 'Mantén tus finanzas al día. Registra tus ingresos y gastos.',
-    url: '/transactions'
-  }
-];
-
 /**
- * Browser-open reminders only. Closed-browser/PWA push requires a dedicated
- * authenticated server push subscription and job scheduler.
+ * Server-managed Web Push for authenticated users. Browser permission does
+ * not prove an active subscription; verify it before reporting enabled.
  */
 @Injectable({ providedIn: 'root' })
 export class DailyRemindersService {
@@ -29,7 +19,6 @@ export class DailyRemindersService {
   );
   private userId: string | null = null;
   private readonly allowedEmail = 'stpptx@icloud.com';
-  private timer?: ReturnType<typeof setInterval>;
 
   start(userId: string | null): void {
     if (this.userId === userId) return;
@@ -37,16 +26,26 @@ export class DailyRemindersService {
     this.userId = userId;
     if (!userId || userId.toLowerCase() !== this.allowedEmail || !this.supported) return;
     const preferred = this.read(this.preferenceKey(userId)) === 'true';
-    this.enabled.set(preferred && Notification.permission === 'granted');
+    // A saved toggle is not a verified server push subscription.
+    this.enabled.set(false);
+    if (preferred && Notification.permission === 'granted') void this.restorePushState(userId);
     this.permission.set(Notification.permission);
     // Background delivery is scheduled by the server, not by an open browser tab.
   }
 
   stop(): void {
-    if (this.timer) clearInterval(this.timer);
-    this.timer = undefined;
     this.userId = null;
     this.enabled.set(false);
+  }
+
+  private async restorePushState(user: string): Promise<void> {
+    try {
+      const registration = await this.ensureWorker();
+      const subscription = await registration?.pushManager?.getSubscription();
+      if (!subscription || this.userId !== user) return;
+      const config = await firstValueFrom(this.http.get<{enabled:boolean;publicKey:string}>(this.pushApi + '/config'));
+      if (this.userId === user && config.enabled && config.publicKey) this.enabled.set(true);
+    } catch { /* Do not report stale browser permission as delivered push. */ }
   }
 
   async enable(): Promise<boolean> {
@@ -55,13 +54,22 @@ export class DailyRemindersService {
     const permission = await Notification.requestPermission();
     this.permission.set(permission);
     const ok = permission === 'granted';
-    this.write(this.preferenceKey(this.userId), String(ok));
-    this.enabled.set(ok);
-    if (ok) {
-      try { await this.subscribePush(); }
-      catch { this.enabled.set(false); this.write(this.preferenceKey(this.userId!), 'false'); return false; }
+    if (!ok) {
+      this.enabled.set(false);
+      this.write(this.preferenceKey(this.userId), 'false');
+      return false;
     }
-    return ok;
+    try {
+      await this.subscribePush();
+      if (!this.userId) return false;
+      this.write(this.preferenceKey(this.userId), 'true');
+      this.enabled.set(true);
+      return true;
+    } catch {
+      this.enabled.set(false);
+      if (this.userId) this.write(this.preferenceKey(this.userId), 'false');
+      return false;
+    }
   }
 
   disable(): void {
@@ -100,41 +108,6 @@ export class DailyRemindersService {
     const bytes = new Uint8Array(new ArrayBuffer(raw.length));
     for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
     return bytes;
-  }
-
-  private async tick(): Promise<void> {
-    const id = this.userId;
-    if (!id || id.toLowerCase() !== this.allowedEmail || !this.enabled() || Notification.permission !== 'granted') return;
-    const now = new Date();
-    const slot = DAILY.find(item => now.getHours() === item.hour && now.getMinutes() < 5);
-    if (!slot) return;
-    const today = [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('-');
-    const stamp = `finflow.reminder.sent.${id}.${today}.${slot.hour}`;
-    if (this.read(stamp)) return;
-    // Commit the local marker before display so a late tab wake cannot duplicate it.
-    this.write(stamp, '1');
-    try {
-      const registration = await this.ensureWorker();
-      if (registration?.showNotification) {
-        await registration.showNotification(slot.title, {
-          body: slot.body,
-          icon: '/icons/finflow-192.png',
-          badge: '/icons/finflow-192.png',
-          tag: `finflow-daily-${slot.hour}`,
-          data: { url: slot.url }
-        });
-      } else {
-        const notification = new Notification(slot.title, {
-          body: slot.body,
-          icon: '/icons/finflow-192.png',
-          tag: `finflow-daily-${slot.hour}`
-        });
-        notification.onclick = () => { window.focus(); location.assign(slot.url); };
-      }
-    } catch {
-      // Do not pretend delivery succeeded when browser notifications are unavailable.
-      this.write(stamp, '');
-    }
   }
 
   private async ensureWorker(): Promise<ServiceWorkerRegistration | null> {
