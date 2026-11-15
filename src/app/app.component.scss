@@ -1,0 +1,22 @@
+.privacy-shield{position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;background:#061328e8;backdrop-filter:blur(8px);padding:clamp(.5rem,2vw,1.7rem)}
+    .privacy-dialog{display:flex;flex-direction:column;width:min(100%,720px);max-height:calc(100dvh - 1rem);min-height:0;overflow:hidden;background:var(--bg-primary,#fff);color:var(--text-primary,#13253c);border-radius:18px;box-shadow:0 22px 75px #0007}
+    .privacy-dialog header{padding:1.2rem clamp(1rem,3vw,1.8rem);border-bottom:1px solid var(--border,#dce2e9)}
+    .privacy-dialog header span{font-size:.67rem;letter-spacing:.17em;font-weight:800;color:#b58c50}
+    .privacy-dialog h2{margin:.5rem 0;font-size:clamp(1.25rem,3vw,1.75rem)}
+    .privacy-dialog header p{font-size:.83rem;line-height:1.7;color:var(--text-secondary,#55657a)}
+    .privacy-scroll{padding:1rem clamp(1rem,3vw,1.8rem);flex:1 1 auto;overflow-y:auto;min-height:0}
+    .privacy-dialog footer{padding:1rem clamp(1rem,3vw,1.8rem) calc(1rem + env(safe-area-inset-bottom));display:grid;gap:.7rem;border-top:1px solid var(--border,#dce2e9)}
+    .privacy-check{display:flex;align-items:flex-start;gap:.7rem;font-size:.82rem;line-height:1.5;cursor:pointer}
+    .privacy-check input{flex:0 0 20px;width:20px;height:20px;margin-top:2px;accent-color:#173a64}
+    .privacy-dialog button{cursor:pointer;min-height:45px;background:#122d4d;color:white;border:0;border-radius:10px;font-weight:750}
+    .privacy-dialog button:disabled{opacity:.5;cursor:not-allowed}
+    .privacy-dialog .privacy-leave{background:transparent;color:var(--text-primary,#13253c);border:1px solid var(--border,#dce2e9);padding:.55rem 1rem}
+    .privacy-footer-links{display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap}
+    .privacy-footer-links a{font-size:.78rem;color:#2563a0}
+    .privacy-error{font-size:.8rem;color:#a5243b}
+    .signup-privacy-dialog header p{margin-bottom:0}
+    .signup-privacy-dialog footer{gap:.8rem}
+    .signup-privacy-dialog .signup-privacy-status{font-size:.82rem;line-height:1.55;color:#586b80;margin:0;padding:.65rem .85rem;background:#f4f7fa;border-radius:10px}
+    .signup-privacy-dialog footer a{color:#285683;text-align:center;font-size:.78rem;text-decoration:underline;text-underline-offset:3px}
+    .signup-privacy-dialog :is(a,button,[tabindex="0"]):focus-visible{outline:3px solid #b58c50;outline-offset:3px}
+    @media(max-width:600px){.privacy-shield{padding:0;align-items:end}.privacy-dialog{border-radius:18px 18px 0 0;max-height:100dvh}.privacy-dialog header{padding:1rem}.privacy-footer-links{align-items:stretch;flex-direction:column}}
