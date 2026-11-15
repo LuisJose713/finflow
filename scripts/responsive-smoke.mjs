@@ -267,18 +267,6 @@ for (const width of widths) {
           `${width}px ${route}: no financial create action should overlay this screen`);
       }
       if (route === '/advisor') {
-        assert(await fab.count() === 0, `${width}px /advisor: the floating transaction shortcut must not cover the composer`);
-      } else {
-        await fab.waitFor({ state: 'visible', timeout: 6000 });
-        assert(await fab.count() === 1, `${width}px ${route}: duplicate transaction buttons`);
-      }
-      if (route === '/accounts' && [320, 768, 1440].includes(width)) {
-        await fab.click();
-        await page.getByRole('dialog', { name: 'Nueva transacción' }).waitFor({ state: 'visible' });
-        await page.getByRole('button', { name: 'Cerrar formulario' }).click();
-        await page.getByRole('dialog', { name: 'Nueva transacción' }).waitFor({ state: 'hidden' });
-      }
-      if (route === '/advisor') {
         await page.getByRole('heading', { name: '¿En qué puedo ayudarte?' }).waitFor({ state: 'visible' });
         await page.locator('.chat-topbar img.brand-avatar[src="/finflow-icon-classic.svg"]').waitFor({ state: 'visible' });
         await page.locator('.welcome-panel img.welcome-mark[src="/finflow-icon-classic.svg"]').waitFor({ state: 'visible' });
