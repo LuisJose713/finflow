@@ -13,13 +13,6 @@ import { ToastService } from '../../../core/services/toast.service';
 import { DashboardRefreshService } from '../../../core/services/dashboard-refresh.service';
 import { CreateTransactionRequest, TransactionType, Category, Transaction } from '../../../core/models';
 
-@Component({
-  selector: 'app-add-transaction',
-  standalone: true,
-  imports: [CurrencyInputDirective, ReactiveFormsModule, CommonModule],
-  templateUrl: './add-transaction.component.html',
-  styleUrls: ['./add-transaction.component.scss'],
-})
 interface VoiceDraft {
   title: string;
   amount: number | null;
@@ -44,6 +37,13 @@ type SpeechWindow = Window & {
   webkitSpeechRecognition?: new () => NativeSpeechRecognition;
 };
 
+@Component({
+  selector: 'app-add-transaction',
+  standalone: true,
+  imports: [CurrencyInputDirective, ReactiveFormsModule, CommonModule],
+  templateUrl: './add-transaction.component.html',
+  styleUrls: ['./add-transaction.component.scss'],
+})
 export class AddTransactionComponent implements OnInit {
   private readonly http = inject(HttpClient);
   private speech: NativeSpeechRecognition | null = null;
