@@ -88,25 +88,6 @@
         </div>
       </div>
 
-      <details class="voice-disclosure">
-        <summary>Registrar por voz <span>(opcional)</span></summary>
-      <section class="voice-draft" aria-label="Registrar movimiento por voz">
-        <strong>Registro por voz</strong>
-        <p>Di, por ejemplo, «Gasté 35.000 pesos en almuerzo». Revisarás los datos antes de guardar.</p>
-        <button class="voice-button" type="button" (click)="startVoiceCapture()"
-                [disabled]="voiceListening() || voiceWorking() || loading()">
-          {{ voiceListening() ? 'Escuchando…' : '🎙 Dictar movimiento' }}
-        </button>
-        <div class="voice-manual">
-          <input type="text" maxlength="300" aria-label="Frase para interpretar"
-                 [value]="voiceText()" (input)="voiceText.set($any($event.target).value)"
-                 placeholder="O escribe tu movimiento aquí" />
-          <button type="button" (click)="interpretVoiceDraft()" [disabled]="!voiceText().trim() || voiceWorking()">Interpretar</button>
-        </div>
-        <p *ngIf="voiceNotice()" role="status" class="voice-notice">{{voiceNotice()}}</p>
-      </section>
-      </details>
-
       <div class="modal-footer">
         <button type="button" class="btn-cancel" (click)="close()">Cancelar</button>
         <button type="submit" class="btn-submit" data-finflow-tour="save" [disabled]="loading()">
