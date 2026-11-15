@@ -15,67 +15,8 @@ interface SpotlightBounds {
 @Component({
   selector: 'app-transaction-spotlight',
   standalone: true,
-  template: `
-    @if (walkthrough.step() >= 0 && !isBlocked()) {
-      @if (bounds(); as b) {
-        <div class="spotlight-layer" aria-label="Tutorial guiado de FinFlow">
-          <div class="shade" aria-hidden="true" style="top:0;left:0;right:0"
-               [style.height.px]="b.top"></div>
-          <div class="shade" aria-hidden="true" style="left:0;right:0;bottom:0"
-               [style.top.px]="b.top + b.height"></div>
-          <div class="shade" aria-hidden="true" [style.top.px]="b.top"
-               [style.width.px]="b.left" [style.height.px]="b.height" style="left:0"></div>
-          <div class="shade" aria-hidden="true" [style.top.px]="b.top"
-               [style.left.px]="b.left + b.width" [style.height.px]="b.height" style="right:0"></div>
-          <div class="focus-ring" aria-hidden="true" [style.top.px]="b.top"
-               [style.left.px]="b.left" [style.width.px]="b.width" [style.height.px]="b.height"></div>
-          <section class="spotlight-message" role="status" aria-live="polite" [class.above]="b.above"
-                   [style.top.px]="b.tooltipTop" [style.left.px]="b.tooltipLeft">
-            <div class="heading">
-              <span>FINFLOW · GUÍA PRÁCTICA</span>
-              <button type="button" (click)="walkthrough.finish()" aria-label="Salir de la guía">✕</button>
-            </div>
-            <p class="step-count">PASO {{ walkthrough.step() + 1 }} DE 7</p>
-            <h2>{{ current().title }}</h2>
-            <p class="description">{{ current().description }}</p>
-            @if (walkthrough.step() === 5) {
-              <button class="accept-date" type="button" (click)="walkthrough.advance(5)">
-                La fecha está bien
-              </button>
-            }
-            <button class="exit" type="button" (click)="walkthrough.finish()">Omitir tutorial</button>
-          </section>
-        </div>
-      }
-    }
-  `,
-  styles: [`
-    :host { display:contents }
-    .spotlight-layer { position:fixed; inset:0; z-index:3600; pointer-events:none }
-    .shade { position:fixed; background:rgba(4,13,31,.75); pointer-events:none }
-    .focus-ring { position:fixed; border:3px solid #e5b967; border-radius:12px; box-sizing:border-box;
-      box-shadow:0 0 0 2px #fff9,0 0 28px #e5b967aa; pointer-events:none; animation:tour-glow 1.8s ease-in-out infinite }
-    @keyframes tour-glow {
-      50% { box-shadow:0 0 0 4px #fff8,0 0 36px #e5b967dd }
-    }
-    .spotlight-message { box-sizing:border-box; position:fixed; width:min(340px,calc(100vw - 24px));
-      background:#132b49; color:#fff; border:1px solid #b79459; border-radius:16px; padding:16px 17px;
-      box-shadow:0 18px 50px #0008; pointer-events:auto; max-height:44dvh; overflow:auto }
-    .heading { display:flex; justify-content:space-between; align-items:center; gap:12px;
-      color:#edcb86; font-size:10px; letter-spacing:.11em; font-weight:800 }
-    .heading button { background:transparent; color:#fff; border:0; font-size:18px;
-      min-width:28px; min-height:28px; cursor:pointer }
-    .step-count { margin:11px 0 6px; color:#e0b773; font-weight:700; font-size:11px; letter-spacing:.08em }
-    h2 { font-size:18px; margin:0 0 9px; line-height:1.3; color:#fff }
-    .description { font-size:13px; line-height:1.55; margin:0; color:#e6eaf1 }
-    .exit { border:0; background:transparent; color:#d6e4ff; text-decoration:underline;
-      margin-top:14px; padding:5px 0; cursor:pointer; font-size:12px }
-    .accept-date { display:block; border:0; border-radius:9px; background:#dfbd7e; color:#152841;
-      font-weight:800; cursor:pointer; padding:10px 12px; margin-top:12px; width:100% }
-    :is(button):focus-visible { outline:3px solid #e5b967; outline-offset:3px }
-    @media(max-width:540px) { .spotlight-message { padding:13px 15px; max-height:38dvh } h2 { font-size:16px } }
-    @media(prefers-reduced-motion:reduce) { .focus-ring { animation:none } }
-  `]
+  templateUrl: './transaction-spotlight.component.html',
+  styleUrls: ['./transaction-spotlight.component.scss']
 })
 export class TransactionSpotlightComponent {
   readonly walkthrough = inject(TransactionWalkthroughService);
