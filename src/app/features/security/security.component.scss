@@ -39,3 +39,12 @@
 .security-danger-zone .security-delete:hover:not(:disabled){background:rgba(181,77,86,.09)}
 .security-danger-zone :is(input,button):focus-visible{outline:2px solid #c39a61;outline-offset:2px}
 @media(max-width:600px){.security-danger-zone .security-delete{width:100%;align-self:stretch}}
+
+.security-profile { margin-top:1.2rem; scroll-margin-top:1.25rem; }
+.profile-identification { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; margin:1.2rem 0; }
+.profile-identification > div { display:flex; flex-direction:column; gap:.3rem; padding:1rem; border:1px solid var(--ff-border); border-radius:12px; background:var(--bg-secondary); min-width:0; }
+.profile-identification small { color:var(--text-secondary); }
+.profile-identification strong { overflow-wrap:anywhere; font-size:.95rem; }
+.security-profile h3 { margin:.6rem 0; font-size:1.04rem; }
+.profile-password-link { display:inline-flex; margin-top:1.1rem; color:var(--ff-text); text-underline-offset:3px; }
+@media(max-width:600px) { .profile-identification { grid-template-columns:minmax(0,1fr); } }

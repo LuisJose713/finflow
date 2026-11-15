@@ -7,6 +7,34 @@
   </header>
   <p *ngIf="error()" class="security-message error" role="alert">{{error()}}</p>
   <p *ngIf="message()" class="security-message success" role="status">{{message()}}</p>
+  <section class="security-panel security-profile" id="profile" aria-labelledby="profile-title">
+    <span class="security-kicker">TU CUENTA FINFLOW</span>
+    <h2 id="profile-title">Mi perfil</h2>
+    <p>Gestiona tu correo y contraseña. Los cambios de credenciales invalidan las sesiones anteriores.</p>
+    <div class="profile-identification">
+      <div><small>Nombre</small><strong>{{auth.currentUser()?.name}}</strong></div>
+      <div><small>Correo actual</small><strong>{{auth.currentUser()?.email}}</strong></div>
+    </div>
+    <form (ngSubmit)="changeEmail()" novalidate>
+      <h3>Cambiar correo electrónico</h3>
+      <label for="profile-new-email">Nuevo correo</label>
+      <input id="profile-new-email" name="newEmail" type="email" [(ngModel)]="newEmail"
+        maxlength="254" autocomplete="email" required />
+      <label for="profile-confirm-email">Confirma el correo</label>
+      <input id="profile-confirm-email" name="confirmEmail" type="email" [(ngModel)]="confirmEmail"
+        maxlength="254" autocomplete="off" required />
+      <label for="profile-current-password">Contraseña actual</label>
+      <div class="field-password">
+        <input id="profile-current-password" name="emailPassword" [(ngModel)]="emailPassword"
+          [type]="revealEmailPassword()?'text':'password'" autocomplete="current-password" required />
+        <button type="button" (click)="revealEmailPassword.set(!revealEmailPassword())"
+          [attr.aria-label]="revealEmailPassword()?'Ocultar contraseña':'Mostrar contraseña'">{{revealEmailPassword()?'Ocultar':'Mostrar'}}</button>
+      </div>
+      <small>Se cerrarán las sesiones activas. Todavía no hay verificación del correo nuevo mediante enlace.</small>
+      <button class="security-primary" type="submit" [disabled]="busy() || !newEmail || !confirmEmail || !emailPassword">Actualizar correo</button>
+    </form>
+    <a class="profile-password-link" href="#change-password-title">Cambiar contraseña</a>
+  </section>
   <div class="security-grid">
    <section class="security-panel" aria-labelledby="change-password-title">
     <span class="security-kicker">ACCESO PERSONAL</span><h2 id="change-password-title">Cambiar contraseña</h2>

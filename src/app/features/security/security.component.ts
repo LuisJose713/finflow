@@ -32,7 +32,47 @@ export class SecurityComponent {
  deletePassword='';
  deletePhrase='';
  readonly showDeletePassword=signal(false);
+ emailPassword='';
+ newEmail='';
+ confirmEmail='';
+ readonly revealEmailPassword=signal(false);
  readonly api=environment.apiUrl+'/auth';
+
+ changeEmail(): void {
+   if (this.busy()) return;
+   this.error.set(''); this.message.set('');
+   const desired = this.newEmail.trim().toLowerCase();
+   const confirmed = this.confirmEmail.trim().toLowerCase();
+   if (desired.length > 254 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(desired) || desired !== confirmed) {
+     this.error.set('Introduce y confirma un correo válido.');
+     return;
+   }
+   if (!this.emailPassword || new TextEncoder().encode(this.emailPassword).length > 72) {
+     this.error.set('Confirma tu contraseña actual (máximo 72 bytes).');
+     return;
+   }
+   if (desired === this.auth.currentUser()?.email?.toLowerCase()) {
+     this.error.set('El nuevo correo debe ser distinto al actual.');
+     return;
+   }
+   this.busy.set(true);
+   this.http.post<{status:string; logoutRequired:boolean}>(this.api + '/change-email', {
+     currentPassword:this.emailPassword, newEmail:desired, confirmEmail:confirmed
+   }).subscribe({
+     next:()=> {
+       this.busy.set(false);
+       this.emailPassword=''; this.newEmail=''; this.confirmEmail='';
+       this.auth.logout();
+     },
+     error:(err:HttpErrorResponse)=> {
+       this.busy.set(false);
+       this.error.set(err.status===403?'Contraseña actual incorrecta.'
+         :err.status===409?'Ese correo ya está registrado.'
+         :err.status===400?'Revisa el correo, su confirmación y la contraseña.'
+         :'No fue posible actualizar el correo.');
+     }
+   });
+ }
 
  onGoogleLinked(): void {
    this.error.set('');
