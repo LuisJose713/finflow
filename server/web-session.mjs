@@ -62,8 +62,8 @@ export function createSessionHandler({ fetchImpl = globalThis.fetch, timeoutMs =
     let access = stored.get(ACCESS_COOKIE);
     const refresh = stored.get(REFRESH_COOKIE);
     let responseCookies = [];
-    const publicAuth = ['auth/login', 'auth/register'].includes(path);
-    const publicRead = method === 'GET' && ['privacy/policy', 'billing/catalog', 'billing/quote'].includes(path);
+    const publicAuth = ['auth/login', 'auth/register', 'auth/google/login'].includes(path);
+    const publicRead = method === 'GET' && ['privacy/policy', 'billing/catalog', 'billing/quote', 'auth/google/config'].includes(path);
     const upstreamCall = (target, options = {}, duration = timeoutMs) => fetchImpl(UPSTREAM + target, {
       ...options, redirect: 'manual', signal: AbortSignal.timeout(duration),
     });

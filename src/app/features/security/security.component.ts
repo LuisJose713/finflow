@@ -8,9 +8,10 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 import { DailyRemindersService } from '../../core/services/daily-reminders.service';
 import { AuthService } from '../../core/services/auth.service';
 import { environment } from '@environments/environment';
+import { GoogleSignInComponent } from '../../shared/components/google-sign-in/google-sign-in.component';
 
 @Component({
- selector:'app-security',standalone:true,imports: [DismissibleCardDirective, CommonModule,FormsModule,NavbarComponent,RouterLink],
+ selector:'app-security',standalone:true,imports: [DismissibleCardDirective, CommonModule,FormsModule,NavbarComponent,RouterLink,GoogleSignInComponent],
  templateUrl:'./security.component.html',styleUrl:'./security.component.scss'
 })
 export class SecurityComponent {
@@ -32,6 +33,12 @@ export class SecurityComponent {
  deletePhrase='';
  readonly showDeletePassword=signal(false);
  readonly api=environment.apiUrl+'/auth';
+
+ onGoogleLinked(): void {
+   this.error.set('');
+   this.message.set('Cuenta de Google vinculada: podrás entrar con ella sin alterar tus finanzas.');
+ }
+ onGoogleError(message: string): void { this.error.set(message); }
 
  async activatePush() {
    if (this.pushBusy()) return;

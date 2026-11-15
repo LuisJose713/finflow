@@ -7,11 +7,12 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { GoogleSignInComponent } from '../../../shared/components/google-sign-in/google-sign-in.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, GoogleSignInComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
@@ -32,6 +33,11 @@ export class LoginComponent {
 
   get email() { return this.form.get('email'); }
   get password() { return this.form.get('password'); }
+
+  onGoogleLogin(): void {
+    this.toast.success('¡Bienvenido a FinFlow!');
+    void this.router.navigate(['/dashboard']);
+  }
 
   onSubmit() {
     if (this.form.invalid) {

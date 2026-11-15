@@ -93,6 +93,13 @@ export class AuthService {
     );
   }
 
+  /** The backend issues the normal FinFlow session only after verifying the Google ID token. */
+  googleLogin(idToken: string) {
+    return this.http.post<AuthResponse>(this.apiUrl + '/google/login', { idToken }).pipe(
+      tap(response => this.saveSession(response)),
+    );
+  }
+
   register(data: RegisterRequest) {
     return this.http.post<AuthResponse>(this.apiUrl + '/register', data).pipe(
       tap(res => this.saveSession(res)),

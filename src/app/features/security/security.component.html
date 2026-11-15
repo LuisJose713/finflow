@@ -25,6 +25,14 @@
      <button type="submit" class="security-primary" [disabled]="busy()">{{busy()?'Guardando…':'Actualizar contraseña'}}</button>
     </form>
    </section>
+   <section class="security-panel" aria-labelledby="google-link-title">
+    <span class="security-kicker">CUENTA VINCULADA</span>
+    <h2 id="google-link-title">Continuar con Google</h2>
+    <p>Usa tu cuenta actual de FinFlow para vincular Google. El correo de ambas cuentas debe coincidir.
+       Tus movimientos, metas y billeteras permanecen intactos.</p>
+    <app-google-sign-in mode="link"
+       (completed)="onGoogleLinked()" (errorOccurred)="onGoogleError($event)" />
+   </section>
    <section class="security-panel" aria-labelledby="session-control-title">
     <span class="security-kicker">TUS DISPOSITIVOS</span><h2 id="session-control-title">Cerrar todas las sesiones</h2>
     <p>¿Perdiste un celular o iniciaste sesión en un equipo compartido? Invalida los tokens anteriores con tu contraseña.</p>

@@ -60,6 +60,7 @@
           </button>
         </form>
 
+        <app-google-sign-in mode="login" (completed)="onGoogleLogin()"/>
         <p class="auth-footer">
           ¿No tienes cuenta?
           <a routerLink="/register">Regístrate</a>
