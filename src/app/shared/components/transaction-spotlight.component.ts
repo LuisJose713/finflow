@@ -52,13 +52,44 @@ export class TransactionSpotlightComponent {
   private pending: ReturnType<typeof setTimeout> | undefined;
   private readonly refresh = () => this.locate(false);
 
+  // The tutorial is a focused interaction, not a decorative overlay:
+  // keyboard users must not reach the sidebar or unrelated form controls.
+  private readonly guardKeyboard = (event: KeyboardEvent) => {
+    if (this.activeStep() < 0 || this.isBlocked()) return;
+    if (event.key === 'Escape' || (event.altKey && event.key === 'ArrowLeft')) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+  };
+
+  private readonly guardFocus = (event: FocusEvent) => {
+    if (this.activeStep() < 0 || this.isBlocked()) return;
+    const focused = event.target;
+    if (!(focused instanceof HTMLElement)) return;
+    if (focused.closest('.spotlight-message')) return;
+    const selector = this.isTransaction()
+      ? '[data-finflow-tour="' + this.selectors[this.walkthrough.step()] + '"]'
+      : this.pageGuide.step()?.selector;
+    if (selector && focused.closest(selector)) return;
+    const highlighted = selector ? document.querySelector<HTMLElement>(selector) : null;
+    const focusableSelector = 'button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), a[href], [tabindex]:not([tabindex="-1"])';
+    const preferred = highlighted?.matches(focusableSelector)
+      ? highlighted : highlighted?.querySelector<HTMLElement>(focusableSelector);
+    const fallback = document.querySelector<HTMLElement>('.spotlight-message .exit');
+    (preferred && preferred.getClientRects().length ? preferred : fallback)?.focus({ preventScroll: true });
+  };
+
   constructor() {
     if (typeof window !== 'undefined') {
       window.addEventListener('resize', this.refresh);
       document.addEventListener('scroll', this.refresh, true);
+      document.addEventListener('keydown', this.guardKeyboard, true);
+      document.addEventListener('focusin', this.guardFocus, true);
       this.destroyRef.onDestroy(() => {
         window.removeEventListener('resize', this.refresh);
         document.removeEventListener('scroll', this.refresh, true);
+        document.removeEventListener('keydown', this.guardKeyboard, true);
+        document.removeEventListener('focusin', this.guardFocus, true);
         clearTimeout(this.pending);
       });
     }
@@ -74,11 +105,6 @@ export class TransactionSpotlightComponent {
       this.bounds.set(null);
       this.pending = setTimeout(() => this.locate(true), 0);
     });
-  }
-
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    if (this.activeStep() >= 0) this.finish();
   }
 
   @HostListener('document:click', ['$event'])
