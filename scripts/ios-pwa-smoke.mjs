@@ -45,10 +45,20 @@ try {
     // Synthetic touch events exercise the edge-swipe contract without writing data.
     const swipe = async (x0, y0, x1, y1) => page.evaluate(([x0, y0, x1, y1]) => {
       const target = document.querySelector('.main-content') || document.body;
-      const start = new Touch({ identifier: 1, target, clientX: x0, clientY: y0 });
-      const end = new Touch({ identifier: 1, target, clientX: x1, clientY: y1 });
-      target.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, touches: [start], changedTouches: [start] }));
-      target.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: [end] }));
+      // WebKit's headless context may reject the Touch constructor. Use
+      // standard bubbling events with the TouchEvent properties under test.
+      const start = { identifier: 1, target, clientX: x0, clientY: y0 };
+      const end = { identifier: 1, target, clientX: x1, clientY: y1 };
+      const dispatch = (type, touches, changedTouches) => {
+        const event = new Event(type, { bubbles: true, cancelable: true });
+        Object.defineProperties(event, {
+          touches: { value: touches },
+          changedTouches: { value: changedTouches },
+        });
+        target.dispatchEvent(event);
+      };
+      dispatch('touchstart', [start], [start]);
+      dispatch('touchend', [], [end]);
     }, [x0, y0, x1, y1]);
     const sidebar = page.locator('#finflow-sidebar');
     await swipe(8, 240, 155, 243);
@@ -61,8 +71,9 @@ try {
     await Promise.all([page.waitForResponse(r => r.url().includes('/preferences/ui/categories.intro') && r.request().method() === 'PUT'), categories.getByRole('button', { name: 'Ocultar presentación', exact: true }).click()]);
     await categories.waitFor({ state: 'hidden' });
     await page.reload(); await categories.waitFor({ state: 'hidden' });
-    await page.getByRole('button', { name: 'Mostrar presentación', exact: true }).click();
-    await categories.waitFor({ state: 'visible' });
+    // A hidden presentation does not render a floating reopen button.
+    // Restoring it is handled by the user's account-level preferences.
+    assert.equal(await page.getByRole('button', { name: 'Mostrar presentación', exact: true }).count(), 0);
     await page.goto(base + '/advisor');
     const advisor = page.locator('.chat-layout'); await advisor.waitFor();
     await page.getByRole('heading', { name: '¿En qué puedo ayudarte?' }).waitFor();
