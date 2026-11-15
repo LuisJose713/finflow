@@ -1,9 +1,11 @@
 import { DismissibleCardDirective } from '../../../shared/directives/dismissible-card.directive';
-import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { GoalService } from '../../../core/services/goal.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Goal } from '../../../core/models';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { QuickCreateService } from '../../../core/services/quick-create.service';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { ToastContainerComponent } from '../../../shared/components/toast-container/toast-container.component';
 import { AppCurrencyPipe } from '../../../shared/pipes/currency.pipe';
@@ -29,6 +31,8 @@ import { GoalHistoryComponent } from '../goal-history/goal-history.component';
   styleUrls: ['./goals-list.component.scss'],
 })
 export class GoalsListComponent implements OnInit {
+  private readonly quickCreate = inject(QuickCreateService);
+  private readonly destroyRef = inject(DestroyRef);
   private goalService = inject(GoalService);
   private toast       = inject(ToastService);
 
@@ -40,7 +44,12 @@ export class GoalsListComponent implements OnInit {
   @ViewChild('goalHistory') goalHistory!: GoalHistoryComponent;
 
 
-  ngOnInit() { this.load(); }
+  ngOnInit() {
+    this.load();
+    this.quickCreate.requested$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(route => {
+      if (route === '/goals') this.goalForm.open();
+    });
+  }
 
   load() {
     this.loading.set(true);
