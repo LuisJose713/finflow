@@ -1,5 +1,6 @@
 import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
-import { Component, inject, OnInit, signal, computed, effect, ViewChild } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal, computed, effect, untracked, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransactionService } from '@core/services/transaction.service';
@@ -29,6 +30,8 @@ export class TransactionsComponent implements OnInit {
   private categoryService = inject(CategoryService);
   private toast           = inject(ToastService);
   private refresh         = inject(DashboardRefreshService);
+  private readonly destroyRef = inject(DestroyRef);
+  private activeLoad?: Subscription;
 
   // Datos crudos del backend (sin filtro de descripción)
   allTransactions = signal<Transaction[]>([]);
@@ -70,8 +73,11 @@ export class TransactionsComponent implements OnInit {
     // Keep the history synchronized without requiring a manual reload.
     effect(() => {
       this.refresh.version();
-      this.load();
+      // A data refresh must not subscribe to the active filter signals.
+      // Filter changes already call load() explicitly in their handlers.
+      untracked(() => this.load());
     }, { allowSignalWrites: true });
+    this.destroyRef.onDestroy(() => this.activeLoad?.unsubscribe());
   }
 
   ngOnInit() {
@@ -93,8 +99,11 @@ export class TransactionsComponent implements OnInit {
 
   // Solo llama al backend con filtros de tipo/mes/año/categoría
   load() {
+    // Cancel the older request when users change filters quickly. Otherwise
+    // an earlier response can overwrite the last selected category's results.
+    this.activeLoad?.unsubscribe();
     this.loading.set(true);
-    this.txService.getAll(
+    this.activeLoad = this.txService.getAll(
       this.filterType()       || undefined,
       this.filterMonth()      ?? undefined,
       this.filterYear()       ?? undefined,
