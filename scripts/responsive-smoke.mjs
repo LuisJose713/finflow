@@ -348,6 +348,30 @@ for (const width of widths) {
       await page.getByRole('button', { name: 'Nueva transacción', exact: true }).click();
     });
 
+    // Test the real hand-guided tutorial, not just its explanatory dialog.
+    if ([375, 1024].includes(width)) {
+      await page.getByRole('button', { name: 'Abrir guía de FinFlow' }).click();
+      await page.getByRole('button', { name: /Guíame para crear un movimiento/ }).click();
+      await page.getByRole('heading', { name: 'Pulsa Nueva transacción' }).waitFor({ state: 'visible' });
+      const tourTrigger = page.locator('[data-finflow-tour="new"]');
+      const ring = await page.locator('.focus-ring').boundingBox();
+      const trigger = await tourTrigger.boundingBox();
+      assert(Boolean(ring && trigger &&
+        Math.abs(ring.x - trigger.x) <= 12 && Math.abs(ring.y - trigger.y) <= 12),
+        `${width}px guide: spotlight must point to the real add-transaction button`);
+      await tourTrigger.click();
+      await page.getByRole('heading', { name: 'Selecciona Gasto o Ingreso' }).waitFor({ state: 'visible' });
+      await page.locator('[data-finflow-tour="type"] .type-btn.expense').click();
+      await page.getByRole('heading', { name: 'Escribe el título' }).waitFor({ state: 'visible' });
+      await page.locator('[data-finflow-tour="title"]').fill('Almuerzo QA');
+      await page.locator('[data-finflow-tour="title"]').press('Tab');
+      await page.getByRole('heading', { name: 'Introduce el monto' }).waitFor({ state: 'visible' });
+      await page.getByRole('button', { name: 'Omitir tutorial' }).click();
+      await page.locator('.modal .btn-close').click();
+      assert(await page.locator('.spotlight-layer').count() === 0,
+        `${width}px guide: tutorial must release overlay when dismissed`);
+    }
+
     await page.goto(base + '/goals', { waitUntil: 'domcontentloaded' });
     await page.locator('.goal-card .goal-actions').first().waitFor({ state: 'visible' });
     const iconActions = await page.locator('.goal-card .goal-actions .btn-icon').first().evaluate(button => ({
