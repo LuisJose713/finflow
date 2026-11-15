@@ -1,3 +1,4 @@
+import { DashboardRefreshService } from './core/services/dashboard-refresh.service';
 import { SelectReadabilityService } from './core/services/select-readability.service';
 import { DailyRemindersService } from './core/services/daily-reminders.service';
 import { Component, ElementRef, HostListener, ViewChild, computed, effect, inject, signal } from '@angular/core';
@@ -19,6 +20,7 @@ import { PrivacyPolicyComponent } from './shared/components/privacy-policy.compo
 })
 export class AppComponent {
   private readonly selectReadability = inject(SelectReadabilityService);
+  private readonly financeSync = inject(DashboardRefreshService);
   readonly auth = inject(AuthService);
   private readonly privacy = inject(PrivacyService);
   private readonly reminders = inject(DailyRemindersService);
@@ -114,6 +116,15 @@ export class AppComponent {
 
   constructor() {
     this.auth.ensureSession().subscribe();
+    effect(onCleanup => {
+      const user = this.auth.currentUser();
+      if (!this.auth.isAuthenticated() || !user?.id) {
+        this.financeSync.stop();
+        return;
+      }
+      this.financeSync.start();
+      onCleanup(() => this.financeSync.stop());
+    });
     effect(() => {
       const user = this.auth.currentUser();
       this.reminders.start(this.auth.isAuthenticated() && user?.email ? String(user.email).toLowerCase() : null);

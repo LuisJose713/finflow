@@ -1,33 +1,39 @@
-import { Injectable, effect, inject, signal } from '@angular/core';
-import { AuthService } from './auth.service';
+import { Injectable, signal } from '@angular/core';
 
-/** Visible, authenticated pages re-query the API without reloading the browser. */
+/**
+ * Shared read-only refresh clock. The root component owns its lifecycle so
+ * isolated feature tests do not need an authenticated HTTP session.
+ */
 @Injectable({ providedIn: 'root' })
 export class DashboardRefreshService {
-  private auth = inject(AuthService);
   readonly version = signal(0);
+  private interval?: ReturnType<typeof setInterval>;
   private lastAutomatic = 0;
-  constructor() {
-    effect(onCleanup => {
-      const account = this.auth.isAuthenticated() && this.auth.currentUser()?.id;
-      if (!account || typeof window === 'undefined') return;
-      this.lastAutomatic = Date.now();
-      const pulse = () => {
-        if (document.visibilityState !== 'visible') return;
-        const now = Date.now();
-        if (now - this.lastAutomatic < 10_000) return;
-        this.lastAutomatic = now;
-        this.trigger();
-      };
-      const id = window.setInterval(pulse, 12_000);
-      document.addEventListener('visibilitychange', pulse);
-      window.addEventListener('focus', pulse);
-      onCleanup(() => {
-        window.clearInterval(id);
-        document.removeEventListener('visibilitychange', pulse);
-        window.removeEventListener('focus', pulse);
-      });
-    });
+
+  private readonly onVisibility = () => {
+    if (document.visibilityState !== 'visible') return;
+    const now = Date.now();
+    if (now - this.lastAutomatic < 10_000) return;
+    this.lastAutomatic = now;
+    this.trigger();
+  };
+
+  start(): void {
+    if (this.interval || typeof document === 'undefined') return;
+    this.lastAutomatic = Date.now();
+    this.interval = setInterval(this.onVisibility, 12_000);
+    document.addEventListener('visibilitychange', this.onVisibility);
+    window.addEventListener('focus', this.onVisibility);
   }
-  trigger() { this.version.update(v => v + 1); }
+
+  stop(): void {
+    if (this.interval) clearInterval(this.interval);
+    this.interval = undefined;
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', this.onVisibility);
+      window.removeEventListener('focus', this.onVisibility);
+    }
+  }
+
+  trigger(): void { this.version.update(v => v + 1); }
 }
