@@ -1,4 +1,4 @@
-@if (walkthrough.step() >= 0 && !isBlocked()) {
+@if (activeStep() >= 0 && !isBlocked()) {
       @if (bounds(); as b) {
         <div class="spotlight-layer" aria-label="Tutorial guiado de FinFlow">
           <div class="shade" aria-hidden="true" style="top:0;left:0;right:0"
@@ -15,17 +15,22 @@
                    [style.top.px]="b.tooltipTop" [style.left.px]="b.tooltipLeft">
             <div class="heading">
               <span>FINFLOW · GUÍA PRÁCTICA</span>
-              <button type="button" (click)="walkthrough.finish()" aria-label="Salir de la guía">✕</button>
+              <button type="button" (click)="finish()" aria-label="Salir de la guía">✕</button>
             </div>
-            <p class="step-count">PASO {{ walkthrough.step() + 1 }} DE 7</p>
+            <p class="step-count">PASO {{ activeStep() + 1 }} DE {{ totalSteps() }}</p>
             <h2>{{ current().title }}</h2>
             <p class="description">{{ current().description }}</p>
-            @if (walkthrough.step() === 5) {
+            @if (isTransaction() && walkthrough.step() === 5) {
               <button class="accept-date" type="button" (click)="walkthrough.advance(5)">
                 La fecha está bien
               </button>
             }
-            <button class="exit" type="button" (click)="walkthrough.finish()">Omitir tutorial</button>
+            @if (canAdvanceManually()) {
+              <button class="accept-date" type="button" (click)="nextManual()">
+                {{ isLastPageStep() ? 'Finalizar recorrido' : 'Siguiente paso' }}
+              </button>
+            }
+            <button class="exit" type="button" (click)="finish()">Omitir tutorial</button>
           </section>
         </div>
       }
