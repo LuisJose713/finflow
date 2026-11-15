@@ -78,21 +78,49 @@ export class TransactionSpotlightComponent {
       else this.bounds.set(null);
       return;
     }
+    // Keep the highlighted action in view, including inside scrollable dialogs.
     let rect = target.getBoundingClientRect();
-    if (allowScroll && (rect.top < 12 || rect.bottom > window.innerHeight - 12)) {
-      target.scrollIntoView({ behavior: 'auto', block: 'center' });
+    if (allowScroll && (rect.top < 190 || rect.bottom > window.innerHeight - 190)) {
+      target.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'nearest' });
       rect = target.getBoundingClientRect();
     }
-    const vw = window.innerWidth, vh = window.innerHeight, gap = 7;
+
+    // "Gasto / Ingreso" is a two-button choice. Highlight the buttons, not
+    // their layout wrapper (which includes padding and can bleed into Título).
+    if (step === 1) {
+      const choices = Array.from(target.querySelectorAll<HTMLElement>('.type-btn'))
+        .filter(button => button.getClientRects().length > 0)
+        .map(button => button.getBoundingClientRect());
+      if (choices.length) {
+        const x = Math.min(...choices.map(b => b.left));
+        const y = Math.min(...choices.map(b => b.top));
+        const right = Math.max(...choices.map(b => b.right));
+        const bottom = Math.max(...choices.map(b => b.bottom));
+        rect = new DOMRect(x, y, right - x, bottom - y);
+      }
+    }
+
+    const vw = window.innerWidth, vh = window.innerHeight, gap = 4;
     const left = Math.max(0, rect.left - gap), top = Math.max(0, rect.top - gap);
     const right = Math.min(vw, rect.right + gap);
     const bottom = Math.min(vh, rect.bottom + gap);
-    const tooltipWidth = Math.min(340, vw - 24), tooltipHeight = Math.min(200, vh * .4);
-    const above = vh - bottom < tooltipHeight + 14 && top > tooltipHeight + 14;
-    const tooltipTop = above ? Math.max(12, top - tooltipHeight - 12)
-      : Math.min(vh - tooltipHeight - 12, bottom + 12);
+
+    // Prefer showing the instruction ABOVE the highlighted field; that leaves
+    // the next input visible for the very next interaction.
+    const tooltipWidth = Math.min(328, vw - 24);
+    const tooltipHeight = Math.min(198, vh * 0.38);
+    const spaceAbove = top - 12;
+    const spaceBelow = vh - bottom - 12;
+    const above = spaceAbove >= tooltipHeight + 12 ||
+      (spaceAbove > spaceBelow && spaceAbove >= 130);
+    let tooltipTop = above ? top - tooltipHeight - 12 : bottom + 12;
+
+    // Never place the explanation over the active target, even near screen edges.
+    tooltipTop = Math.max(10, Math.min(tooltipTop, vh - tooltipHeight - 10));
     const tooltipLeft = Math.max(12, Math.min(vw - tooltipWidth - 12, left));
-    this.bounds.set({ top, left, width: Math.max(0, right - left), height: Math.max(0, bottom - top),
-      tooltipTop: Math.max(12, tooltipTop), tooltipLeft, above });
+    this.bounds.set({
+      top, left, width: Math.max(0, right - left), height: Math.max(0, bottom - top),
+      tooltipTop, tooltipLeft, above
+    });
   }
 }
