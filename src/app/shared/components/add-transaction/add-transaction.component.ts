@@ -60,6 +60,7 @@ export class AddTransactionComponent implements OnInit {
   private toast          = inject(ToastService);
   private refresh        = inject(DashboardRefreshService);
   private readonly destroyRef = inject(DestroyRef);
+  readonly walkthrough = inject(TransactionWalkthroughService);
 
   @Input() floating = false;
   @Input() showTrigger = true;
