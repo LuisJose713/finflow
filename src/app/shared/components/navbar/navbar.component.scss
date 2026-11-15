@@ -385,3 +385,41 @@
 .currency-control label{font-weight:700}
 .currency-control small{font-size:.68rem;line-height:1.4;overflow-wrap:anywhere}
 .currency-control a{color:inherit;text-decoration:underline}
+
+/* One contextual action per screen; keep forms owned by their features. */
+.quick-create-floating {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 120;
+  display: inline-flex;
+  align-items: center;
+  gap: .65rem;
+  max-width: calc(100vw - 2rem);
+  min-height: 56px;
+  padding: .75rem 1.3rem .75rem .8rem;
+  background: var(--ff-action-bg);
+  border: 1px solid rgba(215, 169, 77, .55);
+  border-radius: 999px;
+  color: var(--ff-action-fg);
+  box-shadow: 0 14px 35px rgba(5, 15, 32, .28);
+  font: 700 .875rem/1.25 'Inter', 'Segoe UI', sans-serif;
+  cursor: pointer;
+}
+.quick-create-floating:hover { background: var(--ff-action-hover); border-color: #f5d68c; }
+.quick-create-floating:focus-visible { outline: 3px solid #f5d68c; outline-offset: 3px; }
+.quick-create-icon {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(220, 194, 154, .18);
+  font-size: 1.65rem;
+  line-height: 1;
+}
+@media (max-width: 600px) {
+  .quick-create-floating { min-height: 54px; padding: .65rem 1rem; font-size: .8rem; }
+  .quick-create-icon { width: 30px; height: 30px; flex-basis: 30px; }
+}
