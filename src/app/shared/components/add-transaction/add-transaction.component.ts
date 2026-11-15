@@ -1,7 +1,4 @@
 import { CurrencyInputDirective } from '../../directives/currency-input.directive';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
-import { firstValueFrom } from 'rxjs';
 import { Component, inject, signal, output, OnInit, Input, HostListener, DestroyRef } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -14,30 +11,6 @@ import { DashboardRefreshService } from '../../../core/services/dashboard-refres
 import { TransactionWalkthroughService } from '../../../core/services/transaction-walkthrough.service';
 import { CreateTransactionRequest, TransactionType, Category, Transaction } from '../../../core/models';
 
-interface VoiceDraft {
-  title: string;
-  amount: number | null;
-  type: 'income' | 'expense' | null;
-  currency: string;
-  requiresConversion: boolean;
-  warning: string;
-}
-
-interface NativeSpeechRecognition {
-  lang: string;
-  interimResults: boolean;
-  maxAlternatives: number;
-  onresult: ((event: { results: ArrayLike<ArrayLike<{transcript: string}>> }) => void) | null;
-  onerror: (() => void) | null;
-  onend: (() => void) | null;
-  start(): void;
-  stop(): void;
-}
-type SpeechWindow = Window & {
-  SpeechRecognition?: new () => NativeSpeechRecognition;
-  webkitSpeechRecognition?: new () => NativeSpeechRecognition;
-};
-
 @Component({
   selector: 'app-add-transaction',
   standalone: true,
@@ -46,13 +19,6 @@ type SpeechWindow = Window & {
   styleUrls: ['./add-transaction.component.scss'],
 })
 export class AddTransactionComponent implements OnInit {
-  private readonly http = inject(HttpClient);
-  private speech: NativeSpeechRecognition | null = null;
-  readonly voiceListening = signal(false);
-  readonly voiceWorking = signal(false);
-  readonly voiceText = signal('');
-  readonly voiceNotice = signal('');
-  private voiceOperation = 0;
   private fb             = inject(FormBuilder);
   private txService      = inject(TransactionService);
   private categoryService= inject(CategoryService);
@@ -145,13 +111,6 @@ export class AddTransactionComponent implements OnInit {
   close() {
     if (this.loading()) return;
     if (this.walkthrough.step() >= 1) this.walkthrough.finish();
-    this.speech?.stop();
-    this.speech = null;
-    this.voiceOperation++;
-    this.voiceListening.set(false);
-    this.voiceWorking.set(false);
-    this.voiceText.set('');
-    this.voiceNotice.set('');
     this.isOpen.set(false);
     this.editing.set(null);
     this.form.reset({
@@ -159,69 +118,6 @@ export class AddTransactionComponent implements OnInit {
       date: this.today(),
       currency: 'COP', status: 'completed',
     });
-  }
-
-  startVoiceCapture(): void {
-    if (this.voiceListening() || this.voiceWorking() || !this.isOpen()) return;
-    const win = window as SpeechWindow;
-    const Recognition = win.SpeechRecognition ?? win.webkitSpeechRecognition;
-    if (!Recognition) {
-      this.voiceNotice.set('El dictado no está disponible en este navegador. Puedes escribir la frase abajo.');
-      return;
-    }
-    try {
-      const recognition = new Recognition();
-      this.speech = recognition;
-      recognition.lang = 'es-CO';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-      recognition.onresult = event => {
-        const text = event.results[0]?.[0]?.transcript?.trim() ?? '';
-        this.voiceText.set(text);
-        if (text) void this.interpretVoiceDraft();
-      };
-      recognition.onerror = () => {
-        this.voiceNotice.set('No se reconoció la voz. Comprueba el permiso del micrófono o escribe tu frase.');
-        this.voiceListening.set(false);
-      };
-      recognition.onend = () => {
-        this.voiceListening.set(false);
-        this.speech = null;
-      };
-      recognition.start();
-      this.voiceListening.set(true);
-      this.voiceNotice.set('Escuchando… habla con claridad.');
-    } catch {
-      this.voiceListening.set(false);
-      this.voiceNotice.set('No se pudo activar el micrófono.');
-    }
-  }
-
-  async interpretVoiceDraft(): Promise<void> {
-    const text = this.voiceText().trim().slice(0, 300);
-    if (!text || this.voiceWorking() || !this.isOpen()) return;
-    const operation = ++this.voiceOperation;
-    this.voiceWorking.set(true);
-    try {
-      const draft = await firstValueFrom(this.http.post<VoiceDraft>(
-        environment.apiUrl + '/voice/draft', { text },
-      ));
-      if (operation !== this.voiceOperation || !this.isOpen()) return;
-      if (draft.type) this.form.patchValue({ type: draft.type });
-      this.form.patchValue({
-        description: draft.title.slice(0, 255),
-        // Foreign currencies require explicit conversion. Never store 20 USD as 20 COP.
-        amount: !draft.requiresConversion && Number.isFinite(draft.amount) ? draft.amount : null,
-        currency: 'COP',
-      });
-      this.voiceNotice.set(draft.warning);
-    } catch {
-      if (operation === this.voiceOperation) {
-        this.voiceNotice.set('No se pudo interpretar el dictado. Revisa la conexión o completa los campos manualmente.');
-      }
-    } finally {
-      if (operation === this.voiceOperation) this.voiceWorking.set(false);
-    }
   }
 
   onSubmit() {
