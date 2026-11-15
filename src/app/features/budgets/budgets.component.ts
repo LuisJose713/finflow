@@ -1,9 +1,11 @@
 import { AppCurrencyPipe } from '../../shared/pipes/currency.pipe';
 import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { QuickCreateService } from '../../core/services/quick-create.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { CurrencyInputDirective } from '../../shared/directives/currency-input.directive';
 import { CategoryService } from '../../core/services/category.service';
@@ -15,6 +17,8 @@ import { Category } from '../../core/models';
  templateUrl:'./budgets.component.html', styleUrl:'./budgets.component.scss'
 })
 export class BudgetsComponent implements OnInit {
+  private readonly quickCreate = inject(QuickCreateService);
+  private readonly destroyRef = inject(DestroyRef);
  private readonly api=inject(BudgetService);
  private readonly categoryApi=inject(CategoryService);
  readonly year=signal(new Date(new Date().toLocaleString('en-US',{timeZone:'America/Bogota'})).getFullYear());
@@ -34,7 +38,15 @@ export class BudgetsComponent implements OnInit {
  readonly totalLimit= computed(()=>this.budgets().reduce((sum,b)=>sum+Number(b.limitAmount),0));
  readonly totalSpent= computed(()=>this.budgets().reduce((sum,b)=>sum+Number(b.spent),0));
  readonly alerts= computed(()=>this.budgets().filter(b=>b.status!=='ok').length);
- ngOnInit(){this.refresh();}
+ ngOnInit() {
+   this.refresh();
+   this.quickCreate.requested$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(route => {
+     if (route !== '/budgets') return;
+     this.reset();
+     document.getElementById('budget-category')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+     (document.getElementById('budget-category') as HTMLSelectElement | null)?.focus({ preventScroll: true });
+   });
+ }
  refresh() {
    this.loading.set(true);this.error.set('');
    forkJoin({budgets:this.api.list(this.year(),this.month()),categories:this.categoryApi.getAll()}).subscribe({
