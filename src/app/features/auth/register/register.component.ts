@@ -140,8 +140,10 @@ export class RegisterComponent {
               ? 'No pudimos conectar con el servidor. Inténtalo nuevamente.'
               : error.status === 429
                 ? 'Demasiados intentos con Google. Espera un momento y vuelve a intentarlo.'
-                : error.status === 401 || error.status === 403
-                  ? 'Google no pudo verificar el acceso. Vuelve a seleccionar tu cuenta de Google.'
+                : error.status === 401
+                  ? 'El servidor rechazó la credencial de Google (HTTP 401). Comprueba que el acceso con Google esté configurado correctamente.'
+                  : error.status === 403
+                    ? 'El servidor bloqueó la solicitud de registro con Google (HTTP 403). Revisa la configuración de seguridad y el dominio autorizado.'
                   : error.status === 404
                     ? 'El registro con Google no está disponible en el servidor.'
                     : error.status >= 500
