@@ -81,7 +81,7 @@ try {
     await page.waitForFunction(() => !document.querySelector('#finflow-sidebar')?.classList.contains('open'));
     await page.evaluate(() => { delete navigator.standalone; });
     const categories = page.locator('.categories-heading'); await categories.waitFor();
-    await Promise.all([page.waitForResponse(r => r.url().includes('/preferences/ui/categories.intro') && r.request().method() === 'PUT'), categories.getByRole('button', { name: 'Ocultar presentación', exact: true }).click()]);
+    await Promise.all([page.waitForResponse(r => r.url().includes('/preferences/ui/categories.intro') && r.request().method() === 'PUT'), categories.getByRole('button', { name: 'Ocultar presentación', exact: true }).tap()]);
     await categories.waitFor({ state: 'hidden' });
     await page.reload(); await categories.waitFor({ state: 'hidden' });
     // A hidden presentation does not render a floating reopen button.

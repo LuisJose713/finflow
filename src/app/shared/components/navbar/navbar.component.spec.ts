@@ -137,6 +137,22 @@ describe('Mobile drawer interaction', () => {
     expect(component.mobileOpen()).toBeFalse();
   });
 
+  it('accepts a new intentional tap immediately after a completed swipe', () => {
+    installedIOS();
+    component.toggleMobile(); fixture.detectChanges();
+    touch('touchstart', [[1, 240, 250]], 0);
+    touch('touchmove', [[1, 100, 250]], 200);
+    touch('touchend', [[1, 100, 250]], 300);
+    expect(component.mobileOpen()).toBeFalse();
+    const button = fixture.nativeElement.querySelector('.mobile-menu-btn') as HTMLElement;
+    touch('touchstart', [[2, 40, 40]], 310, button);
+    touch('touchend', [[2, 40, 40]], 320, button);
+    const click = new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 });
+    button.dispatchEvent(click);
+    expect(click.defaultPrevented).toBeFalse();
+    expect(component.mobileOpen()).toBeTrue();
+  });
+
   it('restores the closed drawer when cancelled or interrupted by another finger', () => {
     touch('touchstart', [[1, 60, 250]], 0);
     touch('touchmove', [[1, 110, 251]], 20);

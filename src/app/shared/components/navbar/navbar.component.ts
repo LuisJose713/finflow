@@ -176,6 +176,8 @@ export class NavbarComponent implements AfterViewInit {
   onTouchStart(event: TouchEvent): void {
     this.cancelSwipe();
     if (typeof window === 'undefined' || window.innerWidth > 768 || event.touches.length !== 1) return;
+    // A fresh touch is a new action, not the compatibility click of the last drag.
+    this.suppressClickUntil = 0;
     const touch = event.touches[0];
     const target = event.target instanceof Element ? event.target : null;
     if (target?.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="slider"], [data-no-drawer-swipe], dialog, [aria-modal="true"], [role="dialog"]')) return;
