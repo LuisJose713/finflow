@@ -114,7 +114,7 @@ export class RegisterComponent {
 
   onGoogleCredential(idToken: string) {
     if (this.loading()) return;
-    if (!this.policy()?.ready || !this.form.controls.privacyAccepted.value || !this.privacyReviewed()) {
+    if (this.policy()?.ready && (!this.form.controls.privacyAccepted.value || !this.privacyReviewed())) {
       this.privacyError.set('Lee y confirma la política de tratamiento de datos antes de registrarte con Google.');
       this.openPrivacyModal();
       return;
@@ -123,8 +123,8 @@ export class RegisterComponent {
     this.errorMsg.set('');
     this.auth.googleRegister({
       idToken,
-      privacyAccepted: true,
-      privacyVersion: this.policy()!.version,
+      privacyAccepted: Boolean(this.policy()?.ready && this.form.controls.privacyAccepted.value),
+      privacyVersion: this.policy()?.ready ? this.policy()!.version : '',
       marketingConsent: Boolean(this.form.controls.marketingConsent.value),
     }).subscribe({
       next: result => this.finishRegistration(result.user.id),
