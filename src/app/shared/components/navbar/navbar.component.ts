@@ -65,6 +65,7 @@ export class NavbarComponent implements AfterViewInit {
   private readonly destroyRef = inject(DestroyRef);
   private drawerWidth = 320;
   private swipe: DrawerSwipe | null = null;
+  private edgeMenuTap = false;
   private suppressClickUntil = 0;
   private static readonly NAV_SCROLL_KEY = 'finflow.nav.scroll-position';
 
@@ -100,9 +101,10 @@ export class NavbarComponent implements AfterViewInit {
       if (event instanceof NavigationEnd) this.currentPath.set(event.urlAfterRedirects.split(/[?#]/)[0]);
     });
     if (typeof document === 'undefined') return;
-    // Only an accepted horizontal drag cancels the browser's default action.
-    // A non-passive listener is necessary on Safari and Chrome document touches.
+    // iOS must receive a cancellable touchstart before its edge history gesture begins.
+    // Other touches are claimed only once a horizontal drawer drag is accepted.
     this.zone.runOutsideAngular(() => {
+      const start = (event: TouchEvent) => this.zone.run(() => this.onTouchStart(event));
       const move = (event: TouchEvent) => this.onTouchMove(event);
       const click = (event: MouseEvent) => {
         if (event.detail > 0 && performance.now() < this.suppressClickUntil) {
@@ -110,9 +112,11 @@ export class NavbarComponent implements AfterViewInit {
           event.stopImmediatePropagation();
         }
       };
+      document.addEventListener('touchstart', start, { passive: false, capture: true });
       document.addEventListener('touchmove', move, { passive: false });
       document.addEventListener('click', click, true);
       this.destroyRef.onDestroy(() => {
+        document.removeEventListener('touchstart', start, true);
         document.removeEventListener('touchmove', move);
         document.removeEventListener('click', click, true);
       });
@@ -162,7 +166,13 @@ export class NavbarComponent implements AfterViewInit {
     this.closeMobile();
   }
 
-  @HostListener('document:touchstart', ['$event'])
+  private isInstalledIOS(): boolean {
+    const ios = /iPad|iPhone|iPod/.test(navigator.userAgent)
+      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    return ios && ((navigator as Navigator & { standalone?: boolean }).standalone === true
+      || window.matchMedia('(display-mode: standalone)').matches);
+  }
+
   onTouchStart(event: TouchEvent): void {
     this.cancelSwipe();
     if (typeof window === 'undefined' || window.innerWidth > 768 || event.touches.length !== 1) return;
@@ -171,7 +181,8 @@ export class NavbarComponent implements AfterViewInit {
     if (target?.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="slider"], [data-no-drawer-swipe], dialog, [aria-modal="true"], [role="dialog"]')) return;
     const open = this.mobileOpen();
     const fromMenuButton = !!target?.closest('.mobile-menu-btn');
-    if (!DrawerSwipe.canStart(touch.clientX, window.innerWidth, open, fromMenuButton)) return;
+    const captureBackEdge = this.isInstalledIOS();
+    if (!DrawerSwipe.canStart(touch.clientX, window.innerWidth, open, fromMenuButton, captureBackEdge)) return;
     if (!open) {
       if (document.querySelector('[aria-modal="true"], dialog[open]')) return;
       // The visible hamburger button is a valid drag handle as well as a tap target.
@@ -180,6 +191,13 @@ export class NavbarComponent implements AfterViewInit {
         if (/(auto|scroll)/.test(window.getComputedStyle(element).overflowX)
             && element.scrollWidth > element.clientWidth + 1) return;
       }
+    }
+    if (captureBackEdge && touch.clientX < DrawerSwipe.BACK_EDGE_WIDTH
+        && (fromMenuButton || !target?.closest('button, a'))) {
+      if (!event.cancelable) return;
+      event.preventDefault();
+      // Cancelling touchstart also suppresses the button's native click.
+      this.edgeMenuTap = fromMenuButton;
     }
     this.drawerWidth = this.sidebar?.nativeElement.getBoundingClientRect().width || Math.min(320, window.innerWidth - 16);
     this.swipe = new DrawerSwipe(touch.identifier, touch.clientX, touch.clientY, open, this.drawerWidth, event.timeStamp);
@@ -190,6 +208,7 @@ export class NavbarComponent implements AfterViewInit {
     if (!swipe) return;
     const touch = Array.from(event.touches).find(item => item.identifier === swipe.touchId);
     if (event.touches.length !== 1 || !touch) { this.zone.run(() => this.cancelSwipe()); return; }
+    if (Math.hypot(touch.clientX - swipe.startX, touch.clientY - swipe.startY) >= 10) this.edgeMenuTap = false;
     const offset = swipe.move(touch.clientX, touch.clientY, event.timeStamp);
     if (offset === null) return;
     if (!event.cancelable) { this.zone.run(() => this.cancelSwipe()); return; }
@@ -202,9 +221,12 @@ export class NavbarComponent implements AfterViewInit {
     const swipe = this.swipe;
     const touch = swipe && Array.from(event.changedTouches).find(item => item.identifier === swipe.touchId);
     if (!swipe || !touch || event.touches.length) { this.cancelSwipe(); return; }
-    const open = swipe.finish(event.timeStamp, touch.clientX, touch.clientY);
-    if (swipe.active) this.suppressClickUntil = performance.now() + 300;
+    const tappedMenuButton = this.edgeMenuTap && !swipe.active
+      && Math.hypot(touch.clientX - swipe.startX, touch.clientY - swipe.startY) < 10;
+    const open = tappedMenuButton ? !swipe.initiallyOpen : swipe.finish(event.timeStamp, touch.clientX, touch.clientY);
+    if (swipe.active || tappedMenuButton) this.suppressClickUntil = performance.now() + 300;
     this.swipe = null;
+    this.edgeMenuTap = false;
     this.mobileOpen.set(open);
     this.dragOffset.set(null);
   }
@@ -225,6 +247,7 @@ export class NavbarComponent implements AfterViewInit {
   cancelSwipe(): void {
     if (this.swipe?.active) this.suppressClickUntil = performance.now() + 300;
     this.swipe = null;
+    this.edgeMenuTap = false;
     this.dragOffset.set(null);
   }
 

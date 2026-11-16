@@ -11,6 +11,12 @@ describe('Mobile drawer interaction', () => {
   let component: NavbarComponent;
   let surface: HTMLElement;
   let originalWidth: number;
+  let originalStandalone: PropertyDescriptor | undefined;
+
+  function installedIOS(standalone = true): void {
+    spyOnProperty(navigator, 'userAgent', 'get').and.returnValue('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15');
+    Object.defineProperty(navigator, 'standalone', { configurable: true, value: standalone });
+  }
 
   function touch(type: string, points: number[][], time: number, target = surface): TouchEvent {
     const touches = points.map(([identifier, clientX, clientY]) => new Touch({ identifier, clientX, clientY, target }));
@@ -26,6 +32,7 @@ describe('Mobile drawer interaction', () => {
 
   beforeEach(async () => {
     originalWidth = window.innerWidth;
+    originalStandalone = Object.getOwnPropertyDescriptor(navigator, 'standalone');
     Object.defineProperty(window, 'innerWidth', { configurable: true, value: 375 });
     await TestBed.configureTestingModule({
       imports: [NavbarComponent],
@@ -49,6 +56,8 @@ describe('Mobile drawer interaction', () => {
   afterEach(() => {
     fixture.destroy(); surface.remove();
     Object.defineProperty(window, 'innerWidth', { configurable: true, value: originalWidth });
+    if (originalStandalone) Object.defineProperty(navigator, 'standalone', originalStandalone);
+    else delete (navigator as Navigator & { standalone?: boolean }).standalone;
   });
 
   it('tracks the finger before release and claims only the horizontal movement', () => {
@@ -69,6 +78,63 @@ describe('Mobile drawer interaction', () => {
     touch('touchend', [[1, 200, 305]], 50);
     expect(component.mobileOpen()).toBeFalse();
     expect(component.dragOffset()).toBeNull();
+  });
+
+  it('reserves the iOS PWA back edge on touchstart and opens the drawer without changing history', () => {
+    installedIOS();
+    const path = location.pathname;
+    const historyLength = history.length;
+    expect(touch('touchstart', [[1, 8, 250]], 0).defaultPrevented).toBeTrue();
+    expect(touch('touchmove', [[1, 110, 252]], 200).defaultPrevented).toBeTrue();
+    touch('touchend', [[1, 110, 252]], 300);
+    expect(component.mobileOpen()).toBeTrue();
+    expect(location.pathname).toBe(path);
+    expect(history.length).toBe(historyLength);
+  });
+
+  it('recognizes iOS standalone display mode when the legacy standalone flag is absent', () => {
+    installedIOS(false);
+    const originalMatchMedia = window.matchMedia.bind(window);
+    spyOn(window, 'matchMedia').and.callFake(query => {
+      const result = originalMatchMedia(query);
+      return query === '(display-mode: standalone)' ? { ...result, matches: true } : result;
+    });
+    expect(touch('touchstart', [[1, 8, 250]], 0).defaultPrevented).toBeTrue();
+    touch('touchend', [[1, 110, 252]], 300);
+    expect(component.mobileOpen()).toBeTrue();
+  });
+
+  it('keeps the browser back edge available outside the installed iOS app', () => {
+    installedIOS(false);
+    expect(touch('touchstart', [[1, 8, 250]], 0).defaultPrevented).toBeFalse();
+    touch('touchend', [[1, 110, 252]], 300);
+    expect(component.mobileOpen()).toBeFalse();
+  });
+
+  it('keeps the PWA menu button tappable at the reserved edge and ignores a duplicate click', () => {
+    installedIOS();
+    const button = fixture.nativeElement.querySelector('.mobile-menu-btn') as HTMLElement;
+    expect(touch('touchstart', [[1, 18, 40]], 0, button).defaultPrevented).toBeTrue();
+    touch('touchend', [[1, 18, 40]], 100, button);
+    expect(component.mobileOpen()).toBeTrue();
+    const duplicate = new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 });
+    button.dispatchEvent(duplicate);
+    expect(duplicate.defaultPrevented).toBeTrue();
+    expect(component.mobileOpen()).toBeTrue();
+    touch('touchstart', [[1, 18, 40]], 200, button);
+    touch('touchend', [[1, 18, 40]], 300, button);
+    expect(component.mobileOpen()).toBeFalse();
+  });
+
+  it('keeps vertical scrolling and form controls native outside the reserved edge in the PWA', () => {
+    installedIOS();
+    expect(touch('touchstart', [[1, 60, 250]], 0).defaultPrevented).toBeFalse();
+    expect(touch('touchmove', [[1, 62, 320]], 200).defaultPrevented).toBeFalse();
+    touch('touchend', [[1, 62, 320]], 300);
+    const input = document.createElement('input'); surface.append(input);
+    expect(touch('touchstart', [[1, 8, 250]], 400, input).defaultPrevented).toBeFalse();
+    touch('touchend', [[1, 110, 250]], 500, input);
+    expect(component.mobileOpen()).toBeFalse();
   });
 
   it('restores the closed drawer when cancelled or interrupted by another finger', () => {

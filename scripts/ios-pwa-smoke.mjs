@@ -56,9 +56,12 @@ try {
           changedTouches: { value: changedTouches },
         });
         target.dispatchEvent(event);
+        return event.defaultPrevented;
       };
-      dispatch('touchstart', [start], [start]);
+      const claimedStart = dispatch('touchstart', [start], [start]);
+      dispatch('touchmove', [end], [end]);
       dispatch('touchend', [], [end]);
+      return claimedStart;
     }, [x0, y0, x1, y1]);
     const sidebar = page.locator('#finflow-sidebar');
     await swipe(8, 240, 155, 243);
@@ -67,6 +70,16 @@ try {
     await page.waitForFunction(() => document.querySelector('#finflow-sidebar')?.classList.contains('open'));
     await swipe(200, 245, 55, 245);
     await page.waitForFunction(() => !document.querySelector('#finflow-sidebar')?.classList.contains('open'));
+    // Emulate the installed-app flag; synthetic WebKit events verify early
+    // cancellation, while the native iPhone history recognizer needs a device check.
+    await page.evaluate(() => Object.defineProperty(navigator, 'standalone', { configurable: true, value: true }));
+    const historyBefore = await page.evaluate(() => ({ length: history.length, url: location.href }));
+    assert.equal(await swipe(8, 240, 155, 243), true, 'The PWA must reserve the edge before iOS starts navigating');
+    await page.waitForFunction(() => document.querySelector('#finflow-sidebar')?.classList.contains('open'));
+    assert.deepEqual(await page.evaluate(() => ({ length: history.length, url: location.href })), historyBefore);
+    await swipe(200, 245, 55, 245);
+    await page.waitForFunction(() => !document.querySelector('#finflow-sidebar')?.classList.contains('open'));
+    await page.evaluate(() => { delete navigator.standalone; });
     const categories = page.locator('.categories-heading'); await categories.waitFor();
     await Promise.all([page.waitForResponse(r => r.url().includes('/preferences/ui/categories.intro') && r.request().method() === 'PUT'), categories.getByRole('button', { name: 'Ocultar presentación', exact: true }).click()]);
     await categories.waitFor({ state: 'hidden' });

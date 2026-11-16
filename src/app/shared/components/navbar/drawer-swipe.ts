@@ -1,5 +1,6 @@
 /** A single-finger drawer drag. All distances are CSS pixels, time is milliseconds. */
 export class DrawerSwipe {
+  static readonly BACK_EDGE_WIDTH = 24;
   private axis: 'pending' | 'horizontal' | 'rejected' = 'pending';
   private lastX: number;
   private lastTime: number;
@@ -28,12 +29,13 @@ export class DrawerSwipe {
     this.lastTime = time;
   }
 
-  static canStart(x: number, viewportWidth: number, open: boolean, fromMenuButton = false): boolean {
+  static canStart(x: number, viewportWidth: number, open: boolean, fromMenuButton = false, captureBackEdge = false): boolean {
     if (viewportWidth > 768 || viewportWidth <= 0) return false;
-    // Permit rightward swipes from any horizontal position while preserving the OS back edge.
+    // Installed iOS apps reserve the edge at touchstart; browser tabs keep native history gestures.
     if (open) return true;
+    if (captureBackEdge) return x >= 0 && x <= viewportWidth;
     if (fromMenuButton && x >= 0 && x <= Math.min(88, viewportWidth * .36)) return true;
-    return x >= 24 && x <= viewportWidth;
+    return x >= DrawerSwipe.BACK_EDGE_WIDTH && x <= viewportWidth;
   }
 
   get active(): boolean { return this.axis === 'horizontal'; }

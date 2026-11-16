@@ -60,6 +60,18 @@ test('opening zone protects the browser back edge and desktop navigation', () =>
   assert.equal(DrawerSwipe.canStart(60, 1280, false), false);
 });
 
+test('an installed iOS app can reserve the entire left edge for its drawer', () => {
+  for (const width of [320, 375, 430, 768]) {
+    for (const x of [0, 8, 18, 23]) {
+      assert.equal(DrawerSwipe.canStart(x, width, false, false, true), true);
+      const drag = new DrawerSwipe(7, x, 200, false, 320, 0);
+      assert.notEqual(drag.move(x + 100, 202, 200), null);
+      assert.equal(drag.finish(300), true);
+    }
+  }
+  assert.equal(DrawerSwipe.canStart(8, 1280, false, false, true), false);
+});
+
 test('a small diagonal wobble does not prematurely discard a horizontal swipe', () => {
   const drag = swipe();
   assert.equal(drag.move(59, 211, 15), null);
