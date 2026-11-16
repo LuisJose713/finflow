@@ -122,6 +122,18 @@
           </button>
         </form>
 
+        <div class="google-register-entry">
+          <p class="auth-footer">O regístrate con tu cuenta de Google</p>
+          @if (policy()?.ready && privacyReviewed() && form.controls.privacyAccepted.value) {
+            <app-google-sign-in mode="register"
+              (credentialReceived)="onGoogleCredential($event)"
+              (errorOccurred)="errorMsg.set($event)"/>
+          } @else {
+            <p class="auth-footer">Para registrarte con Google, primero lee y autoriza el tratamiento de datos.</p>
+            <button type="button" class="privacy-open-modal" (click)="openPrivacyModal()">Autorizar y continuar con Google</button>
+          }
+        </div>
+
         <p class="auth-footer">
           ¿Ya tienes cuenta?
           <a routerLink="/login">Inicia sesión</a>
