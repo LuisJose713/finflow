@@ -142,7 +142,7 @@ export class RegisterComponent {
     });
   }
 
-  private finishRegistration(userId: number) {
+  private finishRegistration(userId: string) {
     this.toast.success('¡Cuenta creada exitosamente!');
     void this.router.navigate(['/dashboard']).then(navigated => {
       if (navigated) {
