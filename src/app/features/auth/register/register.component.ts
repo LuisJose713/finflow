@@ -131,13 +131,24 @@ export class RegisterComponent {
       error: (error: HttpErrorResponse) => {
         this.loading.set(false);
         const code = error.error?.code;
+        const details = typeof error.error?.error === 'string' ? error.error.error : '';
         this.errorMsg.set(code === 'GOOGLE_LINK_REQUIRED'
           ? 'Este correo ya tiene una cuenta. Inicia sesión con tu contraseña y vincula Google desde Seguridad.'
           : code === 'PRIVACY_CONSENT_REQUIRED'
             ? 'Debes autorizar la política vigente antes de continuar.'
             : error.status === 0
               ? 'No pudimos conectar con el servidor. Inténtalo nuevamente.'
-              : 'No pudimos crear tu cuenta con Google. Inténtalo nuevamente.');
+              : error.status === 429
+                ? 'Demasiados intentos con Google. Espera un momento y vuelve a intentarlo.'
+                : error.status === 401 || error.status === 403
+                  ? 'Google no pudo verificar el acceso. Vuelve a seleccionar tu cuenta de Google.'
+                  : error.status === 404
+                    ? 'El registro con Google no está disponible en el servidor.'
+                    : error.status >= 500
+                      ? 'El servidor tuvo un error al crear la cuenta con Google. No lo intentes repetidamente; vuelve a probar más tarde.'
+                      : details && error.status < 500
+                        ? details.slice(0, 240)
+                        : 'No pudimos crear tu cuenta con Google (HTTP ' + error.status + '). Inténtalo nuevamente.');
       },
     });
   }
