@@ -10,7 +10,8 @@ import { firstValueFrom } from 'rxjs';
   styleUrl: './google-sign-in.component.css',
 })
 export class GoogleSignInComponent implements AfterViewInit, OnDestroy {
-  @Input() mode: 'login' | 'link' = 'login';
+  @Input() mode: 'login' | 'link' | 'register' = 'login';
+  @Output() credentialReceived = new EventEmitter<string>();
   @Output() completed = new EventEmitter<void>();
   @Output() errorOccurred = new EventEmitter<string>();
   @ViewChild('googleButton') private button?: ElementRef<HTMLElement>;
@@ -60,6 +61,9 @@ export class GoogleSignInComponent implements AfterViewInit, OnDestroy {
     try {
       if (this.mode === 'login') {
         await firstValueFrom(this.auth.googleLogin(token));
+      } else if (this.mode === 'register') {
+        this.credentialReceived.emit(token);
+        return;
       } else {
         const status = await this.google.link(token);
         this.linked.set(status.linked);
@@ -68,7 +72,9 @@ export class GoogleSignInComponent implements AfterViewInit, OnDestroy {
       if (!this.destroyed) this.completed.emit();
     } catch (e: any) {
       if (this.destroyed) return;
-      const response = e?.error?.code === 'GOOGLE_LINK_REQUIRED'
+      const response = e?.error?.code === 'GOOGLE_REGISTRATION_REQUIRED'
+        ? 'Si todavía no tienes cuenta, regístrate con Google.'
+        : e?.error?.code === 'GOOGLE_LINK_REQUIRED'
         ? 'Inicia sesión con tu contraseña y vincula Google desde Seguridad antes de usar este acceso.'
         : 'No pudimos confirmar Google. Revisa que uses el mismo correo y vuelve a intentarlo.';
       this.error.set(response);
