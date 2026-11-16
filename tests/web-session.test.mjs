@@ -34,6 +34,60 @@ test('login exposes only the profile and stores both credentials as protected ho
   assert.match(result.headers.get('cache-control'), /no-store/);
 });
 
+test('Google sign-in and signup establish a session without an existing session or renewal', async () => {
+  for (const path of ['auth/google/login', 'auth/google/register']) {
+    for (const cookie of [undefined, '__Host-finflow_session=' + jwt(-1) + '; __Host-finflow_refresh=' + 'r'.repeat(43)]) {
+      let calls = 0;
+      const body = { idToken: 'google-proof', privacyAccepted: true, privacyVersion: 'current', marketingConsent: false };
+      const handle = createSessionHandler({ fetchImpl: async (url, options) => {
+        calls++;
+        assert.equal(url, 'https://finflow-backend-production.up.railway.app/' + path);
+        assert.equal(options.method, 'POST');
+        assert.equal(options.headers.get('Authorization'), null);
+        assert.equal(options.headers.get('Cookie'), null);
+        assert.deepEqual(JSON.parse(options.body.toString()), body);
+        return response(tokens());
+      } });
+      const result = await handle(request(path, { method: 'POST', body, cookie }));
+      assert.equal(result.status, 200, path);
+      assert.equal(calls, 1);
+      assert.deepEqual(await result.json(), { user });
+      assert.equal(result.headers.getSetCookie().length, 2);
+      assert.ok(result.headers.getSetCookie().every(value => value.includes('HttpOnly; Secure; SameSite=Lax')));
+      assert.match(result.headers.get('cache-control'), /no-store/);
+    }
+  }
+});
+
+test('Google signup preserves backend validation failures and never issues a session on rejection', async () => {
+  for (const [status, body] of [
+    [401, { error: 'Credencial de Google inválida' }],
+    [409, { code: 'GOOGLE_LINK_REQUIRED', error: 'Vincula tu cuenta desde Seguridad.' }],
+    [400, { code: 'PRIVACY_CONSENT_REQUIRED', error: 'Confirma la política vigente.' }],
+  ]) {
+    let calls = 0;
+    const handle = createSessionHandler({ fetchImpl: async () => { calls++; return response(body, status); } });
+    const result = await handle(request('auth/google/register', { method: 'POST', body: { idToken: 'google-proof' } }));
+    assert.equal(result.status, status);
+    assert.equal(calls, 1);
+    assert.deepEqual(await result.json(), body);
+    assert.equal(result.headers.getSetCookie().length, 0);
+  }
+});
+
+test('public Google signup still requires the same origin and keeps account linking private', async () => {
+  let calls = 0;
+  const handle = createSessionHandler({ fetchImpl: async () => { calls++; return response({}); } });
+  for (const source of ['https://attacker.example', null]) {
+    const result = await handle(request('auth/google/register', { method: 'POST', source, body: { idToken: 'google-proof' } }));
+    assert.equal(result.status, 403);
+  }
+  for (const [path, method] of [['auth/google/status', 'GET'], ['auth/google/link', 'POST'], ['auth/google/link', 'DELETE'], ['auth/google/password', 'POST']]) {
+    assert.equal((await handle(request(path, { method }))).status, 401);
+  }
+  assert.equal(calls, 0);
+});
+
 test('writes from another origin or without an Origin are rejected before any upstream call', async () => {
   let calls = 0;
   const handle = createSessionHandler({ fetchImpl: async () => { calls++; return response({}); } });
