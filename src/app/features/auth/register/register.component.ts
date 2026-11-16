@@ -11,6 +11,8 @@ import { PrivacyPolicy, PrivacyService } from '../../../core/services/privacy.se
 import { PrivacyPolicyComponent } from '../../../shared/components/privacy-policy.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { GoogleSignInComponent } from '../../../shared/components/google-sign-in/google-sign-in.component';
+import { HttpErrorResponse } from '@angular/common/http';
 
 function passwordMatchValidator(
   control: AbstractControl
@@ -23,7 +25,7 @@ function passwordMatchValidator(
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, PrivacyPolicyComponent],
+  imports: [ReactiveFormsModule, RouterLink, PrivacyPolicyComponent, GoogleSignInComponent],
   templateUrl: './register.component.html',
   styleUrl: '../login/login.component.scss',
 })
@@ -110,6 +112,51 @@ export class RegisterComponent {
   get email() { return this.form.get('email'); }
   get password() { return this.form.get('password'); }
 
+  onGoogleCredential(idToken: string) {
+    if (this.loading()) return;
+    if (!this.policy()?.ready || !this.form.controls.privacyAccepted.value || !this.privacyReviewed()) {
+      this.privacyError.set('Lee y confirma la política de tratamiento de datos antes de registrarte con Google.');
+      this.openPrivacyModal();
+      return;
+    }
+    this.loading.set(true);
+    this.errorMsg.set('');
+    this.auth.googleRegister({
+      idToken,
+      privacyAccepted: true,
+      privacyVersion: this.policy()!.version,
+      marketingConsent: Boolean(this.form.controls.marketingConsent.value),
+    }).subscribe({
+      next: result => this.finishRegistration(result.user.id),
+      error: (error: HttpErrorResponse) => {
+        this.loading.set(false);
+        const code = error.error?.code;
+        this.errorMsg.set(code === 'GOOGLE_LINK_REQUIRED'
+          ? 'Este correo ya tiene una cuenta. Inicia sesión con tu contraseña y vincula Google desde Seguridad.'
+          : code === 'PRIVACY_CONSENT_REQUIRED'
+            ? 'Debes autorizar la política vigente antes de continuar.'
+            : error.status === 0
+              ? 'No pudimos conectar con el servidor. Inténtalo nuevamente.'
+              : 'No pudimos crear tu cuenta con Google. Inténtalo nuevamente.');
+      },
+    });
+  }
+
+  private finishRegistration(userId: number) {
+    this.toast.success('¡Cuenta creada exitosamente!');
+    void this.router.navigate(['/dashboard']).then(navigated => {
+      if (navigated) {
+        this.privacy.queueSignupNotice(userId);
+      } else {
+        this.loading.set(false);
+        this.errorMsg.set('La cuenta se creó, pero no pudimos abrir el inicio. Entra desde el panel principal.');
+      }
+    }).catch(() => {
+      this.loading.set(false);
+      this.errorMsg.set('La cuenta se creó, pero hubo un error de navegación. Intenta abrir el inicio.');
+    });
+  }
+
   onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -135,22 +182,7 @@ export class RegisterComponent {
         marketingConsent: Boolean(marketingConsent)
       } : {})
     }).subscribe({
-      next: result => {
-        this.toast.success('¡Cuenta creada exitosamente!');
-        // First enter the financial home; only then open the one-time notice.
-        // This must not be confused with a legal authorization receipt.
-        void this.router.navigate(['/dashboard']).then(navigated => {
-          if (navigated) {
-            this.privacy.queueSignupNotice(result.user.id);
-          } else {
-            this.loading.set(false);
-            this.errorMsg.set('La cuenta se creó, pero no pudimos abrir el inicio. Entra desde el panel principal.');
-          }
-        }).catch(() => {
-          this.loading.set(false);
-          this.errorMsg.set('La cuenta se creó, pero hubo un error de navegación. Intenta abrir el inicio.');
-        });
-      },
+      next: result => this.finishRegistration(result.user.id),
       error: (err: string) => {
         this.errorMsg.set(err);
         this.loading.set(false);
