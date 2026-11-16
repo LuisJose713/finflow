@@ -7,11 +7,12 @@ import { RouterLink } from '@angular/router';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { AdminOverview, AdminPlatformHealth, AdminService } from '../../core/services/admin.service';
 import { AuthService } from '../../core/services/auth.service';
+import { AdminNotificationsComponent } from './notifications/admin-notifications.component';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [DismissibleCardDirective, CommonModule, NavbarComponent, RouterLink],
+  imports: [DismissibleCardDirective, CommonModule, NavbarComponent, RouterLink, AdminNotificationsComponent],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss'
 })

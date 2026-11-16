@@ -94,6 +94,9 @@ async function mockApi(route, authenticated = true) {
   });
   else if (p === '/transactions/years') response = [2026];
   else if (p === '/admin/overview') response = adminStats;
+  else if (p === '/admin/notifications') response = {
+    capabilities: { webReady: true, timezone: 'America/Bogota', webSubscriptions: 1, nativeDevices: 1 }, campaigns: [],
+  };
   else if (p === '/admin/monitor') response = {
     overall: 'DEGRADED', checkedAt: '2026-11-09T20:00:00Z',
     services: [

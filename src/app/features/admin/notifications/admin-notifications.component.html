@@ -1,0 +1,50 @@
+<section class="notification-workspace" aria-labelledby="admin-notifications-title">
+  <header class="notification-heading">
+    <div><span class="notification-overline">COMUNICACIÓN · FINFLOW</span><h2 id="admin-notifications-title">Notificaciones programadas</h2>
+      <p>Escribe el mensaje y elige cuándo quieres que comience el envío.</p></div>
+    <button type="button" class="secondary" (click)="refresh()" [disabled]="loading()">Actualizar</button>
+  </header>
+  <p *ngIf="error()" class="feedback error" role="alert">{{ error() }}</p>
+  <p *ngIf="message()" class="feedback success" role="status">{{ message() }}</p>
+  <div *ngIf="data() as current" class="notification-capabilities">
+    <span>Web: {{ current.capabilities.webReady ? 'disponible' : 'sin configurar' }} · {{ current.capabilities.webSubscriptions }} suscripciones</span>
+    <span>Apps: {{ current.capabilities.nativeDevices }} dispositivos activados</span>
+  </div>
+  <form (ngSubmit)="schedule()" class="notification-form">
+    <div class="notification-editor">
+      <label for="notification-title">Título</label>
+      <input id="notification-title" name="notificationTitle" [(ngModel)]="title" maxlength="80" required placeholder="Una novedad de FinFlow" />
+      <label for="notification-body">Mensaje</label>
+      <textarea id="notification-body" name="notificationBody" [(ngModel)]="body" maxlength="320" required rows="4" placeholder="¿Qué quieres contarles?"></textarea>
+      <small>{{ body.length }}/320 caracteres</small>
+      <div class="notification-options">
+        <div><label for="notification-when">Fecha y hora de Colombia (UTC−5)</label>
+          <input id="notification-when" name="notificationWhen" type="datetime-local" [(ngModel)]="when" required /></div>
+        <div><label for="notification-audience">Destinatarios</label>
+          <select id="notification-audience" name="notificationAudience" [(ngModel)]="audience">
+            <option value="SELF">Solo yo · Prueba privada</option>
+            <option value="ALL">Todos los suscritos</option>
+          </select></div>
+      </div>
+      <button class="primary" type="submit" [disabled]="saving() || !data()">{{ saving() ? 'Programando…' : 'Programar mensaje' }}</button>
+    </div>
+    <aside class="notification-preview" aria-label="Vista previa de la notificación">
+      <span class="notification-overline">VISTA PREVIA</span>
+      <div class="preview-brand"><img src="/finflow-icon-classic.svg" width="32" height="32" alt="" /><strong>FinFlow</strong></div>
+      <h3>{{ title || 'El título de tu mensaje' }}</h3><p>{{ body || 'Así se verá el contenido de tu notificación.' }}</p>
+      <small>La recepción depende de los permisos, la conexión y las restricciones de batería del teléfono.</small>
+    </aside>
+  </form>
+  <div class="notification-history" aria-live="polite">
+    <h3>Mensajes recientes</h3>
+    <p *ngIf="loading() && !data()">Consultando programación…</p>
+    <p *ngIf="data()?.campaigns?.length === 0" class="empty">Todavía no has programado mensajes.</p>
+    <article *ngFor="let item of data()?.campaigns" class="campaign">
+      <div class="campaign-copy"><span class="campaign-status">{{ status(item.status) }}</span><h4>{{ item.title }}</h4><p>{{ item.body }}</p>
+        <small>{{ item.scheduledAt | date:'dd/MM/yyyy HH:mm':'-0500' }} · Colombia · {{ item.audience === 'ALL' ? 'Todos los suscritos' : 'Solo administrador' }}</small>
+        <small *ngIf="item.status === 'SENT'">Web: {{ item.acceptedWeb }} aceptadas por el servicio, {{ item.failedWeb }} con error · Apps: {{ item.nativeDevices }} dispositivos disponibles para sincronizar.</small>
+      </div>
+      <button *ngIf="item.status === 'SCHEDULED'" type="button" class="secondary" [disabled]="!!cancelling()" (click)="cancel(item.id)">Cancelar envío</button>
+    </article>
+  </div>
+</section>

@@ -64,6 +64,8 @@
       </ng-container>
     </section>
 
+    <app-admin-notifications></app-admin-notifications>
+
     <div *ngIf="loading()" class="admin-state" role="status">Cargando información de la plataforma…</div>
     <section *ngIf="error()" class="admin-state admin-error" role="alert">
       <p>{{ error() }}</p>

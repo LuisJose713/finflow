@@ -18,13 +18,12 @@ export class DailyRemindersService {
     this.supported ? Notification.permission : 'denied'
   );
   private userId: string | null = null;
-  private readonly allowedEmail = 'stpptx@icloud.com';
 
   start(userId: string | null): void {
     if (this.userId === userId) return;
     this.stop();
     this.userId = userId;
-    if (!userId || userId.toLowerCase() !== this.allowedEmail || !this.supported) return;
+    if (!userId || !this.supported) return;
     const preferred = this.read(this.preferenceKey(userId)) === 'true';
     // A saved toggle is not a verified server push subscription.
     this.enabled.set(false);
@@ -54,7 +53,7 @@ export class DailyRemindersService {
   }
 
   async enable(): Promise<boolean> {
-    if (!this.userId || this.userId.toLowerCase() !== this.allowedEmail || !this.supported) return false;
+    if (!this.userId || !this.supported) return false;
     // Called directly from a user click: required by browsers / iOS installed PWAs.
     const permission = await Notification.requestPermission();
     this.permission.set(permission);
