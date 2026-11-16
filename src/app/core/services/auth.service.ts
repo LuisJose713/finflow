@@ -100,6 +100,12 @@ export class AuthService {
     );
   }
 
+  googleRegister(data: { idToken: string; privacyAccepted: boolean; privacyVersion: string; marketingConsent: boolean }) {
+    return this.http.post<AuthResponse>(this.apiUrl + '/google/register', data).pipe(
+      tap(response => this.saveSession(response)),
+    );
+  }
+
   register(data: RegisterRequest) {
     return this.http.post<AuthResponse>(this.apiUrl + '/register', data).pipe(
       tap(res => this.saveSession(res)),
