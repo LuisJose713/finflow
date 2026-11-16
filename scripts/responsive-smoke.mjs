@@ -14,6 +14,8 @@ const browser = await chromium.launch({
 });
 const base = 'http://127.0.0.1:4200';
 const widths = [320, 375, 430, 768, 1024, 1440];
+// DOMRect subtraction can report 43.999938px for a 44px CSS target.
+const geometryEpsilon = 0.01;
 const failures = [];
 const output = 'artifacts/responsive';
 fs.mkdirSync(output, { recursive: true });
@@ -497,7 +499,7 @@ for (const width of widths) {
       width: button.getBoundingClientRect().width,
       height: button.getBoundingClientRect().height,
     }));
-    assert(iconActions.icon && iconActions.width >= 44 && iconActions.height >= 44,
+    assert(iconActions.icon && iconActions.width + geometryEpsilon >= 44 && iconActions.height + geometryEpsilon >= 44,
       `${width}px goal actions need menu-style vector icons and 44px touch targets`);
     await checkDialog(page, width, 'crear-meta', async () => {
       await page.locator('button.btn-new').first().click();
@@ -519,7 +521,7 @@ for (const width of widths) {
       const bounds = button.getBoundingClientRect();
       return { opacity: getComputedStyle(button.parentElement).opacity, width: bounds.width, height: bounds.height };
     });
-    assert(pendingActions.opacity === '1' && pendingActions.width >= 44 && pendingActions.height >= 44,
+    assert(pendingActions.opacity === '1' && pendingActions.width + geometryEpsilon >= 44 && pendingActions.height + geometryEpsilon >= 44,
       `${width}px pending expense actions need visible 44px touch targets: ${JSON.stringify(pendingActions)}`);
     await checkDialog(page, width, 'crear-gasto', async () => {
       await page.getByRole('button', { name: /Nuevo gasto/i }).first().click();
