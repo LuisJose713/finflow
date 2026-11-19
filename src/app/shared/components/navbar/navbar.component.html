@@ -22,6 +22,10 @@
       <span class="nav-label" *ngIf="!collapsed() || mobileVisible()">{{ item.label }}</span>
       </a>
     </ng-container>
+    <button type="button" class="nav-item" title="Volver a ver la guía" (click)="replayGuide()" [style.width.%]="100" [style.text-align]="'left'">
+      <span class="nav-icon" aria-hidden="true">?</span>
+      <span class="nav-label" *ngIf="!collapsed() || mobileVisible()">Guía de FinFlow</span>
+    </button>
     <a routerLink="/pricing" routerLinkActive="active" class="nav-item" title="Planes" (click)="onNavigateFromMenu()">
       <span class="nav-icon" aria-hidden="true">◈</span>
       <span class="nav-label" *ngIf="!collapsed() || mobileVisible()">Planes y precios</span>
