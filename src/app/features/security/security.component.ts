@@ -2,10 +2,11 @@ import { DismissibleCardDirective } from '../../shared/directives/dismissible-ca
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { DailyRemindersService } from '../../core/services/daily-reminders.service';
+import { PageGuideService } from '../../core/services/page-guide.service';
 import { AuthService } from '../../core/services/auth.service';
 import { environment } from '@environments/environment';
 import { GoogleSignInComponent } from '../../shared/components/google-sign-in/google-sign-in.component';
@@ -16,6 +17,11 @@ import { GoogleSignInComponent } from '../../shared/components/google-sign-in/go
 })
 export class SecurityComponent {
  private readonly http=inject(HttpClient);
+ private readonly router=inject(Router);
+ private readonly guide=inject(PageGuideService);
+ replayGuide(): void {
+   void this.router.navigateByUrl('/dashboard').then(ok => { if (ok) this.guide.start('/dashboard'); });
+ }
  readonly auth=inject(AuthService);
  readonly reminders=inject(DailyRemindersService);
  readonly pushBusy=signal(false);
