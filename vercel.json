@@ -72,6 +72,10 @@
   ],
   "rewrites": [
     {
+      "source": "/descargar-android",
+      "destination": "/api/download-android"
+    },
+    {
       "source": "/api/:path*",
       "destination": "/api/session?__finflow_path=:path*"
     }
