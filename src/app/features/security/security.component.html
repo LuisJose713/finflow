@@ -34,6 +34,7 @@
       <button class="security-primary" type="submit" [disabled]="busy() || !newEmail || !confirmEmail || !emailPassword">Actualizar correo</button>
     </form>
     <a class="profile-password-link" href="#change-password-title">Cambiar contraseña</a>
+    <button type="button" class="security-secondary" (click)="replayGuide()">Volver a ver la guía de FinFlow</button>
   </section>
   <div class="security-grid">
    <section class="security-panel" aria-labelledby="change-password-title">
@@ -83,7 +84,7 @@
     <p *ngIf="!reminders.supported">Este navegador no ofrece notificaciones Web Push. En iPhone, instala FinFlow en la pantalla de inicio y ábrelo desde su icono.</p>
     <p>En iPhone debes abrir FinFlow desde el icono instalado en la pantalla de inicio para activar las notificaciones.</p>
     <button *ngIf="!reminders.enabled()" type="button" class="security-primary" [disabled]="pushBusy() || !reminders.supported" (click)="activatePush()">Activar notificaciones</button>
-    <button *ngIf="reminders.enabled()" type="button" class="security-secondary" [disabled]="pushBusy()" (click)="deactivatePush()">Desactivar notificaciones</button>
+    <p *ngIf="reminders.enabled()">Notificaciones activas. Puedes administrar los permisos de FinFlow desde los ajustes del navegador o del sistema.</p>
     <button type="button" class="security-secondary" [disabled]="pushBusy() || !reminders.enabled()" (click)="testPush()">Enviar notificación de prueba</button>
   </section>
   <section class="security-panel security-danger-zone" aria-labelledby="delete-account-title">
