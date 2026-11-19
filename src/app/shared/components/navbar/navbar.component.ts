@@ -10,6 +10,7 @@ import { environment } from '../../../../environments/environment';
 import { DrawerSwipe } from './drawer-swipe';
 import { CurrencyDisplayService, DisplayCurrency } from '../../../core/services/currency-display.service';
 import { QuickCreateService, QUICK_CREATE, QuickCreateConfig } from '../../../core/services/quick-create.service';
+import { PageGuideService } from '../../../core/services/page-guide.service';
 
 interface NavItem {
   path: string;
@@ -35,6 +36,11 @@ export class NavbarComponent implements AfterViewInit {
 
   auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly guide = inject(PageGuideService);
+  replayGuide(): void {
+    this.onNavigateFromMenu();
+    void this.router.navigateByUrl('/dashboard').then(ok => { if (ok) this.guide.start('/dashboard'); });
+  }
   private readonly quickCreateService = inject(QuickCreateService);
   readonly currentPath = signal(this.router.url.split(/[?#]/)[0]);
   readonly createAction = computed<QuickCreateConfig | null>(() =>
