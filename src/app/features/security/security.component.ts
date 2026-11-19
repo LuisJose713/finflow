@@ -89,6 +89,18 @@ export class SecurityComponent {
    } catch { this.error.set('No se pudo activar Web Push.'); }
    finally { this.pushBusy.set(false); }
  }
+ async deactivatePush() {
+   if (this.pushBusy()) return;
+   this.pushBusy.set(true); this.error.set(''); this.message.set('');
+   try {
+     const confirmed = await this.reminders.disable();
+     this.message.set(confirmed
+       ? 'Notificaciones desactivadas en este dispositivo.'
+       : 'Notificaciones desactivadas en este navegador, pero no pudimos confirmar la baja con el servidor.');
+   } catch {
+     this.error.set('No pudimos desactivar las notificaciones. Inténtalo de nuevo.');
+   } finally { this.pushBusy.set(false); }
+ }
  async testPush() {
    if (this.pushBusy()) return;
    this.pushBusy.set(true); this.error.set(''); this.message.set('');

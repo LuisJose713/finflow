@@ -7,9 +7,14 @@ self.addEventListener('push', event => {
   const title = typeof payload.title === 'string' ? payload.title.slice(0, 120) : 'FinFlow';
   const body = typeof payload.body === 'string' ? payload.body.slice(0, 240) : '';
   const url = payload.url === '/transactions' ? '/transactions' : '/dashboard';
+  // Distinct campaigns must not replace one another. Only known, bounded tags
+  // can intentionally deduplicate daily reminders and repeated campaigns.
+  const tag = typeof payload.tag === 'string' &&
+    /^finflow-(?:daily-(?:10|16)|message-[0-9a-fA-F-]{36}|test)$/.test(payload.tag)
+    ? payload.tag : undefined;
   event.waitUntil(self.registration.showNotification(title, {
     body, icon: '/icons/finflow-192.png', badge: '/icons/finflow-192.png',
-    tag: payload.tag === 'finflow-daily-16' ? 'finflow-daily-16' : 'finflow-daily-10', data: { url }
+    ...(tag ? { tag } : {}), data: { url }
   }));
 });
 self.addEventListener('notificationclick', event => {

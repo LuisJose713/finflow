@@ -75,11 +75,15 @@
     </div>
    </section>
   </div>
-  <section class="security-panel" *ngIf="auth.currentUser()?.email?.toLowerCase() === 'stpptx@icloud.com'">
+  <section class="security-panel" aria-labelledby="finflow-push-title">
     <span class="security-kicker">FINFLOW · NOTIFICACIONES</span>
-    <h2>Recordatorio privado</h2>
-    <p>Solo para tu cuenta, todos los días a las 10:00 a. m. (Colombia). En iPhone debes abrir FinFlow desde el icono instalado en la pantalla de inicio.</p>
-    <button type="button" class="security-primary" [disabled]="pushBusy()" (click)="activatePush()">Activar notificaciones</button>
+    <h2 id="finflow-push-title">Notificaciones en este dispositivo</h2>
+    <p>Recibe los recordatorios diarios a las 10:00 a. m. y 4:00 p. m. (hora de Colombia), además de los mensajes programados por el administrador.</p>
+    <p *ngIf="reminders.supported">Estado: <strong>{{reminders.enabled() ? 'activadas' : 'no activadas'}}</strong>. Se comprueba la suscripción con el servidor; conceder el permiso del navegador no basta.</p>
+    <p *ngIf="!reminders.supported">Este navegador no ofrece notificaciones Web Push. En iPhone, instala FinFlow en la pantalla de inicio y ábrelo desde su icono.</p>
+    <p>En iPhone debes abrir FinFlow desde el icono instalado en la pantalla de inicio para activar las notificaciones.</p>
+    <button *ngIf="!reminders.enabled()" type="button" class="security-primary" [disabled]="pushBusy() || !reminders.supported" (click)="activatePush()">Activar notificaciones</button>
+    <button *ngIf="reminders.enabled()" type="button" class="security-secondary" [disabled]="pushBusy()" (click)="deactivatePush()">Desactivar notificaciones</button>
     <button type="button" class="security-secondary" [disabled]="pushBusy() || !reminders.enabled()" (click)="testPush()">Enviar notificación de prueba</button>
   </section>
   <section class="security-panel security-danger-zone" aria-labelledby="delete-account-title">

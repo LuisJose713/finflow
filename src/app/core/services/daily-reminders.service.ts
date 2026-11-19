@@ -46,8 +46,9 @@ export class DailyRemindersService {
       if (this.userId === user) this.enabled.set(true);
     } catch {
       if (this.userId === user) {
+        // A temporary backend/network outage must not erase consent or prevent
+        // a future page load from restoring an existing subscription.
         this.enabled.set(false);
-        this.write(this.preferenceKey(user), 'false');
       }
     }
   }
@@ -76,10 +77,17 @@ export class DailyRemindersService {
     }
   }
 
-  disable(): void {
+  async disable(): Promise<boolean> {
     if (this.userId) this.write(this.preferenceKey(this.userId), 'false');
     this.enabled.set(false);
-    void this.unsubscribePush();
+    try {
+      await this.unsubscribePush();
+      return true;
+    } catch {
+      // The browser subscription is also revoked in unsubscribePush's finally
+      // block even when the server is temporarily unreachable.
+      return false;
+    }
   }
 
   private async subscribePush(): Promise<void> {
