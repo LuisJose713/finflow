@@ -21,7 +21,7 @@ export class DashboardRefreshService {
   start(): void {
     if (this.interval || typeof document === 'undefined') return;
     this.lastAutomatic = Date.now();
-    this.interval = setInterval(this.onVisibility, 12_000);
+    this.interval = setInterval(this.onVisibility, 45_000);
     document.addEventListener('visibilitychange', this.onVisibility);
     window.addEventListener('focus', this.onVisibility);
   }
