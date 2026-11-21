@@ -79,13 +79,13 @@ export class AddTransactionComponent implements OnInit {
   }
 
 
-  open(transaction?: Transaction) {
+  open(transaction?: Transaction, initialType: TransactionType = 'expense') {
     if (this.loading()) return;
     this.editing.set(transaction ?? null);
     this.form.reset({
       amount: transaction?.amount ?? null,
       description: transaction?.description ?? '',
-      type: transaction?.type ?? 'expense', categoryId: transaction?.categoryId ?? null,
+      type: transaction?.type ?? initialType, categoryId: transaction?.categoryId ?? null,
       accountId: transaction?.accountId ?? null, date: transaction?.date?.split('T')[0] ?? this.today(),
       currency: transaction?.currency ?? 'COP', status: transaction?.status ?? 'completed',
     }, { emitEvent: false });
