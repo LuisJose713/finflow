@@ -73,6 +73,13 @@
   }
 }
 
+.btn-export.import {
+  background: var(--bg-secondary);
+  color: var(--primary);
+  text-decoration: none;
+  &:hover { filter: brightness(1.08); }
+}
+
 // ── Filters ───────────────────────────────────────────────
 .filters-card {
   background: var(--bg-secondary);
