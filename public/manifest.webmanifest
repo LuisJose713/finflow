@@ -10,8 +10,64 @@
   "background_color": "#09162A",
   "theme_color": "#09162A",
   "icons": [
-    { "src": "/icons/finflow-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/finflow-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/finflow-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "/icons/finflow-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/finflow-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/finflow-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Registrar gasto",
+      "short_name": "Nuevo gasto",
+      "description": "Crear un gasto en FinFlow",
+      "url": "/transactions?create=expense",
+      "icons": [
+        {
+          "src": "/icons/finflow-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Registrar ingreso",
+      "short_name": "Nuevo ingreso",
+      "description": "Crear un ingreso en FinFlow",
+      "url": "/transactions?create=income",
+      "icons": [
+        {
+          "src": "/icons/finflow-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Ver movimientos",
+      "short_name": "Movimientos",
+      "description": "Consultar los movimientos de FinFlow",
+      "url": "/transactions",
+      "icons": [
+        {
+          "src": "/icons/finflow-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
   ]
 }
