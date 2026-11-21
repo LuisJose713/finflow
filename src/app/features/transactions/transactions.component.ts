@@ -1,7 +1,7 @@
 import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
 import { Component, DestroyRef, inject, OnInit, AfterViewInit, signal, computed, effect, untracked, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,7 +19,7 @@ import { AddTransactionComponent } from '@shared/components/add-transaction/add-
   selector: 'app-transactions',
   standalone: true,
   imports: [DismissibleCardDirective, 
-    CommonModule, DatePipe, FormsModule,
+    CommonModule, DatePipe, FormsModule, RouterLink,
     AppCurrencyPipe, NavbarComponent, ToastContainerComponent, AddTransactionComponent
 ],
   templateUrl: './transactions.component.html',
