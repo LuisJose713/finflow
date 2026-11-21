@@ -1,6 +1,8 @@
 import { DismissibleCardDirective } from '../../shared/directives/dismissible-card.directive';
-import { Component, DestroyRef, inject, OnInit, signal, computed, effect, untracked, ViewChild } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, AfterViewInit, signal, computed, effect, untracked, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransactionService } from '@core/services/transaction.service';
@@ -23,9 +25,11 @@ import { AddTransactionComponent } from '@shared/components/add-transaction/add-
   templateUrl: './transactions.component.html',
   styleUrls: ['./transactions.component.scss'],
 })
-export class TransactionsComponent implements OnInit {
+export class TransactionsComponent implements OnInit, AfterViewInit {
   @ViewChild("transactionEditor") private transactionEditor?: AddTransactionComponent;
   edit(transaction: Transaction) { this.transactionEditor?.open(transaction); }
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private txService       = inject(TransactionService);
   private categoryService = inject(CategoryService);
   private toast           = inject(ToastService);
@@ -83,6 +87,26 @@ export class TransactionsComponent implements OnInit {
   ngOnInit() {
     this.loadCategories();
     this.loadYears();
+  }
+
+  // PWA shortcuts and iOS user-created URL shortcuts open a draft, never POST.
+  // Consume the query parameter once so returning from another screen does not
+  // unexpectedly reopen the composer. The server still validates the session.
+  ngAfterViewInit(): void {
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        const type = params.get('create');
+        if (type !== 'expense' && type !== 'income') return;
+        if (!this.transactionEditor) return;
+        this.transactionEditor.open(undefined, type);
+        void this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { create: null },
+          queryParamsHandling: 'merge',
+          replaceUrl: true,
+        });
+      });
   }
 
   loadCategories() {
