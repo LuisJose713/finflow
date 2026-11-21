@@ -1,0 +1,116 @@
+<div class="app-shell">
+  <app-navbar></app-navbar>
+  <main class="main-content">
+    <a class="back-link" routerLink="/transactions">← Volver a movimientos</a>
+    <header class="page-header">
+      <span class="eyebrow">FINFLOW SMART CAPTURE</span>
+      <h1>Importar extracto</h1>
+      <p>Deja que FinFlow prepare los movimientos. Tú revisas y decides qué guardar.</p>
+    </header>
+
+    <section class="import-card" aria-label="Seleccionar extracto">
+      <h2>1. Elige la billetera y tu archivo</h2>
+      <p>Importamos a una billetera en pesos colombianos. Admite CSV, Excel (.xlsx) y PDF con texto seleccionable, de máximo 3 MB.</p>
+      <div class="form-fields">
+        <label>
+          <span>Billetera de destino</span>
+          <select [ngModel]="accountId()" (ngModelChange)="onAccount($event)" [disabled]="loading() || saving()">
+            <option [ngValue]="null">Selecciona una billetera</option>
+            <option *ngFor="let account of accounts()" [ngValue]="account.id">{{ account.name }} · COP</option>
+          </select>
+        </label>
+        <label>
+          <span>Extracto bancario</span>
+          <input type="file" accept=".csv,.xlsx,.pdf,text/csv,application/pdf" (change)="onFile($event)"
+                 [disabled]="loading() || saving()" aria-label="Seleccionar extracto bancario"/>
+        </label>
+      </div>
+      <p class="file-note" *ngIf="file">Seleccionado: {{ file.name }}</p>
+      <button class="primary-action" type="button" [disabled]="!file || !accountId() || loading() || saving()"
+              (click)="analyze()">
+        {{ loading() ? 'Analizando extracto…' : 'Analizar movimientos' }}
+      </button>
+      <p class="privacy-note">El archivo se analiza para preparar la vista previa. No se almacena como comprobante y no genera movimientos automáticamente.</p>
+    </section>
+
+    <section class="import-card" *ngIf="preview()" aria-label="Revisar movimientos">
+      <div class="review-heading">
+        <div>
+          <h2>2. Revisa y confirma</h2>
+          <p>{{ preview()!.rows.length }} detectados · {{ preview()!.ignored }} ignorados · {{ preview()!.format }}</p>
+        </div>
+        <strong>{{ eligibleCount() }} seleccionados</strong>
+      </div>
+      <p class="hint">Los importes sin signo pueden requerir que indiques si son ingreso o gasto. Las transferencias y los posibles duplicados no se seleccionan por defecto.</p>
+      <div class="movements">
+        <article class="movement" *ngFor="let row of rows()" [class.duplicate]="row.status === 'duplicate'">
+          <div class="movement-heading">
+            <label class="check-control">
+              <input type="checkbox" [checked]="row.include" [disabled]="row.status === 'duplicate' || saving()"
+                     (change)="updateRow(row.rowNumber, { include: $any($event.target).checked })"/>
+              <span>Incluir movimiento {{ row.rowNumber }}</span>
+            </label>
+            <span class="status-pill" [attr.data-status]="row.status">{{ statusLabel(row) }}</span>
+          </div>
+          <div class="movement-fields">
+            <label class="description-field">
+              <span>Descripción</span>
+              <input type="text" [ngModel]="row.description"
+                     (ngModelChange)="updateRow(row.rowNumber, { description: $event })"
+                     maxlength="200" [disabled]="saving() || row.status === 'duplicate'"/>
+            </label>
+            <label>
+              <span>Fecha</span>
+              <input type="date" [ngModel]="row.date"
+                     (ngModelChange)="updateRow(row.rowNumber, { date: $event })"
+                     [disabled]="saving() || row.status === 'duplicate'"/>
+            </label>
+            <label>
+              <span>Monto (COP)</span>
+              <input type="number" inputmode="decimal" min="0.01" step="0.01"
+                     [ngModel]="row.amount" (ngModelChange)="updateRow(row.rowNumber, { amount: +$event })"
+                     [disabled]="saving() || row.status === 'duplicate'"/>
+            </label>
+            <label>
+              <span>Tipo</span>
+              <select [ngModel]="row.type" (ngModelChange)="updateRow(row.rowNumber, { type: $event, categoryId: null })"
+                      [disabled]="saving() || row.status === 'duplicate'">
+                <option [ngValue]="null">Seleccionar</option>
+                <option value="expense">Gasto</option>
+                <option value="income">Ingreso</option>
+              </select>
+            </label>
+            <label>
+              <span>Categoría (opcional)</span>
+              <select [ngModel]="row.categoryId" (ngModelChange)="updateRow(row.rowNumber, { categoryId: $event })"
+                      [disabled]="saving() || row.status === 'duplicate'">
+                <option [ngValue]="null">Sin categoría</option>
+                <option *ngFor="let category of categoriesFor(row.type)" [ngValue]="category.id">{{ category.name }}</option>
+              </select>
+            </label>
+          </div>
+          <p class="row-warning" *ngIf="row.note">{{ row.note }}</p>
+          <p class="row-warning" *ngIf="row.include && !valid(row)">Esta fila necesita una corrección antes de importarse.</p>
+        </article>
+      </div>
+      <div class="review-footer">
+        <p>Al confirmar, los ingresos y gastos se reflejarán en tu historial y en el saldo de la billetera. Puedes desmarcar cualquier fila.</p>
+        <button class="primary-action" type="button" (click)="save()"
+                [disabled]="saving() || eligibleCount() === 0">
+          {{ saving() ? 'Guardando…' : 'Confirmar ' + eligibleCount() + ' movimientos' }}
+        </button>
+      </div>
+    </section>
+
+    <section class="import-card result" *ngIf="result()" aria-live="polite">
+      <h2>Importación terminada</h2>
+      <p><strong>{{ result()!.created }}</strong> movimientos creados ·
+         {{ result()!.duplicatesSkipped }} duplicados omitidos ·
+         {{ result()!.excluded }} filas no seleccionadas.</p>
+      <a routerLink="/transactions">Ver movimientos</a>
+    </section>
+
+    <p class="footnote">Los PDF escaneados como imagen y las facturas fotografiadas necesitan reconocimiento de texto (OCR); todavía no están disponibles en esta importación. No compartas archivos con datos de terceros.</p>
+  </main>
+  <app-toast-container></app-toast-container>
+</div>
