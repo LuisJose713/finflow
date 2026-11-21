@@ -65,6 +65,12 @@ export const routes: Routes = [
       ),
     canActivate: [authGuard],
   },
+  {
+    path: "imports",
+    loadComponent: () => import("./features/statement-import/statement-import.component")
+      .then(m => m.StatementImportComponent),
+    canActivate: [authGuard],
+  },
    {
     path:"transactions",
     loadComponent: () =>
